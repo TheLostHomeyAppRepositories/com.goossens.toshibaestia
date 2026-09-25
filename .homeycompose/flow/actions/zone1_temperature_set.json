@@ -1,0 +1,92 @@
+{
+  "id": "zone1_temperature_set",
+  "title": {
+    "en": "Set water temperature",
+    "nl": "Watertemperatuur instellen",
+    "da": "Indstil vandtemperatur",
+    "de": "Wassertemperatur einstellen",
+    "es": "Establecer la temperatura del agua",
+    "fr": "Régler la température de l'eau",
+    "it": "Imposta la temperatura dell'acqua",
+    "no": "Still inn vanntemperatur",
+    "sv": "Ställ in vattentemperatur",
+    "pl": "Ustaw temperaturę wody",
+    "ru": "Установить температуру воды",
+    "ko": "물 온도 설정",
+    "ar": "ضبط درجة حرارة الماء"
+  },
+  "titleFormatted": {
+    "en": "Set water temperature to [[temperature]] °C",
+    "nl": "Watertemperatuur instellen op [[temperature]] °C",
+    "da": "Indstil vandtemperaturen til [[temperature]] °C",
+    "de": "Stelle die Wassertemperatur auf [[temperature]] °C ein.",
+    "es": "Establecer la temperatura del agua a [[temperature]] °C",
+    "fr": "Régler la température de l'eau à [[temperature]] °C",
+    "it": "Imposta la temperatura dell'acqua a [[temperature]] °C",
+    "no": "Sett vanntemperaturen til [[temperature]] °C",
+    "sv": "Ställ in vattentemperaturen till [[temperature]] °C",
+    "pl": "Ustaw temperaturę wody na [[temperature]] °C",
+    "ru": "Установите температуру воды на [[temperature]] °C",
+    "ko": "물 온도를 [[temperature]] °C로 설정하세요.",
+    "ar": "اضبط درجة حرارة الماء إلى [[temperature]] درجة مئوية"
+  },
+  "hint": {
+    "en": "Sets the Zone 1 setpoint (the water temperature for the floor). Has no effect while auto temperature is on — turn that off first.",
+    "nl": "Stelt het Zone 1-instelpunt in (de watertemperatuur voor de vloer). Werkt niet zolang auto-temperatuur aan staat — zet die eerst uit.",
+    "da": "Indstiller setpunktet for Zone 1 (vandtemperaturen til gulvet). Har ingen effekt, mens automatisk temperatur er tændt — sluk for det først.",
+    "de": "Legt den Sollwert für Zone 1 fest (die Wassertemperatur für den Boden). Hat keine Wirkung, solange die automatische Temperaturregelung aktiviert ist – schalte diese zuerst aus.",
+    "es": "Establece el punto de ajuste de la Zona 1 (la temperatura del agua para el suelo). No tiene efecto mientras la temperatura automática esté activada, apágala primero.",
+    "fr": "Règle le point de consigne de la Zone 1 (la température de l'eau pour le sol). N'a aucun effet tant que la température automatique est activée — désactivez-la d'abord.",
+    "it": "Imposta il setpoint della Zona 1 (la temperatura dell'acqua per il pavimento). Non ha effetto quando la temperatura automatica è attiva — disattivala prima.",
+    "no": "Setter sone 1-settpunktet (vanntemperaturen for gulvet). Har ingen effekt mens automatisk temperatur er på — slå det av først.",
+    "sv": "Ställer in setpunkten för Zon 1 (vattentemperaturen för golvet). Har ingen effekt när automatisk temperatur är på — stäng av det först.",
+    "pl": "Ustawia punkt nastawy dla Strefy 1 (temperaturę wody dla podłogi). Nie ma wpływu, gdy włączona jest automatyczna regulacja temperatury — najpierw ją wyłącz.",
+    "ru": "Устанавливает заданное значение для Зоны 1 (температура воды для пола). Не влияет, пока включен автоматический режим температуры — сначала отключите его.",
+    "ko": "존 1 설정값(바닥의 물 온도)을 설정합니다. 자동 온도가 켜져 있는 동안에는 효과가 없습니다. 먼저 자동 온도를 꺼주세요.",
+    "ar": "يضبط نقطة ضبط المنطقة 1 (درجة حرارة الماء للأرضية). ليس له تأثير أثناء تشغيل درجة الحرارة التلقائية - قم بإيقاف تشغيلها أولاً."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=heatpump"
+    },
+    {
+      "name": "temperature",
+      "type": "number",
+      "title": {
+        "en": "Temperature",
+        "nl": "Temperatuur",
+        "da": "Temperatur",
+        "de": "Temperatur",
+        "es": "Temperatura",
+        "fr": "Température",
+        "it": "Temperatura",
+        "no": "Temperatur",
+        "sv": "Temperatur",
+        "pl": "Temperatura",
+        "ru": "Температура",
+        "ko": "온도",
+        "ar": "درجة الحرارة"
+      },
+      "min": 5,
+      "max": 60,
+      "step": 0.5,
+      "placeholder": {
+        "en": "18",
+        "nl": "18",
+        "da": "18",
+        "de": "18",
+        "es": "18",
+        "fr": "18",
+        "it": "18",
+        "no": "18",
+        "sv": "18",
+        "pl": "18",
+        "ru": "18",
+        "ko": "18",
+        "ar": "١٨"
+      }
+    }
+  ]
+}

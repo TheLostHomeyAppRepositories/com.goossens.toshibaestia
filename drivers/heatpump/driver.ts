@@ -67,6 +67,26 @@ export default class HeatpumpDriver extends Homey.Driver {
       this.error('register dhw_boost_for', err);
     }
 
+    // Actions: Zone 1 water temperature and auto temperature. Custom
+    // capabilities (our target_temperature shadow, auto_temp) get no
+    // auto-generated cards, so these go through the capability listeners.
+    try {
+      this.homey.flow.getActionCard('zone1_temperature_set')
+        .registerRunListener(async (args: { device: HeatpumpDevice; temperature: number }) => {
+          await args.device.triggerCapabilityListener('target_temperature', Number(args.temperature));
+        });
+    } catch (err) {
+      this.error('register zone1_temperature_set', err);
+    }
+    try {
+      this.homey.flow.getActionCard('auto_temp_set')
+        .registerRunListener(async (args: { device: HeatpumpDevice; state: 'on' | 'off' }) => {
+          await args.device.triggerCapabilityListener('auto_temp', args.state === 'on');
+        });
+    } catch (err) {
+      this.error('register auto_temp_set', err);
+    }
+
     // Trigger fault_triggered is fired from device.ts; no runListener needed unless
     // we add filter args later. Accessing it once here ensures Homey knows it exists.
     try { this.homey.flow.getDeviceTriggerCard('fault_triggered'); } catch (err) {

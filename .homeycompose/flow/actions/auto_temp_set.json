@@ -1,0 +1,97 @@
+{
+  "id": "auto_temp_set",
+  "title": {
+    "en": "Turn auto temperature on or off",
+    "nl": "Auto-temperatuur aan- of uitzetten",
+    "da": "Tænd eller sluk for automatisk temperatur",
+    "de": "Automatische Temperatur ein- oder ausschalten",
+    "es": "Activar o desactivar la temperatura automática",
+    "fr": "Activer ou désactiver la température automatique",
+    "it": "Attiva o disattiva la temperatura automatica",
+    "no": "Slå automatisk temperatur på eller av",
+    "sv": "Slå på eller av automatisk temperatur",
+    "pl": "Włącz lub wyłącz automatyczną temperaturę",
+    "ru": "Включить или выключить автоматическую регулировку температуры",
+    "ko": "자동 온도 조절 켜기 또는 끄기",
+    "ar": "تشغيل أو إيقاف تشغيل درجة الحرارة التلقائية"
+  },
+  "titleFormatted": {
+    "en": "Turn auto temperature [[state]]",
+    "nl": "Zet auto-temperatuur [[state]]",
+    "da": "Automatisk temperatur: [[state]]",
+    "de": "Automatische Temperatur: [[state]]",
+    "es": "Temperatura automática: [[state]]",
+    "fr": "Température automatique : [[state]]",
+    "it": "Temperatura automatica: [[state]]",
+    "no": "Automatisk temperatur: [[state]]",
+    "sv": "Automatisk temperatur: [[state]]",
+    "pl": "Automatyczna temperatura: [[state]]",
+    "ru": "Автоматическая температура: [[state]]",
+    "ko": "자동 온도: [[state]]",
+    "ar": "درجة الحرارة التلقائية: [[state]]"
+  },
+  "hint": {
+    "en": "Auto temperature (the \"A\" mode) lets the heat pump pick the water temperature from the outdoor temperature.",
+    "nl": "Met auto-temperatuur (de \"A\"-stand) kiest de warmtepomp zelf de watertemperatuur op basis van de buitentemperatuur.",
+    "da": "Auto temperatur (tilstanden \"A\") lader varmepumpen vælge vandtemperaturen ud fra udendørstemperaturen.",
+    "de": "Der Auto-Modus (der \"A\"-Modus) ermöglicht es der Wärmepumpe, die Wassertemperatur basierend auf der Außentemperatur auszuwählen.",
+    "es": "La temperatura automática (el modo \"A\") permite que la bomba de calor elija la temperatura del agua según la temperatura exterior.",
+    "fr": "La température automatique (le mode \"A\") permet à la pompe à chaleur de choisir la température de l'eau en fonction de la température extérieure.",
+    "it": "La modalità Auto temperatura (modalità \"A\") consente alla pompa di calore di scegliere la temperatura dell'acqua in base alla temperatura esterna.",
+    "no": "Auto temperatur (modus \"A\") lar varmepumpen velge vanntemperaturen basert på utetemperaturen.",
+    "sv": "Auto-temperatur (läget \"A\") låter värmepumpen välja vattentemperaturen baserat på utomhustemperaturen.",
+    "pl": "Automatyczna temperatura (tryb \"A\") pozwala pompie ciepła wybrać temperaturę wody na podstawie temperatury zewnętrznej.",
+    "ru": "Автоматическая температура (режим \"A\") позволяет тепловому насосу выбирать температуру воды в зависимости от температуры на улице.",
+    "ko": "자동 온도(\"A\" 모드)는 히트 펌프가 실외 온도에 따라 물 온도를 선택하도록 합니다.",
+    "ar": "وضع درجة الحرارة التلقائي (\"A\") يسمح لمضخة الحرارة باختيار درجة حرارة الماء بناءً على درجة الحرارة الخارجية."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=heatpump"
+    },
+    {
+      "name": "state",
+      "type": "dropdown",
+      "values": [
+        {
+          "id": "on",
+          "label": {
+            "en": "on",
+            "nl": "aan",
+            "da": "til",
+            "de": "ein",
+            "es": "activada",
+            "fr": "activée",
+            "it": "attiva",
+            "no": "på",
+            "sv": "på",
+            "pl": "włączona",
+            "ru": "вкл.",
+            "ko": "켜기",
+            "ar": "تشغيل"
+          }
+        },
+        {
+          "id": "off",
+          "label": {
+            "en": "off",
+            "nl": "uit",
+            "da": "fra",
+            "de": "aus",
+            "es": "desactivada",
+            "fr": "désactivée",
+            "it": "disattiva",
+            "no": "av",
+            "sv": "av",
+            "pl": "wyłączona",
+            "ru": "выкл.",
+            "ko": "끄기",
+            "ar": "إيقاف"
+          }
+        }
+      ]
+    }
+  ]
+}
