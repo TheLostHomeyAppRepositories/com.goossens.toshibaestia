@@ -106,5 +106,20 @@
     "ru": "Перепубликация для исправления журнала изменений App Store для 1.0.25 (в английский текст случайно попал лишний символ). Функциональных изменений нет — поведение декодирования аварий идентично 1.0.25.",
     "ko": "1.0.25의 App Store 변경 내역을 수정하기 위한 재게시 (영어 텍스트에 글자가 잘못 섞여 들어갔습니다). 기능 변경 없음 — 알람 디코딩 동작은 1.0.25와 동일합니다.",
     "ar": "إعادة نشر لتصحيح سجل تغييرات App Store للإصدار 1.0.25 (تسلّل حرف عن طريق الخطأ إلى النص الإنجليزي). لا توجد تغييرات وظيفية — سلوك فك تشفير الإنذارات مطابق للإصدار 1.0.25."
+  },
+  "1.0.27": {
+    "en": "New flow cards: set the water temperature (Zone 1) and turn auto temperature on or off.",
+    "nl": "Nieuwe flowkaarten: de watertemperatuur (zone 1) instellen en auto-temperatuur aan- of uitzetten.",
+    "da": "Nye flowkort: indstil vandtemperaturen (zone 1) og slå automatisk temperatur til eller fra.",
+    "de": "Neue Flow-Karten: Wassertemperatur (Zone 1) einstellen und automatische Temperatur ein- oder ausschalten.",
+    "es": "Nuevas tarjetas de flujo: ajustar la temperatura del agua (zona 1) y activar o desactivar la temperatura automática.",
+    "fr": "Nouvelles cartes de flow : régler la température de l'eau (zone 1) et activer ou désactiver la température automatique.",
+    "it": "Nuove schede flow: impostare la temperatura dell'acqua (zona 1) e attivare o disattivare la temperatura automatica.",
+    "no": "Nye flytkort: still inn vanntemperaturen (sone 1) og slå automatisk temperatur på eller av.",
+    "sv": "Nya flödeskort: ställ in vattentemperaturen (zon 1) och slå på eller av automatisk temperatur.",
+    "pl": "Nowe karty flow: ustawianie temperatury wody (strefa 1) oraz włączanie i wyłączanie automatycznej temperatury.",
+    "ru": "Новые карточки потоков: установка температуры воды (зона 1) и включение или выключение автоматической температуры.",
+    "ko": "새 플로우 카드: 물 온도(구역 1) 설정 및 자동 온도 켜기/끄기.",
+    "ar": "بطاقات تدفق جديدة: ضبط درجة حرارة الماء (المنطقة 1) وتشغيل أو إيقاف درجة الحرارة التلقائية."
   }
 }
