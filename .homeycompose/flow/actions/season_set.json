@@ -1,0 +1,115 @@
+{
+  "id": "season_set",
+  "title": {
+    "en": "Set the season",
+    "nl": "Seizoen instellen",
+    "da": "Indstil sæsonen",
+    "de": "Jahreszeit festlegen",
+    "es": "Establecer la estación",
+    "fr": "Définir la saison",
+    "it": "Imposta la stagione",
+    "no": "Angi sesongen",
+    "sv": "Ställ in säsongen",
+    "pl": "Ustaw porę roku",
+    "ru": "Установить сезон",
+    "ko": "계절 설정",
+    "ar": "تعيين الموسم"
+  },
+  "titleFormatted": {
+    "en": "Set the season to [[season]]",
+    "nl": "Zet het seizoen op [[season]]",
+    "da": "Indstil sæsonen til [[season]]",
+    "de": "Jahreszeit auf [[season]] setzen",
+    "es": "Establecer la estación en [[season]]",
+    "fr": "Définir la saison sur [[season]]",
+    "it": "Imposta la stagione su [[season]]",
+    "no": "Sett sesongen til [[season]]",
+    "sv": "Ställ in säsongen på [[season]]",
+    "pl": "Ustaw porę roku na [[season]]",
+    "ru": "Установить сезон: [[season]]",
+    "ko": "계절을 [[season]](으)로 설정",
+    "ar": "تعيين الموسم إلى [[season]]"
+  },
+  "hint": {
+    "en": "With automatic season detection on, the app changes the season again as soon as the average outdoor temperature is past one of its switch points.",
+    "nl": "Staat automatische seizoensdetectie aan, dan past de app het seizoen weer aan zodra de gemiddelde buitentemperatuur voorbij een van de schakelpunten is.",
+    "da": "Med automatisk sæsonregistrering slået til ændrer appen sæsonen igen, så snart den gennemsnitlige udetemperatur er forbi et af skiftepunkterne.",
+    "de": "Ist die automatische Erkennung der Jahreszeit aktiv, ändert die App die Jahreszeit wieder, sobald die durchschnittliche Außentemperatur jenseits eines der Schaltpunkte liegt.",
+    "es": "Con la detección automática de la estación activada, la app vuelve a cambiar la estación en cuanto la temperatura exterior media sobrepasa uno de los puntos de cambio.",
+    "fr": "Si la détection automatique de la saison est activée, l'app modifie à nouveau la saison dès que la température extérieure moyenne dépasse l'un des seuils de changement.",
+    "it": "Con il rilevamento automatico della stagione attivo, l'app cambia di nuovo la stagione non appena la temperatura esterna media supera una delle soglie.",
+    "no": "Med automatisk sesongregistrering på endrer appen sesongen igjen så snart gjennomsnittlig utetemperatur har passert et av byttepunktene.",
+    "sv": "Med automatisk säsongsidentifiering på ändrar appen säsongen igen så snart den genomsnittliga utomhustemperaturen har passerat en av brytpunkterna.",
+    "pl": "Gdy automatyczne wykrywanie pory roku jest włączone, aplikacja ponownie zmieni porę roku, gdy średnia temperatura zewnętrzna przekroczy jeden z progów.",
+    "ru": "Если автоматическое определение сезона включено, приложение снова изменит сезон, как только средняя температура на улице выйдет за один из порогов.",
+    "ko": "자동 계절 감지가 켜져 있으면 평균 실외 온도가 전환 기준 중 하나를 넘는 즉시 앱이 계절을 다시 변경합니다.",
+    "ar": "عند تفعيل الاكتشاف التلقائي للموسم، يغيّر التطبيق الموسم مجددًا بمجرد أن يتجاوز متوسط درجة الحرارة الخارجية إحدى نقاط التبديل."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=heatpump"
+    },
+    {
+      "name": "season",
+      "type": "dropdown",
+      "values": [
+        {
+          "id": "summer",
+          "label": {
+            "en": "Summer",
+            "nl": "Zomer",
+            "da": "Sommer",
+            "de": "Sommer",
+            "es": "Verano",
+            "fr": "Été",
+            "it": "Estate",
+            "no": "Sommer",
+            "sv": "Sommar",
+            "pl": "Lato",
+            "ru": "Лето",
+            "ko": "여름",
+            "ar": "الصيف"
+          }
+        },
+        {
+          "id": "midseason",
+          "label": {
+            "en": "Mid-season",
+            "nl": "Tussenseizoen",
+            "da": "Overgangssæson",
+            "de": "Übergangszeit",
+            "es": "Entretiempo",
+            "fr": "Mi-saison",
+            "it": "Mezza stagione",
+            "no": "Overgangssesong",
+            "sv": "Övergångssäsong",
+            "pl": "Okres przejściowy",
+            "ru": "Межсезонье",
+            "ko": "간절기",
+            "ar": "فصل انتقالي"
+          }
+        },
+        {
+          "id": "winter",
+          "label": {
+            "en": "Winter",
+            "nl": "Winter",
+            "da": "Vinter",
+            "de": "Winter",
+            "es": "Invierno",
+            "fr": "Hiver",
+            "it": "Inverno",
+            "no": "Vinter",
+            "sv": "Vinter",
+            "pl": "Zima",
+            "ru": "Зима",
+            "ko": "겨울",
+            "ar": "الشتاء"
+          }
+        }
+      ]
+    }
+  ]
+}

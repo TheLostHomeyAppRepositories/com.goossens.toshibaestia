@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Modbus forespørsel mislyktes: {{reason}}"
+    "poll_failed": "Modbus forespørsel mislyktes: {{reason}}",
+    "season_order": "Sesongens byttepunkter må være i denne rekkefølgen: Vinter fra < Vinter til ≤ Sommer til < Sommer fra."
+  },
+  "season": {
+    "summer": "Sommer",
+    "midseason": "Overgangssesong",
+    "winter": "Vinter"
   }
 }

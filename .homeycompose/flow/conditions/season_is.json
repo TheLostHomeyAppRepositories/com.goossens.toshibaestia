@@ -1,0 +1,100 @@
+{
+  "id": "season_is",
+  "title": {
+    "en": "Season !{{is|is not}} …",
+    "nl": "Seizoen !{{is|is niet}} …",
+    "da": "Sæsonen !{{er|er ikke}} …",
+    "de": "Jahreszeit !{{ist|ist nicht}} …",
+    "es": "La estación !{{es|no es}} …",
+    "fr": "La saison !{{est|n'est pas}} …",
+    "it": "La stagione !{{è|non è}} …",
+    "no": "Sesongen !{{er|er ikke}} …",
+    "sv": "Säsongen !{{är|är inte}} …",
+    "pl": "Pora roku !{{to|to nie}} …",
+    "ru": "Сезон !{{равен|не равен}} …",
+    "ko": "계절: … !{{맞음|아님}}",
+    "ar": "الموسم !{{هو|ليس}} …"
+  },
+  "titleFormatted": {
+    "en": "Season !{{is|is not}} [[season]]",
+    "nl": "Seizoen !{{is|is niet}} [[season]]",
+    "da": "Sæsonen !{{er|er ikke}} [[season]]",
+    "de": "Jahreszeit !{{ist|ist nicht}} [[season]]",
+    "es": "La estación !{{es|no es}} [[season]]",
+    "fr": "La saison !{{est|n'est pas}} [[season]]",
+    "it": "La stagione !{{è|non è}} [[season]]",
+    "no": "Sesongen !{{er|er ikke}} [[season]]",
+    "sv": "Säsongen !{{är|är inte}} [[season]]",
+    "pl": "Pora roku !{{to|to nie}} [[season]]",
+    "ru": "Сезон !{{равен|не равен}} [[season]]",
+    "ko": "계절: [[season]] !{{맞음|아님}}",
+    "ar": "الموسم !{{هو|ليس}} [[season]]"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=heatpump"
+    },
+    {
+      "name": "season",
+      "type": "dropdown",
+      "values": [
+        {
+          "id": "summer",
+          "label": {
+            "en": "Summer",
+            "nl": "Zomer",
+            "da": "Sommer",
+            "de": "Sommer",
+            "es": "Verano",
+            "fr": "Été",
+            "it": "Estate",
+            "no": "Sommer",
+            "sv": "Sommar",
+            "pl": "Lato",
+            "ru": "Лето",
+            "ko": "여름",
+            "ar": "الصيف"
+          }
+        },
+        {
+          "id": "midseason",
+          "label": {
+            "en": "Mid-season",
+            "nl": "Tussenseizoen",
+            "da": "Overgangssæson",
+            "de": "Übergangszeit",
+            "es": "Entretiempo",
+            "fr": "Mi-saison",
+            "it": "Mezza stagione",
+            "no": "Overgangssesong",
+            "sv": "Övergångssäsong",
+            "pl": "Okres przejściowy",
+            "ru": "Межсезонье",
+            "ko": "간절기",
+            "ar": "فصل انتقالي"
+          }
+        },
+        {
+          "id": "winter",
+          "label": {
+            "en": "Winter",
+            "nl": "Winter",
+            "da": "Vinter",
+            "de": "Winter",
+            "es": "Invierno",
+            "fr": "Hiver",
+            "it": "Inverno",
+            "no": "Vinter",
+            "sv": "Vinter",
+            "pl": "Zima",
+            "ru": "Зима",
+            "ko": "겨울",
+            "ar": "الشتاء"
+          }
+        }
+      ]
+    }
+  ]
+}

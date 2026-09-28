@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Modbus poll failed"
+    "poll_failed": "Modbus poll failed",
+    "season_order": "The season switch points must be in this order: Winter from < Winter until ≤ Summer until < Summer from."
+  },
+  "season": {
+    "summer": "Summer",
+    "midseason": "Mid-season",
+    "winter": "Winter"
   }
 }

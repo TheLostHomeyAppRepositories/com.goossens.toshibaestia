@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Il polling Modbus non è riuscito: {{reason}}"
+    "poll_failed": "Il polling Modbus non è riuscito: {{reason}}",
+    "season_order": "Le soglie della stagione devono essere in questo ordine: Inverno da < Inverno fino a ≤ Estate fino a < Estate da."
+  },
+  "season": {
+    "summer": "Estate",
+    "midseason": "Mezza stagione",
+    "winter": "Inverno"
   }
 }

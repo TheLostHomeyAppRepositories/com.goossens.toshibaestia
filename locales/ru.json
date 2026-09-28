@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Запрос Modbus не удался: {{reason}}"
+    "poll_failed": "Запрос Modbus не удался: {{reason}}",
+    "season_order": "Пороги сезона должны идти в таком порядке: Зима от < Зима до ≤ Лето до < Лето от."
+  },
+  "season": {
+    "summer": "Лето",
+    "midseason": "Межсезонье",
+    "winter": "Зима"
   }
 }

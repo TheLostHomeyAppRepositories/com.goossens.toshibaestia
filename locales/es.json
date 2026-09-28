@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "La encuesta de Modbus falló: {{reason}}"
+    "poll_failed": "La encuesta de Modbus falló: {{reason}}",
+    "season_order": "Los puntos de cambio de estación deben seguir este orden: Invierno desde < Invierno hasta ≤ Verano hasta < Verano desde."
+  },
+  "season": {
+    "summer": "Verano",
+    "midseason": "Entretiempo",
+    "winter": "Invierno"
   }
 }

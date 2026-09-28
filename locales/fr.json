@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Échec du sondage Modbus : {{reason}}"
+    "poll_failed": "Échec du sondage Modbus : {{reason}}",
+    "season_order": "Les seuils de saison doivent être dans cet ordre : Hiver à partir de < Hiver jusqu'à ≤ Été jusqu'à < Été à partir de."
+  },
+  "season": {
+    "summer": "Été",
+    "midseason": "Mi-saison",
+    "winter": "Hiver"
   }
 }

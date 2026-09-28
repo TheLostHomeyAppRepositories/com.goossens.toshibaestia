@@ -1,6 +1,7 @@
 import Homey from 'homey';
 import type ToshibaEstiaApp from '../../app';
 import type HeatpumpDevice from './device';
+import type { Season } from './season';
 import { REGISTERS, decodeHydroUnitType, decodeBaudRate } from '../../modbus/registers';
 
 type TempScaling = 'x1' | 'x10';
@@ -85,6 +86,21 @@ export default class HeatpumpDriver extends Homey.Driver {
         });
     } catch (err) {
       this.error('register auto_temp_set', err);
+    }
+
+    // Season (1.1.0): the season_changed trigger is fired from device.ts.
+    try {
+      this.homey.flow.getConditionCard('season_is')
+        .registerRunListener(async (args: { device: HeatpumpDevice; season: string }) => {
+          return args.device.getCapabilityValue('season') === args.season;
+        });
+      this.homey.flow.getActionCard('season_set')
+        .registerRunListener(async (args: { device: HeatpumpDevice; season: string }) => {
+          await args.device.setSeason(args.season as Season);
+        });
+      this.homey.flow.getDeviceTriggerCard('season_changed');
+    } catch (err) {
+      this.error('register season cards', err);
     }
 
     // Trigger fault_triggered is fired from device.ts; no runListener needed unless

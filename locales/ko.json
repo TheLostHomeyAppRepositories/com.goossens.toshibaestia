@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Modbus 폴링에 실패했습니다: {{reason}}"
+    "poll_failed": "Modbus 폴링에 실패했습니다: {{reason}}",
+    "season_order": "계절 전환 기준은 다음 순서여야 합니다: 겨울 시작 < 겨울 종료 ≤ 여름 종료 < 여름 시작."
+  },
+  "season": {
+    "summer": "여름",
+    "midseason": "간절기",
+    "winter": "겨울"
   }
 }

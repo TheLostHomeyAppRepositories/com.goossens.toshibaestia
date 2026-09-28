@@ -1,0 +1,92 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Season",
+    "nl": "Seizoen",
+    "da": "Sæson",
+    "de": "Jahreszeit",
+    "es": "Estación",
+    "fr": "Saison",
+    "it": "Stagione",
+    "no": "Sesong",
+    "sv": "Säsong",
+    "pl": "Pora roku",
+    "ru": "Сезон",
+    "ko": "계절",
+    "ar": "الموسم"
+  },
+  "desc": {
+    "en": "Summer, mid-season or winter, from the average outdoor temperature (see the device settings).",
+    "nl": "Zomer, tussenseizoen of winter, op basis van de gemiddelde buitentemperatuur (zie de apparaatinstellingen).",
+    "da": "Sommer, overgangssæson eller vinter ud fra den gennemsnitlige udetemperatur (se enhedsindstillingerne).",
+    "de": "Sommer, Übergangszeit oder Winter, anhand der durchschnittlichen Außentemperatur (siehe Geräteeinstellungen).",
+    "es": "Verano, entretiempo o invierno, según la temperatura exterior media (ver los ajustes del dispositivo).",
+    "fr": "Été, mi-saison ou hiver, selon la température extérieure moyenne (voir les réglages de l'appareil).",
+    "it": "Estate, mezza stagione o inverno, in base alla temperatura esterna media (vedi le impostazioni del dispositivo).",
+    "no": "Sommer, overgangssesong eller vinter ut fra gjennomsnittlig utetemperatur (se enhetsinnstillingene).",
+    "sv": "Sommar, övergångssäsong eller vinter utifrån den genomsnittliga utomhustemperaturen (se enhetsinställningarna).",
+    "pl": "Lato, okres przejściowy lub zima, na podstawie średniej temperatury zewnętrznej (zobacz ustawienia urządzenia).",
+    "ru": "Лето, межсезонье или зима по средней температуре на улице (см. настройки устройства).",
+    "ko": "평균 실외 온도에 따른 여름, 간절기 또는 겨울 (기기 설정 참조).",
+    "ar": "الصيف أو الفصل الانتقالي أو الشتاء، حسب متوسط درجة الحرارة الخارجية (راجع إعدادات الجهاز)."
+  },
+  "values": [
+    {
+      "id": "summer",
+      "title": {
+        "en": "Summer",
+        "nl": "Zomer",
+        "da": "Sommer",
+        "de": "Sommer",
+        "es": "Verano",
+        "fr": "Été",
+        "it": "Estate",
+        "no": "Sommer",
+        "sv": "Sommar",
+        "pl": "Lato",
+        "ru": "Лето",
+        "ko": "여름",
+        "ar": "الصيف"
+      }
+    },
+    {
+      "id": "midseason",
+      "title": {
+        "en": "Mid-season",
+        "nl": "Tussenseizoen",
+        "da": "Overgangssæson",
+        "de": "Übergangszeit",
+        "es": "Entretiempo",
+        "fr": "Mi-saison",
+        "it": "Mezza stagione",
+        "no": "Overgangssesong",
+        "sv": "Övergångssäsong",
+        "pl": "Okres przejściowy",
+        "ru": "Межсезонье",
+        "ko": "간절기",
+        "ar": "فصل انتقالي"
+      }
+    },
+    {
+      "id": "winter",
+      "title": {
+        "en": "Winter",
+        "nl": "Winter",
+        "da": "Vinter",
+        "de": "Winter",
+        "es": "Invierno",
+        "fr": "Hiver",
+        "it": "Inverno",
+        "no": "Vinter",
+        "sv": "Vinter",
+        "pl": "Zima",
+        "ru": "Зима",
+        "ko": "겨울",
+        "ar": "الشتاء"
+      }
+    }
+  ],
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor"
+}

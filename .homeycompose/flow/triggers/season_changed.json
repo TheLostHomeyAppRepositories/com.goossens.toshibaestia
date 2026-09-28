@@ -1,0 +1,76 @@
+{
+  "id": "season_changed",
+  "title": {
+    "en": "The season changed",
+    "nl": "Het seizoen is veranderd",
+    "da": "Sæsonen er skiftet",
+    "de": "Die Jahreszeit hat gewechselt",
+    "es": "La estación ha cambiado",
+    "fr": "La saison a changé",
+    "it": "La stagione è cambiata",
+    "no": "Sesongen har endret seg",
+    "sv": "Säsongen har ändrats",
+    "pl": "Pora roku się zmieniła",
+    "ru": "Сезон изменился",
+    "ko": "계절이 바뀌었습니다",
+    "ar": "تغيّر الموسم"
+  },
+  "hint": {
+    "en": "Use it with the \"Season is\" condition to switch between heating and cooling.",
+    "nl": "Gebruik hem met de voorwaarde \"Seizoen is\" om te wisselen tussen verwarmen en koelen.",
+    "da": "Brug den med betingelsen \"Sæsonen er\" til at skifte mellem opvarmning og køling.",
+    "de": "Zusammen mit der Bedingung \"Jahreszeit ist\" zwischen Heizen und Kühlen umschalten.",
+    "es": "Úsalo con la condición \"La estación es\" para cambiar entre calefacción y refrigeración.",
+    "fr": "À utiliser avec la condition \"La saison est\" pour passer du chauffage au refroidissement.",
+    "it": "Usalo con la condizione \"La stagione è\" per passare tra riscaldamento e raffreddamento.",
+    "no": "Bruk den med betingelsen \"Sesongen er\" for å bytte mellom oppvarming og kjøling.",
+    "sv": "Använd den med villkoret \"Säsongen är\" för att växla mellan värme och kyla.",
+    "pl": "Użyj go z warunkiem \"Pora roku to\", aby przełączać między ogrzewaniem a chłodzeniem.",
+    "ru": "Используйте вместе с условием «Сезон равен», чтобы переключаться между отоплением и охлаждением.",
+    "ko": "\"계절\" 조건과 함께 사용해 난방과 냉방을 전환하세요.",
+    "ar": "استخدمه مع شرط \"الموسم هو\" للتبديل بين التدفئة والتبريد."
+  },
+  "tokens": [
+    {
+      "name": "season",
+      "type": "string",
+      "title": {
+        "en": "Season",
+        "nl": "Seizoen",
+        "da": "Sæson",
+        "de": "Jahreszeit",
+        "es": "Estación",
+        "fr": "Saison",
+        "it": "Stagione",
+        "no": "Sesong",
+        "sv": "Säsong",
+        "pl": "Pora roku",
+        "ru": "Сезон",
+        "ko": "계절",
+        "ar": "الموسم"
+      },
+      "example": {
+        "en": "Summer",
+        "nl": "Zomer",
+        "da": "Sommer",
+        "de": "Sommer",
+        "es": "Verano",
+        "fr": "Été",
+        "it": "Estate",
+        "no": "Sommer",
+        "sv": "Sommar",
+        "pl": "Lato",
+        "ru": "Лето",
+        "ko": "여름",
+        "ar": "الصيف"
+      }
+    }
+  ],
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=heatpump"
+    }
+  ]
+}

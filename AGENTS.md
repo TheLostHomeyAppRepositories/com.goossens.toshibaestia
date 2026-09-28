@@ -38,9 +38,9 @@ The Waveshare runs in **Modbus TCP ↔ Modbus RTU** mode on port 502. Register n
 .homeycompose/                ← source of truth; CLI generates app.json
   app.json                    ← top-level metadata (id, version, name, etc.)
   capabilities/               ← custom capabilities + 1 shadow (target_temperature.json)
-  flow/triggers/              ← fault_triggered.json
-  flow/conditions/            ← alarm_is_active.json
-  flow/actions/               ← dhw_boost_for.json
+  flow/triggers/              ← fault_triggered.json, season_changed.json
+  flow/conditions/            ← alarm_is_active.json, season_is.json
+  flow/actions/               ← dhw_boost_for.json, zone1_temperature_set.json, auto_temp_set.json, season_set.json
 
 drivers/heatpump/
   driver.compose.json         ← class=heatpump, capabilities array, capabilitiesOptions, pair[]
@@ -48,6 +48,7 @@ drivers/heatpump/
   driver.flow.compose.json    ← (none yet — would be device-scoped flow cards)
   driver.ts                   ← pair-session wiring + flow-card runListeners
   device.ts                   ← capability ↔ register mapping, polling loop, capability writes
+  season.ts                   ← season detection (pure functions), see "Season detection" below
   pair/configure.html         ← step 1: IP/port/unit + Test connection
   pair/features.html          ← step 2: DHW / Zone 2 / scaling toggles
   assets/icon.svg             ← driver icon (heat-pump cabinet + fan)
@@ -340,12 +341,24 @@ Languages currently shipped: `en`, `nl`, `da`, `de`, `es`, `fr`, `it`, `no`, `sv
 
 - ✅ **Phase 1**: read-only sensors + alarm + pair flow with connection probe.
 - ✅ **Phase 2**: writable on/off, mode (heat/cool), setpoints (Zone 1 + DHW), DHW boost, frost protection, night setback, auto-temp, anti-bacteria. Flow cards: `fault_triggered` trigger, `alarm_is_active` condition, `dhw_boost_for` action.
+- ✅ **Season detection (1.1.0)**: see 9b.
 - ✅ **Phase 3 — Energy estimation & connection robustness**: estimated `measure_power` (W) gated on demand + delta-T direction + ΔT modulation, with starting hysteresis and post-cycle lock; lifetime `meter_power` (kWh) from per-mode hour counters with monotonicity guard; auto-detection of cylinder immersion via register 40039 delta-hours (no user setting); three-layer dead-socket recovery in the controller (socket events + TCP keepalive + read/write error trap); poll-interval default tuned to gateway behaviour (60 s, reconnect-each-poll).
 - ⏳ **Phase 4 (not started)**:
   - Zone 2 setpoint + per-zone flow cards (gated on `enableZone2`).
   - COP-aware live-power scaling: per-model COP curve indexed by outdoor temp + flow temp. Gets us within ±10 % year-round instead of being weather-blind. ~50 LOC, needs datasheet curve data baked in.
   - mDNS discovery for the Waveshare (low priority — the gateway doesn't announce cleanly; manual IP works).
   - Multiple virtual devices per heat pump (one per setpoint) to escape the title-locking. Reorganise drivers into `heatpump_zone1`, `heatpump_dhw`, `heatpump_zone2`. Significant refactor — only justified if users demand truly distinct labels.
+
+---
+
+## 9b. Season detection (1.1.0)
+
+`season` (custom enum: summer / midseason / winter) and `measure_temperature.outdoor_avg` are always-on caps.
+- Every poll feeds the outdoor temperature into an in-memory hour bucket; at each full hour `recordOutdoor()` stores that hour's average in the device store (`outdoorHourly`, `[hour, °C][]`, last 7 days) and calls `updateSeason()`.
+- `averageOutdoor()` returns null until two thirds of the averaging period (setting `seasonDays`, default 3) has values — so after pairing the average and season stay empty for ~2 days. Device capability logs can't be read from an app, so there's no seeding from Insights.
+- `nextSeason()` applies the switch points with hysteresis (defaults: summer ≥ 24 / leave ≤ 22, winter ≤ 14 / leave ≥ 16). With no season yet it picks the nearest band (midpoints 23 and 15).
+- `season` is read-only (sensor). A setable picker shared Homey's picker component with `thermostat_mode`, and opening the device page then set the season — so a hand-picked season goes through the `season_set` flow card → `setSeason()`, which fires `season_changed`. Automatic detection then only changes it again when the average is past a switch point.
+- The app never changes the heat pump's mode from the season — that's up to the user's flows.
 
 ---
 

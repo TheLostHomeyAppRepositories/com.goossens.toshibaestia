@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Błąd ankiety Modbus: {{reason}}"
+    "poll_failed": "Błąd ankiety Modbus: {{reason}}",
+    "season_order": "Progi pory roku muszą być w tej kolejności: Zima od < Zima do ≤ Lato do < Lato od."
+  },
+  "season": {
+    "summer": "Lato",
+    "midseason": "Okres przejściowy",
+    "winter": "Zima"
   }
 }

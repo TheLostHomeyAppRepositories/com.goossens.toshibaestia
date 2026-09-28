@@ -10,6 +10,16 @@ import {
   decodeBaudRate,
   decodeHydroUnitType,
 } from '../../modbus/registers';
+import {
+  HISTORY_HOURS,
+  averageOutdoor,
+  hoursMeasured,
+  nextSeason,
+  validSeasonConfig,
+  type HourlyTemp,
+  type Season,
+  type SeasonConfig,
+} from './season';
 
 type TempScaling = 'x1' | 'x10';
 type ThermostatMode = 'off' | 'heat' | 'cool';
@@ -45,7 +55,26 @@ interface DeviceSettings {
   detectedSlaveAddress?: string;
   detectedBaudRate?: string;
   lastSeen?: string;
+  // Season detection (see season.ts). Optional: devices paired before 1.1.0
+  // may not have them yet, so seasonConfig() falls back to the defaults.
+  seasonAuto?: boolean;
+  seasonDays?: number;
+  summerStart?: number;
+  summerEnd?: number;
+  winterStart?: number;
+  winterEnd?: number;
+  seasonHours?: string;
 }
+
+const SEASON_SETTINGS = ['seasonAuto', 'seasonDays', 'summerStart', 'summerEnd', 'winterStart', 'winterEnd'];
+
+const seasonConfig = (s: DeviceSettings): SeasonConfig => ({
+  days: Number(s.seasonDays ?? 3),
+  summerStart: Number(s.summerStart ?? 24),
+  summerEnd: Number(s.summerEnd ?? 22),
+  winterStart: Number(s.winterStart ?? 14),
+  winterEnd: Number(s.winterEnd ?? 16),
+});
 
 /**
  * Comprehensive Toshiba Estia model preset table — nominal electrical input
@@ -179,6 +208,15 @@ const ALWAYS_ON_CAPABILITIES: Array<[string, Record<string, unknown>?]> = [
   // Energy estimation
   ['measure_power',         { title: { en: 'Estimated power',         nl: 'Geschat vermogen' } }],
   ['meter_power',           { title: { en: 'Estimated total energy',  nl: 'Geschatte totale energie' } }],
+  // Season detection (1.1.0)
+  ['measure_temperature.outdoor_avg', { title: {
+    en: 'Average outdoor temperature', nl: 'Gemiddelde buitentemperatuur', da: 'Gennemsnitlig udetemperatur',
+    de: 'Durchschnittliche Außentemperatur', es: 'Temperatura exterior media', fr: 'Température extérieure moyenne',
+    it: 'Temperatura esterna media', no: 'Gjennomsnittlig utetemperatur', sv: 'Genomsnittlig utomhustemperatur',
+    pl: 'Średnia temperatura zewnętrzna', ru: 'Средняя температура на улице', ko: '평균 실외 온도',
+    ar: 'متوسط درجة الحرارة الخارجية',
+  } }],
+  ['season'],
 ];
 
 /** Registers always polled, independent of optional features. */
@@ -239,6 +277,8 @@ export default class HeatpumpDevice extends Homey.Device {
   private demandTransitionMs: number | null = null;
   // Lifetime kWh monotonicity guard — a bad register read shouldn't roll the total back.
   private lastMeterPowerKwh: number | null = null;
+  // Outdoor samples of the current hour; stored as one hourly average when the hour ends.
+  private outdoorHour: { hour: number; sum: number; count: number } | null = null;
 
   private get app(): ToshibaEstiaApp {
     return this.homey.app as ToshibaEstiaApp;
@@ -263,6 +303,7 @@ export default class HeatpumpDevice extends Homey.Device {
 
     await this.syncOptionalCapabilities(settings);
     this.registerCapabilityListeners();
+    await this.updateSeason(settings).catch((err) => this.error('updateSeason', err));
 
     // Restore the last-fault display from persistent store so users see the
     // most recent alarm even after Homey or the app restarts. Re-decode the
@@ -315,6 +356,14 @@ export default class HeatpumpDevice extends Homey.Device {
     const s = newSettings as unknown as DeviceSettings;
     this.log('Settings changed:', changedKeys.join(', '));
 
+    if (changedKeys.some((key) => SEASON_SETTINGS.includes(key))) {
+      if (!validSeasonConfig(seasonConfig(s))) throw new Error(this.homey.__('error.season_order'));
+      // After the new settings are saved: updateSeason() writes a setting itself.
+      this.homey.setTimeout(() => {
+        this.updateSeason(this.getDeviceSettings()).catch((err) => this.error('updateSeason', err));
+      }, 500);
+    }
+
     if (changedKeys.includes('host') || changedKeys.includes('port')) {
       const old = this.getDeviceSettings();
       await this.app.modbus.disconnect(old.host, Number(old.port));
@@ -351,6 +400,24 @@ export default class HeatpumpDevice extends Homey.Device {
      * way to apply it to already-paired devices is to remove + re-add so
      * Homey rebuilds the capability from the current manifest.
      */
+    /*
+     * 1.1.0 test builds had `season` as a setable picker, sharing Homey's
+     * picker component with thermostat_mode — opening the device page then
+     * set the season. It's read-only now; re-add it so existing devices pick
+     * up the new uiComponent, keeping its value.
+     */
+    if (!this.getStoreValue('_seasonReadOnly_v1')) {
+      if (this.hasCapability('season')) {
+        const season = this.getCapabilityValue('season');
+        try {
+          await this.removeCapability('season');
+          await this.addCapability('season');
+          if (season) await this.setCapabilityValue('season', season);
+        } catch (err) { this.error('migration: re-add season', err); }
+      }
+      try { await this.setStoreValue('_seasonReadOnly_v1', true); } catch (err) { this.error('migration flag set', err); }
+    }
+
     const migrationFlag = '_noShadowMigration_v3';
     if (!this.getStoreValue(migrationFlag)) {
       // Remove + re-add so caps pick up the current manifest capabilitiesOptions
@@ -525,6 +592,53 @@ export default class HeatpumpDevice extends Homey.Device {
     }, Math.max(1, minutes) * 60 * 1000);
   }
 
+  /** Feed one outdoor reading; at each full hour, store that hour's average and re-check the season. */
+  private async recordOutdoor(celsius: number | null): Promise<void> {
+    if (celsius == null) return;
+    const hour = Math.floor(Date.now() / 3600e3);
+    const done = this.outdoorHour;
+    if (done && done.hour !== hour) {
+      this.outdoorHour = null;
+      const history = ((this.getStoreValue('outdoorHourly') as HourlyTemp[] | null) ?? [])
+        .filter(([h]) => h > hour - HISTORY_HOURS);
+      history.push([done.hour, Math.round((done.sum / done.count) * 10) / 10]);
+      await this.setStoreValue('outdoorHourly', history);
+      await this.updateSeason(this.getDeviceSettings());
+    }
+    if (!this.outdoorHour) this.outdoorHour = { hour, sum: 0, count: 0 };
+    this.outdoorHour.sum += celsius;
+    this.outdoorHour.count += 1;
+  }
+
+  /** Show the outdoor average and, with automatic detection on, move the season along. */
+  private async updateSeason(s: DeviceSettings): Promise<void> {
+    const config = seasonConfig(s);
+    const history = (this.getStoreValue('outdoorHourly') as HourlyTemp[] | null) ?? [];
+    const nowHour = Math.floor(Date.now() / 3600e3);
+    const avg = averageOutdoor(history, nowHour, config.days);
+    const seasonHours = `${hoursMeasured(history, nowHour, config.days)} / ${config.days * 24}`;
+    if (s.seasonHours !== seasonHours) await this.setSettings({ seasonHours }).catch((err) => this.error('setSettings seasonHours', err));
+    if (this.hasCapability('measure_temperature.outdoor_avg')) {
+      await this.setCapabilityValue('measure_temperature.outdoor_avg', avg == null ? null : Math.round(avg * 10) / 10);
+    }
+    if (avg == null || s.seasonAuto === false || !validSeasonConfig(config)) return;
+    const current = (this.getCapabilityValue('season') as Season | null) ?? null;
+    const season = nextSeason(current, avg, config);
+    if (season !== current) {
+      this.log(`Season ${current ?? '—'} → ${season} (${config.days}-day outdoor average ${avg.toFixed(1)} °C)`);
+      await this.setSeason(season);
+    }
+  }
+
+  /** Set the season and fire the season_changed trigger. */
+  public async setSeason(season: Season): Promise<void> {
+    if (!this.hasCapability('season') || this.getCapabilityValue('season') === season) return;
+    await this.setCapabilityValue('season', season);
+    await this.homey.flow.getDeviceTriggerCard('season_changed')
+      .trigger(this, { season: this.homey.__(`season.${season}`) }, {})
+      .catch((err) => this.error('season_changed trigger failed', err));
+  }
+
   private schedulePolling(intervalSeconds: number): void {
     this.clearPolling();
     const ms = Math.max(5, intervalSeconds) * 1000;
@@ -596,6 +710,10 @@ export default class HeatpumpDevice extends Homey.Device {
     // Read-only sensors
     await setTemp('measure_temperature',                       REGISTERS.zone1ControlTemp.number);
     await setTemp('measure_temperature.outdoor',               REGISTERS.outdoorTemp.number);
+    const outdoorRaw = snapshot[REGISTERS.outdoorTemp.number];
+    if (outdoorRaw !== undefined) {
+      await this.recordOutdoor(this.scale(outdoorRaw, s)).catch((err) => this.error('recordOutdoor', err));
+    }
     await setTemp('measure_temperature.water_inlet',           REGISTERS.waterInletTemp.number);
     await setTemp('measure_temperature.water_outlet',          REGISTERS.waterOutletTemp.number);
     if (s.enableZone2) await setTemp('measure_temperature.zone2', REGISTERS.zone2ControlTemp.number);

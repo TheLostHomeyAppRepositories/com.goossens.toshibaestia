@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Modbus-uitlezing mislukt"
+    "poll_failed": "Modbus-uitlezing mislukt",
+    "season_order": "De schakelpunten van het seizoen moeten in deze volgorde staan: Winter vanaf < Winter tot ≤ Zomer tot < Zomer vanaf."
+  },
+  "season": {
+    "summer": "Zomer",
+    "midseason": "Tussenseizoen",
+    "winter": "Winter"
   }
 }

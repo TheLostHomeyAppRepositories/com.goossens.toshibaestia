@@ -860,6 +860,298 @@
   {
     "type": "group",
     "label": {
+      "en": "Season",
+      "nl": "Seizoen",
+      "da": "Sæson",
+      "de": "Jahreszeit",
+      "es": "Estación",
+      "fr": "Saison",
+      "it": "Stagione",
+      "no": "Sesong",
+      "sv": "Säsong",
+      "pl": "Pora roku",
+      "ru": "Сезон",
+      "ko": "계절",
+      "ar": "الموسم"
+    },
+    "children": [
+      {
+        "id": "seasonAuto",
+        "type": "checkbox",
+        "label": {
+          "en": "Detect the season automatically",
+          "nl": "Seizoen automatisch bepalen",
+          "da": "Registrer sæsonen automatisk",
+          "de": "Jahreszeit automatisch erkennen",
+          "es": "Detectar la estación automáticamente",
+          "fr": "Détecter la saison automatiquement",
+          "it": "Rileva la stagione automaticamente",
+          "no": "Finn sesongen automatisk",
+          "sv": "Identifiera säsongen automatiskt",
+          "pl": "Wykrywaj porę roku automatycznie",
+          "ru": "Определять сезон автоматически",
+          "ko": "계절 자동 감지",
+          "ar": "اكتشاف الموسم تلقائيًا"
+        },
+        "hint": {
+          "en": "⚠ Note: after pairing (or installing this version) the season only starts changing once two thirds of the averaging period has been measured — 2 days with the default 3 days. Until then it stays as it is.\n\nSets the season (summer, mid-season or winter) from the average outdoor temperature, like a heat pump's own heating/cooling changeover. Use the season in your flows; the app doesn't change the heat pump's mode itself. You can also set the season yourself with the \"Set the season\" flow card; the app changes it again as soon as the average is past one of the switch points below.",
+          "nl": "⚠ Let op: na het koppelen (of het installeren van deze versie) verandert het seizoen pas zodra twee derde van de middelingsperiode gemeten is — 2 dagen bij de standaard 3 dagen. Tot dan blijft het zoals het is.\n\nBepaalt het seizoen (zomer, tussenseizoen of winter) op basis van de gemiddelde buitentemperatuur, zoals de automatische omschakeling tussen verwarmen en koelen van een warmtepomp. Gebruik het seizoen in je flows; de app verandert de modus van de warmtepomp niet zelf. Je kunt het seizoen ook zelf instellen met de flowkaart \"Seizoen instellen\"; de app past het weer aan zodra het gemiddelde voorbij een van de schakelpunten hieronder is.",
+          "da": "⚠ Bemærk: efter parring (eller installation af denne version) begynder sæsonen først at skifte, når to tredjedele af gennemsnitsperioden er målt — 2 dage med standarden på 3 dage. Indtil da forbliver den, som den er.\n\nBestemmer sæsonen (sommer, overgangssæson eller vinter) ud fra den gennemsnitlige udetemperatur, ligesom en varmepumpes automatiske skift mellem opvarmning og køling. Brug sæsonen i dine flows; appen ændrer ikke selv varmepumpens tilstand. Du kan også selv indstille sæsonen med flowkortet \"Indstil sæsonen\"; appen ændrer den igen, så snart gennemsnittet er forbi et af skiftepunkterne nedenfor.",
+          "de": "⚠ Hinweis: Nach dem Koppeln (oder der Installation dieser Version) wechselt die Jahreszeit erst, wenn zwei Drittel des Mittelungszeitraums gemessen sind — 2 Tage beim Standardwert von 3 Tagen. Bis dahin bleibt sie unverändert.\n\nBestimmt die Jahreszeit (Sommer, Übergangszeit oder Winter) anhand der durchschnittlichen Außentemperatur, wie die automatische Heiz-/Kühlumschaltung einer Wärmepumpe. Verwenden Sie die Jahreszeit in Ihren Flows; die App ändert den Modus der Wärmepumpe nicht selbst. Sie können die Jahreszeit auch selbst mit der Flow-Karte \"Jahreszeit festlegen\" setzen; die App ändert sie wieder, sobald der Durchschnitt jenseits eines der Schaltpunkte unten liegt.",
+          "es": "⚠ Nota: tras el emparejamiento (o al instalar esta versión) la estación solo empieza a cambiar cuando se han medido dos tercios del periodo de promedio: 2 días con los 3 días predeterminados. Hasta entonces se queda como está.\n\nDetermina la estación (verano, entretiempo o invierno) a partir de la temperatura exterior media, como el cambio automático entre calefacción y refrigeración de una bomba de calor. Usa la estación en tus flujos; la app no cambia el modo de la bomba de calor por sí misma. También puedes establecer la estación tú mismo con la tarjeta de flujo \"Establecer la estación\"; la app la vuelve a cambiar en cuanto la media sobrepasa uno de los puntos de cambio de abajo.",
+          "fr": "⚠ Remarque : après l'appairage (ou l'installation de cette version), la saison ne change qu'une fois les deux tiers de la période de moyenne mesurés — 2 jours avec les 3 jours par défaut. D'ici là, elle reste inchangée.\n\nDétermine la saison (été, mi-saison ou hiver) à partir de la température extérieure moyenne, comme la commutation automatique chauffage/refroidissement d'une pompe à chaleur. Utilisez la saison dans vos flows ; l'app ne change pas elle-même le mode de la pompe à chaleur. Vous pouvez aussi définir la saison vous-même avec la carte de flow « Définir la saison » ; l'app la modifie à nouveau dès que la moyenne dépasse l'un des seuils ci-dessous.",
+          "it": "⚠ Nota: dopo l'abbinamento (o l'installazione di questa versione) la stagione inizia a cambiare solo quando sono stati misurati due terzi del periodo di media: 2 giorni con i 3 giorni predefiniti. Fino ad allora resta com'è.\n\nDetermina la stagione (estate, mezza stagione o inverno) dalla temperatura esterna media, come la commutazione automatica riscaldamento/raffreddamento di una pompa di calore. Usa la stagione nei tuoi flow; l'app non cambia da sola la modalità della pompa di calore. Puoi anche impostare tu la stagione con la scheda flow \"Imposta la stagione\"; l'app la cambia di nuovo non appena la media supera una delle soglie qui sotto.",
+          "no": "⚠ Merk: etter paring (eller installasjon av denne versjonen) begynner sesongen først å endre seg når to tredjedeler av gjennomsnittsperioden er målt — 2 dager med standarden på 3 dager. Frem til da forblir den som den er.\n\nBestemmer sesongen (sommer, overgangssesong eller vinter) ut fra gjennomsnittlig utetemperatur, som en varmepumpes automatiske veksling mellom oppvarming og kjøling. Bruk sesongen i flowene dine; appen endrer ikke varmepumpens modus selv. Du kan også angi sesongen selv med flowkortet \"Angi sesongen\"; appen endrer den igjen så snart gjennomsnittet har passert et av byttepunktene nedenfor.",
+          "sv": "⚠ Obs: efter parkoppling (eller installation av den här versionen) börjar säsongen ändras först när två tredjedelar av medelvärdesperioden har mätts — 2 dagar med standardvärdet 3 dagar. Tills dess förblir den som den är.\n\nBestämmer säsongen (sommar, övergångssäsong eller vinter) utifrån den genomsnittliga utomhustemperaturen, som en värmepumps automatiska växling mellan värme och kyla. Använd säsongen i dina flöden; appen ändrar inte själv värmepumpens läge. Du kan också ställa in säsongen själv med flödeskortet \"Ställ in säsongen\"; appen ändrar den igen så snart medelvärdet har passerat en av brytpunkterna nedan.",
+          "pl": "⚠ Uwaga: po sparowaniu (lub instalacji tej wersji) pora roku zaczyna się zmieniać dopiero, gdy zmierzone zostaną dwie trzecie okresu uśredniania — 2 dni przy domyślnych 3 dniach. Do tego czasu pozostaje bez zmian.\n\nOkreśla porę roku (lato, okres przejściowy lub zima) na podstawie średniej temperatury zewnętrznej, podobnie jak automatyczne przełączanie ogrzewania i chłodzenia w pompie ciepła. Używaj pory roku w swoich flow; aplikacja sama nie zmienia trybu pompy ciepła. Możesz też sam ustawić porę roku kartą flow \"Ustaw porę roku\"; aplikacja zmieni ją ponownie, gdy średnia przekroczy jeden z progów poniżej.",
+          "ru": "⚠ Внимание: после сопряжения (или установки этой версии) сезон начинает меняться только после измерения двух третей периода усреднения — 2 дня при стандартных 3 днях. До тех пор он остаётся прежним.\n\nОпределяет сезон (лето, межсезонье или зима) по средней температуре на улице — как автоматическое переключение отопления и охлаждения в тепловом насосе. Используйте сезон в своих сценариях Flow; приложение само не меняет режим теплового насоса. Сезон можно задать и вручную карточкой Flow «Установить сезон»; приложение изменит его снова, как только среднее значение выйдет за один из порогов ниже.",
+          "ko": "⚠ 참고: 페어링 후(또는 이 버전 설치 후)에는 평균 기간의 3분의 2가 측정된 뒤에야 계절이 바뀌기 시작합니다. 기본값 3일이면 2일입니다. 그때까지는 그대로 유지됩니다.\n\n평균 실외 온도로 계절(여름, 간절기, 겨울)을 정합니다. 히트 펌프의 자동 난방/냉방 전환과 같은 방식입니다. 플로우에서 계절을 사용하세요. 앱이 히트 펌프의 모드를 직접 바꾸지는 않습니다. \"계절 설정\" 플로우 카드로 계절을 직접 설정할 수도 있으며, 평균이 아래 전환 기준 중 하나를 넘으면 앱이 다시 변경합니다.",
+          "ar": "⚠ ملاحظة: بعد الإقران (أو تثبيت هذا الإصدار) لا يبدأ الموسم بالتغيّر إلا بعد قياس ثلثي فترة المتوسط — يومان مع الإعداد الافتراضي البالغ 3 أيام. حتى ذلك الحين يبقى كما هو.\n\nيحدد الموسم (الصيف أو الفصل الانتقالي أو الشتاء) من متوسط درجة الحرارة الخارجية، مثل التبديل التلقائي بين التدفئة والتبريد في المضخة الحرارية. استخدم الموسم في تدفقاتك؛ لا يغيّر التطبيق وضع المضخة الحرارية بنفسه. يمكنك أيضًا تعيين الموسم بنفسك باستخدام بطاقة التدفق \"تعيين الموسم\"؛ يغيّره التطبيق مجددًا بمجرد أن يتجاوز المتوسط إحدى نقاط التبديل أدناه."
+        },
+        "value": true
+      },
+      {
+        "id": "seasonDays",
+        "type": "number",
+        "label": {
+          "en": "Average over (days)",
+          "nl": "Gemiddelde over (dagen)",
+          "da": "Gennemsnit over (dage)",
+          "de": "Durchschnitt über (Tage)",
+          "es": "Media de (días)",
+          "fr": "Moyenne sur (jours)",
+          "it": "Media su (giorni)",
+          "no": "Gjennomsnitt over (dager)",
+          "sv": "Medelvärde över (dagar)",
+          "pl": "Średnia z (dni)",
+          "ru": "Среднее за (дней)",
+          "ko": "평균 기간(일)",
+          "ar": "المتوسط على مدى (أيام)"
+        },
+        "hint": {
+          "en": "⚠ Note: the average only appears once two thirds of this period has been measured — 2 days with 3 days, 16 hours with 1 day. Until then it stays empty and the season doesn't change, so a few night hours can't switch the season on their own.\n\nThe outdoor temperature is averaged over this many days, day and night. 3 days follows the weather without reacting to one warm or cold day.",
+          "nl": "⚠ Let op: het gemiddelde verschijnt pas zodra twee derde van deze periode gemeten is — 2 dagen bij 3 dagen, 16 uur bij 1 dag. Tot dan blijft het leeg en verandert het seizoen niet, zodat een paar nachtelijke uren het seizoen niet in hun eentje kunnen omzetten.\n\nDe buitentemperatuur wordt over zoveel dagen gemiddeld, dag en nacht. Met 3 dagen volgt het seizoen het weer zonder te reageren op één warme of koude dag.",
+          "da": "⚠ Bemærk: gennemsnittet vises først, når to tredjedele af perioden er målt — 2 dage ved 3 dage, 16 timer ved 1 dag. Indtil da er det tomt, og sæsonen skifter ikke, så nogle få nattetimer ikke alene kan skifte sæsonen.\n\nUdetemperaturen beregnes som gennemsnit over så mange dage, dag og nat. 3 dage følger vejret uden at reagere på én varm eller kold dag.",
+          "de": "⚠ Hinweis: Der Durchschnitt erscheint erst, wenn zwei Drittel dieses Zeitraums gemessen sind — 2 Tage bei 3 Tagen, 16 Stunden bei 1 Tag. Bis dahin bleibt er leer und die Jahreszeit ändert sich nicht, damit ein paar Nachtstunden die Jahreszeit nicht allein umschalten.\n\nDie Außentemperatur wird über so viele Tage gemittelt, Tag und Nacht. 3 Tage folgen dem Wetter, ohne auf einen einzelnen warmen oder kalten Tag zu reagieren.",
+          "es": "⚠ Nota: la media solo aparece cuando se han medido dos tercios de este periodo: 2 días con 3 días, 16 horas con 1 día. Hasta entonces queda vacía y la estación no cambia, para que unas pocas horas nocturnas no puedan cambiar la estación por sí solas.\n\nLa temperatura exterior se promedia durante este número de días, de día y de noche. Con 3 días sigue el tiempo sin reaccionar a un solo día cálido o frío.",
+          "fr": "⚠ Remarque : la moyenne n'apparaît qu'une fois les deux tiers de cette période mesurés — 2 jours pour 3 jours, 16 heures pour 1 jour. D'ici là, elle reste vide et la saison ne change pas, afin que quelques heures de nuit ne puissent pas changer la saison à elles seules.\n\nLa température extérieure est moyennée sur ce nombre de jours, jour et nuit. 3 jours suivent la météo sans réagir à une seule journée chaude ou froide.",
+          "it": "⚠ Nota: la media compare solo quando sono stati misurati due terzi di questo periodo: 2 giorni con 3 giorni, 16 ore con 1 giorno. Fino ad allora resta vuota e la stagione non cambia, così poche ore notturne non possono cambiare la stagione da sole.\n\nLa temperatura esterna viene mediata su questo numero di giorni, giorno e notte. 3 giorni seguono il meteo senza reagire a una singola giornata calda o fredda.",
+          "no": "⚠ Merk: gjennomsnittet vises først når to tredjedeler av perioden er målt — 2 dager ved 3 dager, 16 timer ved 1 dag. Frem til da er det tomt og sesongen endres ikke, slik at noen få nattetimer ikke alene kan bytte sesong.\n\nUtetemperaturen beregnes som gjennomsnitt over så mange dager, dag og natt. 3 dager følger været uten å reagere på én varm eller kald dag.",
+          "sv": "⚠ Obs: medelvärdet visas först när två tredjedelar av perioden har mätts — 2 dagar vid 3 dagar, 16 timmar vid 1 dag. Tills dess är det tomt och säsongen ändras inte, så att några nattimmar inte ensamma kan byta säsong.\n\nUtomhustemperaturen medelvärdesberäknas över så många dagar, dag och natt. 3 dagar följer vädret utan att reagera på en enstaka varm eller kall dag.",
+          "pl": "⚠ Uwaga: średnia pojawia się dopiero, gdy zmierzone zostaną dwie trzecie tego okresu — 2 dni przy 3 dniach, 16 godzin przy 1 dniu. Do tego czasu pozostaje pusta, a pora roku się nie zmienia, aby kilka nocnych godzin nie mogło samodzielnie przełączyć pory roku.\n\nTemperatura zewnętrzna jest uśredniana z tylu dni, w dzień i w nocy. 3 dni podążają za pogodą, nie reagując na pojedynczy ciepły lub zimny dzień.",
+          "ru": "⚠ Внимание: среднее появляется только после измерения двух третей этого периода — 2 дня при 3 днях, 16 часов при 1 дне. До тех пор оно пустое и сезон не меняется, чтобы несколько ночных часов не могли сами переключить сезон.\n\nТемпература на улице усредняется за столько дней, днём и ночью. 3 дня следуют за погодой, не реагируя на один тёплый или холодный день.",
+          "ko": "⚠ 참고: 이 기간의 3분의 2가 측정된 뒤에야 평균이 표시됩니다. 3일이면 2일, 1일이면 16시간입니다. 그때까지는 비어 있고 계절도 바뀌지 않으므로, 밤 몇 시간만으로 계절이 바뀌지 않습니다.\n\n실외 온도를 이 기간(일) 동안 낮과 밤 모두 평균합니다. 3일이면 하루의 더위나 추위에 반응하지 않고 날씨를 따라갑니다.",
+          "ar": "⚠ ملاحظة: لا يظهر المتوسط إلا بعد قياس ثلثي هذه الفترة — يومان مع 3 أيام، و16 ساعة مع يوم واحد. حتى ذلك الحين يبقى فارغًا ولا يتغيّر الموسم، كي لا تتمكن بضع ساعات ليلية وحدها من تبديل الموسم.\n\nيُحسب متوسط درجة الحرارة الخارجية على مدى هذا العدد من الأيام، ليلًا ونهارًا. مع 3 أيام يتبع الموسم الطقس دون أن يتأثر بيوم دافئ أو بارد واحد."
+        },
+        "value": 3,
+        "min": 1,
+        "max": 7,
+        "step": 1
+      },
+      {
+        "id": "seasonHours",
+        "type": "label",
+        "label": {
+          "en": "Hours measured",
+          "nl": "Gemeten uren",
+          "da": "Målte timer",
+          "de": "Gemessene Stunden",
+          "es": "Horas medidas",
+          "fr": "Heures mesurées",
+          "it": "Ore misurate",
+          "no": "Målte timer",
+          "sv": "Uppmätta timmar",
+          "pl": "Zmierzone godziny",
+          "ru": "Измерено часов",
+          "ko": "측정된 시간",
+          "ar": "الساعات المقاسة"
+        },
+        "hint": {
+          "en": "Hours with an outdoor reading in the averaging period. The average and season appear from two thirds.",
+          "nl": "Uren met een buitenmeting in de middelingsperiode. Het gemiddelde en het seizoen verschijnen vanaf twee derde.",
+          "da": "Timer med en udemåling i gennemsnitsperioden. Gennemsnittet og sæsonen vises fra to tredjedele.",
+          "de": "Stunden mit einer Außenmessung im Mittelungszeitraum. Durchschnitt und Jahreszeit erscheinen ab zwei Dritteln.",
+          "es": "Horas con una lectura exterior en el periodo de promedio. La media y la estación aparecen a partir de dos tercios.",
+          "fr": "Heures avec une mesure extérieure dans la période de moyenne. La moyenne et la saison apparaissent à partir des deux tiers.",
+          "it": "Ore con una lettura esterna nel periodo di media. La media e la stagione compaiono dai due terzi.",
+          "no": "Timer med en utemåling i gjennomsnittsperioden. Gjennomsnittet og sesongen vises fra to tredjedeler.",
+          "sv": "Timmar med en utomhusmätning under medelvärdesperioden. Medelvärdet och säsongen visas från två tredjedelar.",
+          "pl": "Godziny z odczytem zewnętrznym w okresie uśredniania. Średnia i pora roku pojawiają się od dwóch trzecich.",
+          "ru": "Часы с измерением на улице за период усреднения. Среднее и сезон появляются начиная с двух третей.",
+          "ko": "평균 기간 중 실외 측정값이 있는 시간입니다. 3분의 2부터 평균과 계절이 표시됩니다.",
+          "ar": "الساعات التي تتوفر فيها قراءة خارجية ضمن فترة المتوسط. يظهر المتوسط والموسم بدءًا من الثلثين."
+        },
+        "value": "—"
+      },
+      {
+        "id": "summerStart",
+        "type": "number",
+        "label": {
+          "en": "Summer from (°C)",
+          "nl": "Zomer vanaf (°C)",
+          "da": "Sommer fra (°C)",
+          "de": "Sommer ab (°C)",
+          "es": "Verano desde (°C)",
+          "fr": "Été à partir de (°C)",
+          "it": "Estate da (°C)",
+          "no": "Sommer fra (°C)",
+          "sv": "Sommar från (°C)",
+          "pl": "Lato od (°C)",
+          "ru": "Лето от (°C)",
+          "ko": "여름 시작 (°C)",
+          "ar": "الصيف من (°C)"
+        },
+        "hint": {
+          "en": "Mid-season becomes summer when the average rises to this temperature.",
+          "nl": "Tussenseizoen wordt zomer als het gemiddelde tot deze temperatuur stijgt.",
+          "da": "Overgangssæson bliver til sommer, når gennemsnittet stiger til denne temperatur.",
+          "de": "Die Übergangszeit wird zum Sommer, wenn der Durchschnitt auf diese Temperatur steigt.",
+          "es": "El entretiempo pasa a verano cuando la media sube hasta esta temperatura.",
+          "fr": "La mi-saison passe à l'été quand la moyenne monte jusqu'à cette température.",
+          "it": "La mezza stagione diventa estate quando la media sale a questa temperatura.",
+          "no": "Overgangssesong blir sommer når gjennomsnittet stiger til denne temperaturen.",
+          "sv": "Övergångssäsong blir sommar när medelvärdet stiger till denna temperatur.",
+          "pl": "Okres przejściowy zmienia się w lato, gdy średnia wzrośnie do tej temperatury.",
+          "ru": "Межсезонье сменяется летом, когда среднее поднимается до этой температуры.",
+          "ko": "평균이 이 온도까지 오르면 간절기가 여름으로 바뀝니다.",
+          "ar": "يتحول الفصل الانتقالي إلى صيف عندما يرتفع المتوسط إلى هذه الدرجة."
+        },
+        "value": 24,
+        "min": -10,
+        "max": 35,
+        "step": 0.5,
+        "units": {
+          "en": "°C"
+        }
+      },
+      {
+        "id": "summerEnd",
+        "type": "number",
+        "label": {
+          "en": "Summer until (°C)",
+          "nl": "Zomer tot (°C)",
+          "da": "Sommer indtil (°C)",
+          "de": "Sommer bis (°C)",
+          "es": "Verano hasta (°C)",
+          "fr": "Été jusqu'à (°C)",
+          "it": "Estate fino a (°C)",
+          "no": "Sommer til (°C)",
+          "sv": "Sommar till (°C)",
+          "pl": "Lato do (°C)",
+          "ru": "Лето до (°C)",
+          "ko": "여름 종료 (°C)",
+          "ar": "الصيف حتى (°C)"
+        },
+        "hint": {
+          "en": "Summer becomes mid-season when the average drops to this temperature. Keep it a few degrees below \"Summer from\", so the season doesn't switch back and forth.",
+          "nl": "Zomer wordt tussenseizoen als het gemiddelde tot deze temperatuur zakt. Houd het een paar graden onder \"Zomer vanaf\", zodat het seizoen niet heen en weer springt.",
+          "da": "Sommer bliver til overgangssæson, når gennemsnittet falder til denne temperatur. Hold den et par grader under \"Sommer fra\", så sæsonen ikke skifter frem og tilbage.",
+          "de": "Der Sommer wird zur Übergangszeit, wenn der Durchschnitt auf diese Temperatur fällt. Einige Grad unter \"Sommer ab\" halten, damit die Jahreszeit nicht hin und her wechselt.",
+          "es": "El verano pasa a entretiempo cuando la media baja hasta esta temperatura. Mantenla unos grados por debajo de \"Verano desde\" para que la estación no cambie de un lado a otro.",
+          "fr": "L'été passe à la mi-saison quand la moyenne descend jusqu'à cette température. Gardez-la quelques degrés sous « Été à partir de », pour que la saison ne bascule pas sans cesse.",
+          "it": "L'estate diventa mezza stagione quando la media scende a questa temperatura. Tienila qualche grado sotto \"Estate da\", così la stagione non cambia avanti e indietro.",
+          "no": "Sommer blir overgangssesong når gjennomsnittet synker til denne temperaturen. Hold den noen grader under \"Sommer fra\", så sesongen ikke skifter frem og tilbake.",
+          "sv": "Sommar blir övergångssäsong när medelvärdet sjunker till denna temperatur. Håll den några grader under \"Sommar från\" så att säsongen inte växlar fram och tillbaka.",
+          "pl": "Lato zmienia się w okres przejściowy, gdy średnia spadnie do tej temperatury. Ustaw ją kilka stopni poniżej \"Lato od\", aby pora roku nie przełączała się tam i z powrotem.",
+          "ru": "Лето сменяется межсезоньем, когда среднее опускается до этой температуры. Держите её на несколько градусов ниже «Лето от», чтобы сезон не переключался туда-обратно.",
+          "ko": "평균이 이 온도까지 내려가면 여름이 간절기로 바뀝니다. 계절이 자주 오가지 않도록 \"여름 시작\"보다 몇 도 낮게 두세요.",
+          "ar": "يتحول الصيف إلى فصل انتقالي عندما ينخفض المتوسط إلى هذه الدرجة. اجعلها أقل ببضع درجات من \"الصيف من\" حتى لا يتبدل الموسم ذهابًا وإيابًا."
+        },
+        "value": 22,
+        "min": -10,
+        "max": 35,
+        "step": 0.5,
+        "units": {
+          "en": "°C"
+        }
+      },
+      {
+        "id": "winterStart",
+        "type": "number",
+        "label": {
+          "en": "Winter from (°C)",
+          "nl": "Winter vanaf (°C)",
+          "da": "Vinter fra (°C)",
+          "de": "Winter ab (°C)",
+          "es": "Invierno desde (°C)",
+          "fr": "Hiver à partir de (°C)",
+          "it": "Inverno da (°C)",
+          "no": "Vinter fra (°C)",
+          "sv": "Vinter från (°C)",
+          "pl": "Zima od (°C)",
+          "ru": "Зима от (°C)",
+          "ko": "겨울 시작 (°C)",
+          "ar": "الشتاء من (°C)"
+        },
+        "hint": {
+          "en": "It becomes winter when the average drops to this temperature.",
+          "nl": "Het wordt winter als het gemiddelde tot deze temperatuur zakt.",
+          "da": "Det bliver vinter, når gennemsnittet falder til denne temperatur.",
+          "de": "Es wird Winter, wenn der Durchschnitt auf diese Temperatur fällt.",
+          "es": "Pasa a ser invierno cuando la media baja hasta esta temperatura.",
+          "fr": "L'hiver commence quand la moyenne descend jusqu'à cette température.",
+          "it": "Diventa inverno quando la media scende a questa temperatura.",
+          "no": "Det blir vinter når gjennomsnittet synker til denne temperaturen.",
+          "sv": "Det blir vinter när medelvärdet sjunker till denna temperatur.",
+          "pl": "Zima zaczyna się, gdy średnia spadnie do tej temperatury.",
+          "ru": "Наступает зима, когда среднее опускается до этой температуры.",
+          "ko": "평균이 이 온도까지 내려가면 겨울이 됩니다.",
+          "ar": "يبدأ الشتاء عندما ينخفض المتوسط إلى هذه الدرجة."
+        },
+        "value": 14,
+        "min": -10,
+        "max": 35,
+        "step": 0.5,
+        "units": {
+          "en": "°C"
+        }
+      },
+      {
+        "id": "winterEnd",
+        "type": "number",
+        "label": {
+          "en": "Winter until (°C)",
+          "nl": "Winter tot (°C)",
+          "da": "Vinter indtil (°C)",
+          "de": "Winter bis (°C)",
+          "es": "Invierno hasta (°C)",
+          "fr": "Hiver jusqu'à (°C)",
+          "it": "Inverno fino a (°C)",
+          "no": "Vinter til (°C)",
+          "sv": "Vinter till (°C)",
+          "pl": "Zima do (°C)",
+          "ru": "Зима до (°C)",
+          "ko": "겨울 종료 (°C)",
+          "ar": "الشتاء حتى (°C)"
+        },
+        "hint": {
+          "en": "Winter becomes mid-season when the average rises to this temperature. Keep it a few degrees above \"Winter from\".",
+          "nl": "Winter wordt tussenseizoen als het gemiddelde tot deze temperatuur stijgt. Houd het een paar graden boven \"Winter vanaf\".",
+          "da": "Vinter bliver til overgangssæson, når gennemsnittet stiger til denne temperatur. Hold den et par grader over \"Vinter fra\".",
+          "de": "Der Winter wird zur Übergangszeit, wenn der Durchschnitt auf diese Temperatur steigt. Einige Grad über \"Winter ab\" halten.",
+          "es": "El invierno pasa a entretiempo cuando la media sube hasta esta temperatura. Mantenla unos grados por encima de \"Invierno desde\".",
+          "fr": "L'hiver passe à la mi-saison quand la moyenne monte jusqu'à cette température. Gardez-la quelques degrés au-dessus de « Hiver à partir de ».",
+          "it": "L'inverno diventa mezza stagione quando la media sale a questa temperatura. Tienila qualche grado sopra \"Inverno da\".",
+          "no": "Vinter blir overgangssesong når gjennomsnittet stiger til denne temperaturen. Hold den noen grader over \"Vinter fra\".",
+          "sv": "Vinter blir övergångssäsong när medelvärdet stiger till denna temperatur. Håll den några grader över \"Vinter från\".",
+          "pl": "Zima zmienia się w okres przejściowy, gdy średnia wzrośnie do tej temperatury. Ustaw ją kilka stopni powyżej \"Zima od\".",
+          "ru": "Зима сменяется межсезоньем, когда среднее поднимается до этой температуры. Держите её на несколько градусов выше «Зима от».",
+          "ko": "평균이 이 온도까지 오르면 겨울이 간절기로 바뀝니다. \"겨울 시작\"보다 몇 도 높게 두세요.",
+          "ar": "يتحول الشتاء إلى فصل انتقالي عندما يرتفع المتوسط إلى هذه الدرجة. اجعلها أعلى ببضع درجات من \"الشتاء من\"."
+        },
+        "value": 16,
+        "min": -10,
+        "max": 35,
+        "step": 0.5,
+        "units": {
+          "en": "°C"
+        }
+      }
+    ]
+  },
+  {
+    "type": "group",
+    "label": {
       "en": "Detected (read-only)",
       "nl": "Gedetecteerd (alleen-lezen)",
       "da": "Registreret (skrivebeskyttet)",

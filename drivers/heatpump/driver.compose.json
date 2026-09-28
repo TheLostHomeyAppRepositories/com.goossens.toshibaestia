@@ -21,6 +21,7 @@
     "target_temperature",
     "measure_temperature",
     "measure_temperature.outdoor",
+    "measure_temperature.outdoor_avg",
     "measure_temperature.water_inlet",
     "measure_temperature.water_outlet",
     "alarm_generic",
@@ -36,7 +37,8 @@
     "boost_hotwater",
     "antibacteria",
     "measure_power",
-    "meter_power"
+    "meter_power",
+    "season"
   ],
   "capabilitiesOptions": {
     "onoff": {
@@ -181,6 +183,23 @@
         "ru": "Температура на улице",
         "ko": "실외 온도",
         "ar": "درجة الحرارة الخارجية"
+      }
+    },
+    "measure_temperature.outdoor_avg": {
+      "title": {
+        "en": "Average outdoor temperature",
+        "nl": "Gemiddelde buitentemperatuur",
+        "da": "Gennemsnitlig udetemperatur",
+        "de": "Durchschnittliche Außentemperatur",
+        "es": "Temperatura exterior media",
+        "fr": "Température extérieure moyenne",
+        "it": "Temperatura esterna media",
+        "no": "Gjennomsnittlig utetemperatur",
+        "sv": "Genomsnittlig utomhustemperatur",
+        "pl": "Średnia temperatura zewnętrzna",
+        "ru": "Средняя температура на улице",
+        "ko": "평균 실외 온도",
+        "ar": "متوسط درجة الحرارة الخارجية"
       }
     },
     "measure_temperature.water_inlet": {

@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Modbus-pollen misslyckades: {{reason}}"
+    "poll_failed": "Modbus-pollen misslyckades: {{reason}}",
+    "season_order": "Säsongens brytpunkter måste vara i denna ordning: Vinter från < Vinter till ≤ Sommar till < Sommar från."
+  },
+  "season": {
+    "summer": "Sommar",
+    "midseason": "Övergångssäsong",
+    "winter": "Vinter"
   }
 }

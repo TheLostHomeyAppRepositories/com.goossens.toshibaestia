@@ -1,5 +1,11 @@
 {
   "error": {
-    "poll_failed": "Modbus-Abfrage fehlgeschlagen: {{reason}}"
+    "poll_failed": "Modbus-Abfrage fehlgeschlagen: {{reason}}",
+    "season_order": "Die Schaltpunkte der Jahreszeit müssen in dieser Reihenfolge stehen: Winter ab < Winter bis ≤ Sommer bis < Sommer ab."
+  },
+  "season": {
+    "summer": "Sommer",
+    "midseason": "Übergangszeit",
+    "winter": "Winter"
   }
 }
