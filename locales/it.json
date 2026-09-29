@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "Il polling Modbus non è riuscito: {{reason}}",
-    "season_order": "Le soglie della stagione devono essere in questo ordine: Inverno da < Inverno fino a ≤ Estate fino a < Estate da."
+    "season_order": "Le soglie della stagione devono essere in questo ordine: Inverno da < Inverno fino a ≤ Estate fino a < Estate da.",
+    "no_hot_water": "L'acqua calda non è abilitata per questa pompa di calore (impostazioni del dispositivo)."
   },
   "season": {
     "summer": "Estate",

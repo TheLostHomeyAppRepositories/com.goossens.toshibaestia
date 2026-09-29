@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "Modbus-pollen misslyckades: {{reason}}",
-    "season_order": "Säsongens brytpunkter måste vara i denna ordning: Vinter från < Vinter till ≤ Sommar till < Sommar från."
+    "season_order": "Säsongens brytpunkter måste vara i denna ordning: Vinter från < Vinter till ≤ Sommar till < Sommar från.",
+    "no_hot_water": "Varmvatten är inte aktiverat för den här värmepumpen (enhetsinställningar)."
   },
   "season": {
     "summer": "Sommar",

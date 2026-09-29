@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "La encuesta de Modbus falló: {{reason}}",
-    "season_order": "Los puntos de cambio de estación deben seguir este orden: Invierno desde < Invierno hasta ≤ Verano hasta < Verano desde."
+    "season_order": "Los puntos de cambio de estación deben seguir este orden: Invierno desde < Invierno hasta ≤ Verano hasta < Verano desde.",
+    "no_hot_water": "El agua caliente no está habilitada para esta bomba de calor (ajustes del dispositivo)."
   },
   "season": {
     "summer": "Verano",

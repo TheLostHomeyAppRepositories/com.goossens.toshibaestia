@@ -1,0 +1,25 @@
+{
+  "id": "hotwater_is_on",
+  "title": {
+    "en": "Hot water !{{is|is not}} on",
+    "nl": "Warm water staat !{{aan|niet aan}}",
+    "da": "Varmt vand !{{er|er ikke}} tændt",
+    "de": "Warmwasser !{{ist|ist nicht}} eingeschaltet",
+    "es": "El agua caliente !{{está|no está}} activada",
+    "fr": "L'eau chaude !{{est|n'est pas}} activée",
+    "it": "L'acqua calda !{{è|non è}} attiva",
+    "no": "Varmtvann !{{er|er ikke}} på",
+    "sv": "Varmvatten !{{är|är inte}} på",
+    "pl": "Ciepła woda !{{jest|nie jest}} włączona",
+    "ru": "Горячая вода !{{включена|не включена}}",
+    "ko": "온수가 !{{켜져 있음|꺼져 있음}}",
+    "ar": "الماء الساخن !{{مُشغَّل|غير مُشغَّل}}"
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=heatpump"
+    }
+  ]
+}

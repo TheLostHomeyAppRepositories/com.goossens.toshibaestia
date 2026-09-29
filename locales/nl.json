@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "Modbus-uitlezing mislukt",
-    "season_order": "De schakelpunten van het seizoen moeten in deze volgorde staan: Winter vanaf < Winter tot ≤ Zomer tot < Zomer vanaf."
+    "season_order": "De schakelpunten van het seizoen moeten in deze volgorde staan: Winter vanaf < Winter tot ≤ Zomer tot < Zomer vanaf.",
+    "no_hot_water": "Warm water staat niet aan voor deze warmtepomp (apparaatinstellingen)."
   },
   "season": {
     "summer": "Zomer",

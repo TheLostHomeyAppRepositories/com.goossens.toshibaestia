@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "Błąd ankiety Modbus: {{reason}}",
-    "season_order": "Progi pory roku muszą być w tej kolejności: Zima od < Zima do ≤ Lato do < Lato od."
+    "season_order": "Progi pory roku muszą być w tej kolejności: Zima od < Zima do ≤ Lato do < Lato od.",
+    "no_hot_water": "Ciepła woda nie jest włączona dla tej pompy ciepła (ustawienia urządzenia)."
   },
   "season": {
     "summer": "Lato",

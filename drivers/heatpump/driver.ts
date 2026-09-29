@@ -88,6 +88,22 @@ export default class HeatpumpDriver extends Homey.Driver {
       this.error('register auto_temp_set', err);
     }
 
+    // Hot water on/off: onoff.hotwater is a sub-capability, which gets no auto-generated cards.
+    try {
+      this.homey.flow.getActionCard('hotwater_set')
+        .registerRunListener(async (args: { device: HeatpumpDevice; state: 'on' | 'off' }) => {
+          if (!args.device.hasCapability('onoff.hotwater')) throw new Error(args.device.homey.__('error.no_hot_water'));
+          await args.device.triggerCapabilityListener('onoff.hotwater', args.state === 'on');
+        });
+      this.homey.flow.getConditionCard('hotwater_is_on')
+        .registerRunListener(async (args: { device: HeatpumpDevice }) => {
+          if (!args.device.hasCapability('onoff.hotwater')) throw new Error(args.device.homey.__('error.no_hot_water'));
+          return args.device.getCapabilityValue('onoff.hotwater') === true;
+        });
+    } catch (err) {
+      this.error('register hot water cards', err);
+    }
+
     // Season (1.1.0): the season_changed trigger is fired from device.ts.
     try {
       this.homey.flow.getConditionCard('season_is')

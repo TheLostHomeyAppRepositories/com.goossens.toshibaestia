@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "Modbus poll failed",
-    "season_order": "The season switch points must be in this order: Winter from < Winter until ≤ Summer until < Summer from."
+    "season_order": "The season switch points must be in this order: Winter from < Winter until ≤ Summer until < Summer from.",
+    "no_hot_water": "Hot water is not enabled for this heat pump (device settings)."
   },
   "season": {
     "summer": "Summer",

@@ -309,6 +309,31 @@
         ]
       },
       {
+        "id": "hotwater_is_on",
+        "title": {
+          "en": "Hot water !{{is|is not}} on",
+          "nl": "Warm water staat !{{aan|niet aan}}",
+          "da": "Varmt vand !{{er|er ikke}} tændt",
+          "de": "Warmwasser !{{ist|ist nicht}} eingeschaltet",
+          "es": "El agua caliente !{{está|no está}} activada",
+          "fr": "L'eau chaude !{{est|n'est pas}} activée",
+          "it": "L'acqua calda !{{è|non è}} attiva",
+          "no": "Varmtvann !{{er|er ikke}} på",
+          "sv": "Varmvatten !{{är|är inte}} på",
+          "pl": "Ciepła woda !{{jest|nie jest}} włączona",
+          "ru": "Горячая вода !{{включена|не включена}}",
+          "ko": "온수가 !{{켜져 있음|꺼져 있음}}",
+          "ar": "الماء الساخن !{{مُشغَّل|غير مُشغَّل}}"
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=heatpump"
+          }
+        ]
+      },
+      {
         "id": "season_is",
         "title": {
           "en": "Season !{{is|is not}} …",
@@ -596,6 +621,103 @@
               "ko": "30",
               "ar": "٣٠"
             }
+          }
+        ]
+      },
+      {
+        "id": "hotwater_set",
+        "title": {
+          "en": "Turn hot water on or off",
+          "nl": "Warm water aan- of uitzetten",
+          "da": "Tænd eller sluk for varmt vand",
+          "de": "Warmwasser ein- oder ausschalten",
+          "es": "Activar o desactivar el agua caliente",
+          "fr": "Activer ou désactiver l'eau chaude",
+          "it": "Attiva o disattiva l'acqua calda",
+          "no": "Slå varmtvann på eller av",
+          "sv": "Slå på eller av varmvatten",
+          "pl": "Włącz lub wyłącz ciepłą wodę",
+          "ru": "Включить или выключить горячую воду",
+          "ko": "온수 켜기 또는 끄기",
+          "ar": "تشغيل أو إيقاف الماء الساخن"
+        },
+        "titleFormatted": {
+          "en": "Turn hot water [[state]]",
+          "nl": "Zet warm water [[state]]",
+          "da": "Varmt vand: [[state]]",
+          "de": "Warmwasser: [[state]]",
+          "es": "Agua caliente: [[state]]",
+          "fr": "Eau chaude : [[state]]",
+          "it": "Acqua calda: [[state]]",
+          "no": "Varmtvann: [[state]]",
+          "sv": "Varmvatten: [[state]]",
+          "pl": "Ciepła woda: [[state]]",
+          "ru": "Горячая вода: [[state]]",
+          "ko": "온수: [[state]]",
+          "ar": "الماء الساخن: [[state]]"
+        },
+        "hint": {
+          "en": "Switches hot water (DHW) operation on or off, as on the remote controller.",
+          "nl": "Zet de warmwaterbereiding aan of uit, zoals op de afstandsbediening.",
+          "da": "Tænder eller slukker for varmtvandsdriften, som på fjernbetjeningen.",
+          "de": "Schaltet die Warmwasserbereitung ein oder aus, wie an der Fernbedienung.",
+          "es": "Activa o desactiva la producción de agua caliente, como en el mando.",
+          "fr": "Active ou désactive la production d'eau chaude, comme sur la télécommande.",
+          "it": "Attiva o disattiva la produzione di acqua calda, come sul comando remoto.",
+          "no": "Slår varmtvannsdriften på eller av, som på fjernkontrollen.",
+          "sv": "Slår på eller av varmvattendriften, som på fjärrkontrollen.",
+          "pl": "Włącza lub wyłącza przygotowanie ciepłej wody, jak na pilocie.",
+          "ru": "Включает или выключает приготовление горячей воды, как на пульте.",
+          "ko": "리모컨에서처럼 온수 운전을 켜거나 끕니다.",
+          "ar": "يشغّل أو يوقف تسخين الماء الساخن، كما في جهاز التحكم عن بُعد."
+        },
+        "args": [
+          {
+            "name": "device",
+            "type": "device",
+            "filter": "driver_id=heatpump"
+          },
+          {
+            "name": "state",
+            "type": "dropdown",
+            "values": [
+              {
+                "id": "on",
+                "label": {
+                  "en": "on",
+                  "nl": "aan",
+                  "da": "til",
+                  "de": "ein",
+                  "es": "activada",
+                  "fr": "activée",
+                  "it": "attiva",
+                  "no": "på",
+                  "sv": "på",
+                  "pl": "włączona",
+                  "ru": "вкл.",
+                  "ko": "켜기",
+                  "ar": "تشغيل"
+                }
+              },
+              {
+                "id": "off",
+                "label": {
+                  "en": "off",
+                  "nl": "uit",
+                  "da": "fra",
+                  "de": "aus",
+                  "es": "desactivada",
+                  "fr": "désactivée",
+                  "it": "disattiva",
+                  "no": "av",
+                  "sv": "av",
+                  "pl": "wyłączona",
+                  "ru": "выкл.",
+                  "ko": "끄기",
+                  "ar": "إيقاف"
+                }
+              }
+            ]
           }
         ]
       },

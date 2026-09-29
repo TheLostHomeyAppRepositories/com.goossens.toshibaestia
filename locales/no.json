@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "Modbus forespørsel mislyktes: {{reason}}",
-    "season_order": "Sesongens byttepunkter må være i denne rekkefølgen: Vinter fra < Vinter til ≤ Sommer til < Sommer fra."
+    "season_order": "Sesongens byttepunkter må være i denne rekkefølgen: Vinter fra < Vinter til ≤ Sommer til < Sommer fra.",
+    "no_hot_water": "Varmtvann er ikke slått på for denne varmepumpen (enhetsinnstillinger)."
   },
   "season": {
     "summer": "Sommer",

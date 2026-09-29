@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "Échec du sondage Modbus : {{reason}}",
-    "season_order": "Les seuils de saison doivent être dans cet ordre : Hiver à partir de < Hiver jusqu'à ≤ Été jusqu'à < Été à partir de."
+    "season_order": "Les seuils de saison doivent être dans cet ordre : Hiver à partir de < Hiver jusqu'à ≤ Été jusqu'à < Été à partir de.",
+    "no_hot_water": "L'eau chaude n'est pas activée pour cette pompe à chaleur (réglages de l'appareil)."
   },
   "season": {
     "summer": "Été",

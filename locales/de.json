@@ -1,7 +1,8 @@
 {
   "error": {
     "poll_failed": "Modbus-Abfrage fehlgeschlagen: {{reason}}",
-    "season_order": "Die Schaltpunkte der Jahreszeit müssen in dieser Reihenfolge stehen: Winter ab < Winter bis ≤ Sommer bis < Sommer ab."
+    "season_order": "Die Schaltpunkte der Jahreszeit müssen in dieser Reihenfolge stehen: Winter ab < Winter bis ≤ Sommer bis < Sommer ab.",
+    "no_hot_water": "Warmwasser ist für diese Wärmepumpe nicht aktiviert (Geräteeinstellungen)."
   },
   "season": {
     "summer": "Sommer",
