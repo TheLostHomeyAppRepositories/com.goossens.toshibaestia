@@ -1,5 +1,9 @@
 # Toshiba Estia — Homey App
 
+**[➜ Install Toshiba Estia from the Homey App Store](https://homey.app/a/com.goossens.toshibaestia)**
+
+That's the easiest way to get the app, and it keeps itself up to date. Installing from this repository is only needed for development.
+
 Homey Pro integration for **Toshiba Estia** air-to-water heat pumps (R410A 4/5 Series WM, R32 1/2 Series WM/AIO), over **Modbus TCP**.
 
 Works with the Toshiba **BMS-IFMB0UEW-E** Modbus RTU interface (or any compatible interface that exposes the Estia register map) wired to any Modbus TCP gateway. Tested with the **Waveshare RS485-to-WiFi/ETH** converter in "Modbus TCP ↔ Modbus RTU" mode.
