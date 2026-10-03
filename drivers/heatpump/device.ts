@@ -20,6 +20,15 @@ import {
   type Season,
   type SeasonConfig,
 } from './season';
+import {
+  PowerEstimator,
+  RefrigerantSensorCheck,
+  energyKwh,
+  type LearntState,
+  type PowerConfig,
+  type PowerSample,
+  type RefrigerantCheckState,
+} from './power-model';
 
 type TempScaling = 'x1' | 'x10';
 type ThermostatMode = 'off' | 'heat' | 'cool';
@@ -44,13 +53,14 @@ interface DeviceSettings {
   tempScaling: TempScaling;
   enableZone2: boolean;
   enableDhw: boolean;
-  // Energy estimation: model preset + backup heater wattage dropdown.
-  // Cylinder immersion is auto-detected from register 40039 (delta-hours);
-  // see STANDARD_IMMERSION_KW in device.ts. No user setting needed because
-  // Toshiba only ships the 2.75 kW HWS-CSHM3-E cylinder immersion, and only
-  // on split installs where it's wired in by the installer.
+  // Energy estimation (see power-model.ts). Cylinder immersion is auto-detected
+  // from register 40039 (delta-hours): Toshiba only ships the 2.75 kW HWS-CSHM3-E
+  // cylinder immersion, and only on split installs where the installer wires it.
   modelKey?: string;
   backupHeaterKW?: string;     // dropdown: "0" | "3" | "6" | "9"
+  tankLitres?: number;         // hot water tank volume, used to learn the water flow
+  flowLpm?: number;            // water flow set by the user; 0 = learn it
+  powerStatus?: string;        // read-only: flow in use + how the compressor is detected
   detectedSeries?: string;
   detectedSlaveAddress?: string;
   detectedBaudRate?: string;
@@ -77,40 +87,49 @@ const seasonConfig = (s: DeviceSettings): SeasonConfig => ({
 });
 
 /**
- * Comprehensive Toshiba Estia model preset table — nominal electrical input
- * power per mode (kW), drawn from official datasheets (R32 S1/S2, R410A S4,
- * S5, Hi Power). Heating @ A7/W35, cooling @ A35/W7, DHW derived at A7/W55.
- * The user picks one entry from the dropdown; the energy estimator multiplies
- * lifetime hours by these values.
+ * Toshiba Estia models: rated heating capacity and electrical input (kW) at A7/W35
+ * from Toshiba's datasheets (R32 S1/S2, R410A S4, S5, Hi Power), and the outdoor
+ * unit code of the R32 Engineering Data Book tables in data/r32-tables.json. Models
+ * with tables get the part-load model; the others their rated COP, shaped over
+ * outdoor and water temperature (power-model.ts).
  *
  * NOTE: backup heater wattage is NOT here — it's an installation choice
  * (3/6/9 kW typically) and lives in its own settings dropdown.
  */
-const MODEL_PRESETS: Record<string, { heat: number; cool: number; dhw: number }> = {
+const MODEL_PRESETS: Record<string, { capacityKw: number; heatInputKw: number; tables?: string }> = {
   // R32 1 Series (F21 indoor) and 2 Series (S21 indoor) share the same outdoor
   // units (HWT-_HW-E codes) and the same compressor → identical input ratings.
   // One entry per kW class; covers both generations.
-  'r32-s1-401':   { heat: 0.77, cool: 1.16, dhw: 1.4 },  // 4 kW  — outdoor HWT-401HW-E
-  'r32-s1-601':   { heat: 1.25, cool: 1.52, dhw: 1.9 },  // 6 kW  — outdoor HWT-601HW-E
-  'r32-s1-801':   { heat: 1.54, cool: 1.88, dhw: 2.5 },  // 8 kW  — outdoor HWT-801HW-E
-  'r32-s1-1101':  { heat: 2.39, cool: 2.86, dhw: 3.6 },  // 11 kW — outdoor HWT-1101HW-E (e.g. F21SM3 / S21SM3)
-  'r32-s1-1401':  { heat: 3.04, cool: 4.08, dhw: 4.7 },  // 14 kW — outdoor HWT-1401H8W-E
+  'r32-s1-401':   { capacityKw: 4,   heatInputKw: 0.77, tables: '401' },  // outdoor HWT-401HW-E
+  'r32-s1-601':   { capacityKw: 6,   heatInputKw: 1.25, tables: '601' },  // outdoor HWT-601HW-E
+  'r32-s1-801':   { capacityKw: 8,   heatInputKw: 1.54, tables: '801' },  // outdoor HWT-801HW-E
+  'r32-s1-1101':  { capacityKw: 11,  heatInputKw: 2.39, tables: '1101' }, // outdoor HWT-1101HW-E (e.g. F21SM3 / S21SM3)
+  'r32-s1-1401':  { capacityKw: 14,  heatInputKw: 3.04 },                 // outdoor HWT-1401H8W-E (not in the Data Book tables)
   // R410A Series 5 (2017-2021)
-  'r410a-s5-455': { heat: 0.92, cool: 1.46, dhw: 1.5 },  // 4.5 kW
-  'r410a-s5-805': { heat: 1.79, cool: 2.00, dhw: 2.6 },  // 8 kW
-  'r410a-s5-1105':{ heat: 2.30, cool: 3.07, dhw: 3.5 },  // 11 kW
-  'r410a-s5-1405':{ heat: 3.11, cool: 3.81, dhw: 4.7 },  // 14 kW
-  'r410a-s5-1605':{ heat: 3.78, cool: 4.10, dhw: 5.0 },  // 16 kW
+  'r410a-s5-455': { capacityKw: 4.5, heatInputKw: 0.92 },
+  'r410a-s5-805': { capacityKw: 8,   heatInputKw: 1.79 },
+  'r410a-s5-1105':{ capacityKw: 11,  heatInputKw: 2.30 },
+  'r410a-s5-1405':{ capacityKw: 14,  heatInputKw: 3.11 },
+  'r410a-s5-1605':{ capacityKw: 16,  heatInputKw: 3.78 },
   // R410A Hi Power (high-temperature flow)
-  'r410a-hp-805': { heat: 1.71, cool: 2.00, dhw: 2.6 },  // 8 kW
-  'r410a-hp-1105':{ heat: 2.30, cool: 3.30, dhw: 3.5 },  // 11 kW
-  'r410a-hp-1405':{ heat: 3.16, cool: 3.81, dhw: 4.7 },  // 14 kW
+  'r410a-hp-805': { capacityKw: 8,   heatInputKw: 1.71 },
+  'r410a-hp-1105':{ capacityKw: 11,  heatInputKw: 2.30 },
+  'r410a-hp-1405':{ capacityKw: 14,  heatInputKw: 3.16 },
   // R410A Series 4 (legacy, 2014-2017)
-  'r410a-s4-803': { heat: 1.90, cool: 2.07, dhw: 2.6 },  // 8 kW
-  'r410a-s4-1103':{ heat: 2.69, cool: 3.45, dhw: 3.5 },  // 11 kW
-  'r410a-s4-1403':{ heat: 3.40, cool: 3.85, dhw: 4.7 },  // 14 kW
-  'r410a-s4-1603':{ heat: 3.95, cool: 3.95, dhw: 5.0 },  // 16 kW
+  'r410a-s4-803': { capacityKw: 8,   heatInputKw: 1.90 },
+  'r410a-s4-1103':{ capacityKw: 11,  heatInputKw: 2.69 },
+  'r410a-s4-1403':{ capacityKw: 14,  heatInputKw: 3.40 },
+  'r410a-s4-1603':{ capacityKw: 16,  heatInputKw: 3.95 },
 };
+const DEFAULT_MODEL = 'r32-s1-1101';
+/** Toshiba's only cylinder immersion: the HWS-CSHM3-E element. */
+const IMMERSION_KW = 2.75;
+/** Toshiba backup heaters come in 3 kW stages (3 / 6 / 9 kW). */
+const BACKUP_STEP_KW = 3;
+/** Rated flow: the rated capacity at the rating's 5 K water ΔT. */
+const RATED_DELTA_T_K = 5;
+/** Settings that change the power estimate. */
+const POWER_SETTINGS = ['modelKey', 'backupHeaterKW', 'tankLitres', 'flowLpm', 'enableDhw'];
 
 /**
  * Feature-gated capabilities. NEVER list these in driver.compose.json.
@@ -235,13 +254,8 @@ const ALWAYS_ON_REGISTERS = [
   REGISTERS.autoTempOnOff.number,
   REGISTERS.nightSetbackOnOff.number,
   REGISTERS.frostProtectionOnOff.number,
-  // Runtime hour counters — used by the energy estimator
-  REGISTERS.dhwCompressorHours.number,
-  REGISTERS.heatingCompressorHours.number,
-  REGISTERS.coolingCompressorHours.number,
-  REGISTERS.waterPumpHours.number,
+  // Cylinder immersion hours: ticking proves an immersion is wired (power estimate)
   REGISTERS.immersionHeaterHours.number,
-  REGISTERS.backupHeaterHours.number,
 ] as const;
 
 /** Registers polled only when Zone 2 is installed. */
@@ -265,18 +279,15 @@ export default class HeatpumpDevice extends Homey.Device {
   private limitsApplied = false;
   private dhwBoostOffTimer: NodeJS.Timeout | null = null;
   private lastAlarmActive = false;
-  private lastBackupHours: number | null = null;
   private lastImmersionHours: number | null = null;
-  // Live-power detection state — last sample's TWO + timestamp for rate calc.
-  private lastTwoC: number | null = null;
-  private lastSampleMs: number | null = null;
-  // Demand-transition state machine: tracks on→off / off→on edges so we can
-  // suppress watts during compressor start (hysteresis) and after cycle end
-  // (post-cycle lock — water side keeps showing delta-T as it equalises).
-  private lastDemandOn = false;
-  private demandTransitionMs: number | null = null;
-  // Lifetime kWh monotonicity guard — a bad register read shouldn't roll the total back.
-  private lastMeterPowerKwh: number | null = null;
+  // Power estimate (power-model.ts); created in onInit from the settings and store.
+  private power!: PowerEstimator;
+  private refrigerantCheck!: RefrigerantSensorCheck;
+  private lastPower: { watts: number; timeMs: number } | null = null;
+  private meterKwh = 0;
+  // Consecutive failed reads of register 40028; after three it's left alone until an app restart.
+  private evaporatorFailures = 0;
+  private refrigerantCheckSavedMs = 0;
   // Outdoor samples of the current hour; stored as one hourly average when the hour ends.
   private outdoorHour: { hour: number; sum: number; count: number } | null = null;
 
@@ -303,6 +314,7 @@ export default class HeatpumpDevice extends Homey.Device {
 
     await this.syncOptionalCapabilities(settings);
     this.registerCapabilityListeners();
+    this.initPower(settings);
     await this.updateSeason(settings).catch((err) => this.error('updateSeason', err));
 
     // Restore the last-fault display from persistent store so users see the
@@ -379,6 +391,14 @@ export default class HeatpumpDevice extends Homey.Device {
 
     if (changedKeys.includes('pollInterval')) {
       this.schedulePolling(Number(s.pollInterval));
+    }
+
+    if (changedKeys.includes('tankLitres')) {
+      // Learnt flows scale with the tank volume they were learnt with: start over.
+      await this.setStoreValue('powerLearnt', null);
+      this.power = new PowerEstimator(this.powerConfig(s));
+    } else if (changedKeys.some((key) => POWER_SETTINGS.includes(key))) {
+      this.power.setConfig(this.powerConfig(s));
     }
 
     this.homey.setTimeout(() => this.pollOnce(), 250);
@@ -639,6 +659,116 @@ export default class HeatpumpDevice extends Homey.Device {
       .catch((err) => this.error('season_changed trigger failed', err));
   }
 
+  /** Power-model inputs from the device settings. */
+  private powerConfig(s: DeviceSettings): PowerConfig {
+    const preset = MODEL_PRESETS[s.modelKey ?? DEFAULT_MODEL] ?? MODEL_PRESETS[DEFAULT_MODEL];
+    const tankLitres = Number(s.tankLitres ?? 210);
+    const flowLpm = Number(s.flowLpm ?? 0);
+    return {
+      tableModel: preset.tables ?? null,
+      ratedHeatKw: preset.capacityKw,
+      ratedCop: preset.capacityKw / preset.heatInputKw,
+      ratedFlowLpm: (preset.capacityKw / (4.186 * RATED_DELTA_T_K)) * 60,
+      fixedFlowLpm: flowLpm > 0 ? flowLpm : null,
+      backupHeaterKw: parseFloat(s.backupHeaterKW ?? '3') || 0,
+      backupStepKw: BACKUP_STEP_KW,
+      immersionKw: this.getStoreValue('immersionSeen') ? IMMERSION_KW : 0,
+      tankLitres: s.enableDhw && tankLitres > 0 ? tankLitres : null,
+    };
+  }
+
+  private initPower(s: DeviceSettings): void {
+    const learnt = this.getStoreValue('powerLearnt') as LearntState | null;
+    const check = this.getStoreValue('refrigerantCheck') as RefrigerantCheckState | null;
+    this.power = new PowerEstimator(this.powerConfig(s), learnt ?? undefined);
+    this.refrigerantCheck = new RefrigerantSensorCheck(check ?? undefined);
+    // meter_power keeps counting from where it is (also the hours-based totals of
+    // versions before 1.2.0), so Homey Energy never sees the meter go backwards.
+    this.meterKwh = Number(this.getCapabilityValue('meter_power')) || 0;
+  }
+
+  /**
+   * Register 40028 (TE) isn't in Toshiba's list: read it on its own so a unit that
+   * rejects it can't break the main poll, and stop asking after three refusals in a row.
+   */
+  private async readEvaporator(endpoint: ModbusEndpoint): Promise<number | undefined> {
+    if (this.evaporatorFailures >= 3) return undefined;
+    try {
+      const snap = await this.app.modbus.readRegisters(endpoint, [REGISTERS.evaporatorTemp.number]);
+      this.evaporatorFailures = 0;
+      return snap[REGISTERS.evaporatorTemp.number];
+    } catch (err) {
+      this.evaporatorFailures += 1;
+      if (this.evaporatorFailures >= 3) {
+        this.log(`Register ${REGISTERS.evaporatorTemp.number} not readable, power estimate uses water temperatures only:`, err instanceof Error ? err.message : err);
+      }
+      return undefined;
+    }
+  }
+
+  /**
+   * Live power (W) and energy (kWh) from the power model: electrical input derived
+   * from the heat the water carries (flow × ΔT) and Toshiba's performance tables,
+   * integrated over time. See power-model.ts and AGENTS.md § 7.
+   */
+  private async updatePower(snapshot: Record<number, number>, s: DeviceSettings, evaporatorRaw?: number): Promise<void> {
+    const temp = (reg: number): number | null => {
+      const raw = snapshot[reg];
+      return raw === undefined ? null : this.scale(raw, s);
+    };
+
+    // An immersion heater is only counted once its hour counter has ticked.
+    const hImm = snapshot[REGISTERS.immersionHeaterHours.number];
+    if (hImm !== undefined) {
+      if (this.lastImmersionHours != null && hImm > this.lastImmersionHours && !this.getStoreValue('immersionSeen')) {
+        await this.setStoreValue('immersionSeen', true);
+        this.power.setConfig(this.powerConfig(s));
+      }
+      this.lastImmersionHours = hImm;
+    }
+
+    const sample: PowerSample = {
+      timeMs: Date.now(),
+      zoneOn: snapshot[REGISTERS.zone1OnOff.number] === 1,
+      dhwOn: s.enableDhw && snapshot[REGISTERS.hotWaterOnOff.number] === 1,
+      coolMode: snapshot[REGISTERS.operationMode.number] === 2,
+      outdoorC: temp(REGISTERS.outdoorTemp.number),
+      twiC: temp(REGISTERS.waterInletTemp.number),
+      twoC: temp(REGISTERS.waterOutletTemp.number),
+      thoC: temp(REGISTERS.heaterOutletTemp.number),
+      tankC: s.enableDhw ? temp(REGISTERS.dhwTankTemp.number) : null,
+      evaporatorC: evaporatorRaw === undefined ? null : this.scale(evaporatorRaw, s),
+    };
+    const reading = this.power.update({ ...sample, evaporatorC: this.refrigerantCheck.trusted ? sample.evaporatorC : null });
+    this.refrigerantCheck.update(sample, reading.waterSaysOn);
+
+    if (this.lastPower) this.meterKwh += energyKwh(this.lastPower.watts, reading.watts, sample.timeMs - this.lastPower.timeMs);
+    this.lastPower = { watts: reading.watts, timeMs: sample.timeMs };
+    if (this.hasCapability('measure_power')) {
+      await this.setCapabilityValue('measure_power', reading.watts).catch(() => undefined);
+    }
+    if (this.hasCapability('meter_power')) {
+      await this.setCapabilityValue('meter_power', Math.round(this.meterKwh * 1000) / 1000).catch(() => undefined);
+    }
+
+    // Persist what was learnt, and show it in the settings.
+    const learnt = this.power.learnt;
+    if (JSON.stringify(learnt) !== JSON.stringify(this.getStoreValue('powerLearnt'))) await this.setStoreValue('powerLearnt', learnt);
+    // The check's counters move every poll: save when its verdict changes, else every 30 min.
+    const saved = this.getStoreValue('refrigerantCheck') as RefrigerantCheckState | null;
+    const verdictChanged = new RefrigerantSensorCheck(saved ?? undefined).trusted !== this.refrigerantCheck.trusted;
+    if (verdictChanged || sample.timeMs - this.refrigerantCheckSavedMs > 30 * 60_000) {
+      await this.setStoreValue('refrigerantCheck', this.refrigerantCheck.snapshot);
+      this.refrigerantCheckSavedMs = sample.timeMs;
+    }
+    let flowSource = this.homey.__('power.flow_rated');
+    if (Number(s.flowLpm) > 0) flowSource = this.homey.__('power.flow_set');
+    else if (this.power.flowIsLearnt) flowSource = `${this.homey.__('power.flow_learnt')} (${learnt.flowSamplesLpm.length})`;
+    const detection = this.homey.__(this.refrigerantCheck.trusted ? 'power.detect_refrigerant' : 'power.detect_water');
+    const powerStatus = `${this.power.flowLpm.toFixed(1)} l/min, ${flowSource} · ${detection}`;
+    if (s.powerStatus !== powerStatus) await this.setSettings({ powerStatus }).catch((err) => this.error('setSettings powerStatus', err));
+  }
+
   private schedulePolling(intervalSeconds: number): void {
     this.clearPolling();
     const ms = Math.max(5, intervalSeconds) * 1000;
@@ -658,7 +788,8 @@ export default class HeatpumpDevice extends Homey.Device {
     const registers = this.buildRegisterList(settings);
     try {
       const snapshot = await this.app.modbus.readRegisters(endpoint, registers);
-      await this.applySnapshot(snapshot, settings);
+      const evaporatorRaw = await this.readEvaporator(endpoint);
+      await this.applySnapshot(snapshot, settings, evaporatorRaw);
       await this.setAvailable();
       await this.setSettings({ lastSeen: new Date().toISOString() }).catch(() => undefined);
 
@@ -693,7 +824,7 @@ export default class HeatpumpDevice extends Homey.Device {
     return s.tempScaling === 'x10' ? signed / 10 : signed;
   }
 
-  private async applySnapshot(snapshot: Record<number, number>, s: DeviceSettings): Promise<void> {
+  private async applySnapshot(snapshot: Record<number, number>, s: DeviceSettings, evaporatorRaw?: number): Promise<void> {
     const setTemp = async (cap: string, regNumber: number) => {
       if (!this.hasCapability(cap)) return;
       const raw = snapshot[regNumber];
@@ -752,152 +883,7 @@ export default class HeatpumpDevice extends Homey.Device {
     await setBool('auto_temp',        REGISTERS.autoTempOnOff.number);
 
     // ── Energy estimation ────────────────────────────────────────────────
-    // The BMS-IFMB0UEW-E doesn't expose power or kWh registers, so we infer
-    // "what's running right now" from physical signals (water-side delta-T)
-    // and multiply by per-model rated input power. Lifetime totals come from
-    // the unit's own hour counters × the same rated values.
-    const preset      = MODEL_PRESETS[s.modelKey ?? 'r32-s1-1101'] ?? MODEL_PRESETS['r32-s1-1101'];
-    const ratedHeat   = preset.heat;
-    const ratedCool   = preset.cool;
-    const ratedDhw    = preset.dhw;
-    const ratedBackup = parseFloat(s.backupHeaterKW   ?? '3') || 0;
-    // Toshiba's only cylinder-immersion product is the 2.75 kW element fitted
-    // to the HWS-CSHM3-E external cylinder. Detection is delta-hours-based:
-    // ratedImm only applies once register 40039 actually starts ticking,
-    // which proves an immersion is physically wired and engaging on this unit.
-    const ratedImm    = 2.75;
-
-    // Lifetime hour counters drive the running kWh total.
-    const hHeat   = snapshot[REGISTERS.heatingCompressorHours.number] ?? 0;
-    const hCool   = snapshot[REGISTERS.coolingCompressorHours.number] ?? 0;
-    const hDhw    = snapshot[REGISTERS.dhwCompressorHours.number]     ?? 0;
-    const hBackup = snapshot[REGISTERS.backupHeaterHours.number]      ?? 0;
-    const hImm    = snapshot[REGISTERS.immersionHeaterHours.number]   ?? 0;
-    const kwhTotal =
-      hHeat * ratedHeat +
-      hCool * ratedCool +
-      hDhw  * ratedDhw  +
-      hBackup * ratedBackup +
-      hImm * ratedImm;
-    // Monotonicity guard: a single bad register read can produce a kWh value
-    // lower than the previous one. Lifetime totals are non-decreasing — drop
-    // the new value and keep the last known good one if it tries to roll back.
-    const kwhPlausible =
-      this.lastMeterPowerKwh == null || kwhTotal >= this.lastMeterPowerKwh - 0.5;
-    if (kwhPlausible && this.hasCapability('meter_power')) {
-      await this.setCapabilityValue('meter_power', Math.round(kwhTotal)).catch(() => undefined);
-      this.lastMeterPowerKwh = kwhTotal;
-    } else if (!kwhPlausible) {
-      this.error(`kWh monotonicity guard: ${this.lastMeterPowerKwh} → ${kwhTotal}, skipping`);
-    }
-
-    // ── Live power: gate on physical signals ─────────────────────────────
-    // Compressor runs ⇔ |TWO − TWI| > ~1.5 °C (heat exchange is happening).
-    // BUH runs ⇔ THO − TWO > ~1.0 °C (heater adds heat downstream of TWO).
-    // Immersion runs ⇔ DHW tank rising fast while compressor isn't heating it,
-    //   or anti-bacteria cycle active (target > heatpump max).
-    const twiC = this.scale(snapshot[REGISTERS.waterInletTemp.number]   ?? NO_SENSOR_VALUE, s);
-    const twoC = this.scale(snapshot[REGISTERS.waterOutletTemp.number]  ?? NO_SENSOR_VALUE, s);
-    const thoC = this.scale(snapshot[REGISTERS.heaterOutletTemp.number] ?? NO_SENSOR_VALUE, s);
-
-    const COMPRESSOR_DELTA_THRESHOLD = 1.5;
-    const BUH_DELTA_THRESHOLD        = 1.0;
-    const TWO_RATE_THRESHOLD         = 0.05;     // °C/min — sign tells direction
-    // Demand-transition hysteresis: filter out compressor-start ramps and
-    // residual water-side delta-T after a cycle ends.
-    const STARTING_HYSTERESIS_MS     = 60_000;   // ignore first 60 s of demand-on
-    const POST_CYCLE_LOCK_MS         = 180_000;  // force 0 W for 180 s after demand-off
-    // Modulation against rated input. Estia rated condition has |ΔT| ≈ 5 °C;
-    // larger ΔT means the inverter is pushing harder, smaller means modulating down.
-    const NOMINAL_DELTA_T            = 5;
-    const MODULATION_MIN             = 0.5;      // 50 % rated minimum when running
-    const MODULATION_MAX             = 1.5;      // 150 % rated maximum (boost mode)
-
-    const z1IsOn  = snapshot[REGISTERS.zone1OnOff.number] === 1;
-    const dhwIsOn = s.enableDhw && snapshot[REGISTERS.hotWaterOnOff.number] === 1;
-    const modeRaw = snapshot[REGISTERS.operationMode.number];
-    const anyHeatpumpDemand = z1IsOn || dhwIsOn;
-
-    // TWO rate of change (°C / minute). Capture the "rate available" flag
-    // while the previous values are still in scope — we update them below.
-    const nowMs = Date.now();
-    let twoRatePerMin  = 0;
-    let twoRateAvailable = false;
-    if (this.lastSampleMs != null && twoC != null && this.lastTwoC != null) {
-      const dtMin = (nowMs - this.lastSampleMs) / 60000;
-      if (dtMin > 0) {
-        twoRatePerMin = (twoC - this.lastTwoC) / dtMin;
-        twoRateAvailable = true;
-      }
-    }
-    this.lastTwoC = twoC;
-    this.lastSampleMs = nowMs;
-
-    // Demand-edge tracking — capture timestamps of on→off and off→on transitions.
-    if (anyHeatpumpDemand !== this.lastDemandOn) {
-      this.demandTransitionMs = nowMs;
-      this.lastDemandOn = anyHeatpumpDemand;
-    }
-    const sinceTransitionMs = this.demandTransitionMs != null
-      ? nowMs - this.demandTransitionMs
-      : Number.POSITIVE_INFINITY;
-    const inStartingHysteresis = anyHeatpumpDemand && sinceTransitionMs < STARTING_HYSTERESIS_MS;
-    const inPostCycleLock      = !anyHeatpumpDemand && sinceTransitionMs < POST_CYCLE_LOCK_MS;
-
-    // Compressor: needs demand AND active heat exchange AND TWO moving in the
-    // expected direction. After a cycle ends, residual delta-T lingers but TWO
-    // decays — that decay is what eliminates the false positive.
-    let compressorRunning = false;
-    if (anyHeatpumpDemand && twiC != null && twoC != null) {
-      const deltaOK = Math.abs(twoC - twiC) > COMPRESSOR_DELTA_THRESHOLD;
-      // Heating: TWO should be rising (or steady-high). Cooling: TWO should be falling.
-      const directionOK = modeRaw === 2
-        ? twoRatePerMin < -TWO_RATE_THRESHOLD || (twoRatePerMin <= 0 && twoC < twiC)
-        : twoRatePerMin >  TWO_RATE_THRESHOLD || (twoRatePerMin >= 0 && twoC > twiC);
-      // First poll has no rate — fall back to delta-T alone so a unit that's
-      // actually running at app startup isn't wrongly reported as 0 W.
-      compressorRunning = deltaOK && (twoRateAvailable ? directionOK : true);
-    }
-    // Suppress during the starting-up window (compressor still ramping) and
-    // after demand drops (water-side delta-T lingers ~3 min as it equalises).
-    const compressorBilling = compressorRunning && !inStartingHysteresis && !inPostCycleLock;
-
-    // BUH: independent of compressor — heats whichever side the 3-way valve points at.
-    const buhRunning =
-      thoC != null && twoC != null && (thoC - twoC) > BUH_DELTA_THRESHOLD;
-
-    // Immersion: the only reliable runtime signal we have is the lifetime hour
-    // counter ticking between two polls. The anti-bacteria flag (reg 40011) is
-    // a config bit ("feature enabled"), not a runtime status — using it caused
-    // a permanent false positive. Tank-temperature heuristics also misfire
-    // because tank readings are integer-quantized and the heatpump itself can
-    // reach >55 °C. Hours-only is rare-but-correct.
-    const immersionRunning =
-      ratedImm > 0 &&
-      this.lastImmersionHours != null &&
-      hImm > this.lastImmersionHours;
-    this.lastBackupHours = hBackup;
-    this.lastImmersionHours = hImm;
-
-    let watts = 0;
-    if (compressorBilling && twiC != null && twoC != null) {
-      // 3-way valve sends compressor heat to whichever destination is active.
-      // DHW takes priority over zone heating when both are on.
-      const ratedKw = dhwIsOn ? ratedDhw : (modeRaw === 2 ? ratedCool : ratedHeat);
-      // Modulation: ΔT scales linearly with thermal output (Q = ṁ·Cp·ΔT) at
-      // constant flow, and electrical input tracks thermal output via COP. So
-      // watts ≈ rated × (|ΔT| / nominal). Clipped to a sane band.
-      const deltaT = Math.abs(twoC - twiC);
-      const modulation = Math.max(MODULATION_MIN, Math.min(MODULATION_MAX, deltaT / NOMINAL_DELTA_T));
-      watts += ratedKw * modulation * 1000;
-    }
-    if (buhRunning) watts += ratedBackup * 1000;
-    if (immersionRunning) watts += ratedImm * 1000;
-
-    if (this.hasCapability('measure_power')) {
-      await this.setCapabilityValue('measure_power', Math.round(watts)).catch(() => undefined);
-    }
-    // ─────────────────────────────────────────────────────────────────────
+    await this.updatePower(snapshot, s, evaporatorRaw).catch((err) => this.error('updatePower', err));
 
     // Alarm flag + rich trigger on transition
     const alarmRaw = snapshot[REGISTERS.alarmStatus.number];

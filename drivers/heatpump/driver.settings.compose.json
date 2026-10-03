@@ -422,19 +422,19 @@
           "ar": "نموذج مضخة الحرارة"
         },
         "hint": {
-          "en": "Select your Estia model — the rated compressor input power for heating, cooling and DHW is taken from Toshiba's datasheet for that model. If your exact variant isn't listed, pick the closest capacity in the same series.",
-          "nl": "Selecteer je Estia-model — het nominale compressorvermogen voor verwarming, koeling en SWW is afkomstig uit Toshiba's datasheet voor dat model. Als jouw exacte variant niet wordt vermeld, kies dan de dichtstbijzijnde capaciteit in dezelfde serie.",
-          "da": "Vælg din Estia-model — den nominelle kompressorindgangseffekt til opvarmning, køling og brugsvand er taget fra Toshibas datablad for den model. Hvis din præcise variant ikke er angivet, skal du vælge den nærmeste kapacitet i samme serie.",
-          "de": "Wählen Sie Ihr Estia-Modell aus — die Nennleistung des Kompressors für Heizung, Kühlung und Warmwasser wird aus dem Toshiba-Datenblatt für dieses Modell entnommen. Wenn Ihre genaue Variante nicht aufgeführt ist, wählen Sie die nächstgelegene Kapazität in derselben Serie.",
-          "es": "Selecciona tu modelo Estia: la potencia de entrada del compresor para calefacción, refrigeración y ACS se toma de la hoja de datos de Toshiba para ese modelo. Si tu variante exacta no está en la lista, elige la capacidad más cercana de la misma serie.",
-          "fr": "Sélectionnez votre modèle Estia — la puissance d'entrée nominale du compresseur pour le chauffage, le refroidissement et l'ECS est tirée de la fiche technique de Toshiba pour ce modèle. Si votre variante exacte n'est pas répertoriée, choisissez la capacité la plus proche dans la même série.",
-          "it": "Seleziona il tuo modello Estia: la potenza nominale di ingresso del compressore per riscaldamento, raffreddamento e ACS è presa dalla scheda tecnica di Toshiba per quel modello. Se la tua variante esatta non è elencata, scegli la capacità più vicina nella stessa serie.",
-          "no": "Velg din Estia-modell — den nominelle kompressorens inngangseffekt for oppvarming, kjøling og varmtvann er hentet fra Toshibas datablad for den modellen. Hvis din eksakte variant ikke er oppført, velg den nærmeste kapasiteten i samme serie.",
-          "sv": "Välj din Estia-modell — den angivna kompressoreffektförbrukningen för uppvärmning, kylning och tappvarmvatten är hämtad från Toshibas datablad för den modellen. Om din exakta variant inte finns med, välj den närmaste kapaciteten i samma serie.",
-          "pl": "Wybierz swój model Estia — znamionowa moc wejściowa sprężarki dla ogrzewania, chłodzenia i CWU jest zaczerpnięta z karty katalogowej Toshiba dla tego modelu. Jeśli Twój dokładny wariant nie jest wymieniony, wybierz najbliższą pojemność w tej samej serii.",
-          "ru": "Выберите свою модель Estia — номинальная мощность компрессора для отопления, охлаждения и ГВС взята из технической документации Toshiba для этой модели. Если ваша точная версия не указана, выберите ближайшую по мощности в той же серии.",
-          "ko": "귀하의 Estia 모델을 선택하세요 — 난방, 냉방 및 DHW에 대한 정격 압축기 입력 전력은 해당 모델의 Toshiba 데이터 시트에서 가져옵니다. 정확한 변형이 목록에 없으면 동일한 시리즈에서 가장 가까운 용량을 선택하세요.",
-          "ar": "اختر طراز Estia الخاص بك — يتم أخذ قدرة الإدخال المقدرة للضاغط للتدفئة والتبريد والمياه الساخنة المنزلية من ورقة بيانات Toshiba لهذا الطراز. إذا لم يكن الطراز الخاص بك مدرجًا بالضبط، اختر السعة الأقرب في نفس السلسلة."
+          "en": "Select your Estia model. Power is estimated from Toshiba's performance tables for that model (R32 4–11 kW) or from its rated efficiency (other models). If your exact variant isn't listed, pick the closest capacity in the same series.",
+          "nl": "Selecteer je Estia-model. Het vermogen wordt geschat met Toshiba's prestatietabellen voor dat model (R32 4–11 kW) of met het nominale rendement (andere modellen). Staat jouw exacte variant er niet bij, kies dan de dichtstbijzijnde capaciteit in dezelfde serie.",
+          "da": "Vælg din Estia-model. Effekten anslås ud fra Toshibas ydelsestabeller for modellen (R32 4–11 kW) eller dens nominelle virkningsgrad (andre modeller). Hvis din præcise variant ikke er angivet, så vælg den nærmeste kapacitet i samme serie.",
+          "de": "Wählen Sie Ihr Estia-Modell. Die Leistung wird aus Toshibas Leistungstabellen für dieses Modell (R32 4–11 kW) oder aus seinem Nennwirkungsgrad (andere Modelle) geschätzt. Ist Ihre genaue Variante nicht aufgeführt, wählen Sie die nächstliegende Leistung derselben Serie.",
+          "es": "Selecciona tu modelo Estia. La potencia se estima con las tablas de rendimiento de Toshiba para ese modelo (R32 4–11 kW) o con su eficiencia nominal (otros modelos). Si tu variante exacta no aparece, elige la capacidad más cercana de la misma serie.",
+          "fr": "Sélectionnez votre modèle Estia. La puissance est estimée à partir des tableaux de performances de Toshiba pour ce modèle (R32 4–11 kW) ou de son rendement nominal (autres modèles). Si votre variante exacte n'est pas listée, choisissez la capacité la plus proche dans la même série.",
+          "it": "Seleziona il tuo modello Estia. La potenza viene stimata con le tabelle prestazionali di Toshiba per quel modello (R32 4–11 kW) o con il suo rendimento nominale (altri modelli). Se la tua variante esatta non è elencata, scegli la capacità più vicina della stessa serie.",
+          "no": "Velg Estia-modellen din. Effekten anslås ut fra Toshibas ytelsestabeller for modellen (R32 4–11 kW) eller dens nominelle virkningsgrad (andre modeller). Hvis den nøyaktige varianten din ikke står oppført, velg nærmeste kapasitet i samme serie.",
+          "sv": "Välj din Estia-modell. Effekten uppskattas med Toshibas prestandatabeller för modellen (R32 4–11 kW) eller dess nominella verkningsgrad (övriga modeller). Om din exakta variant inte finns med, välj närmaste kapacitet i samma serie.",
+          "pl": "Wybierz swój model Estia. Moc jest szacowana na podstawie tabel wydajności Toshiby dla tego modelu (R32 4–11 kW) lub jego znamionowej sprawności (pozostałe modele). Jeśli Twojego wariantu nie ma na liście, wybierz najbliższą moc z tej samej serii.",
+          "ru": "Выберите модель Estia. Мощность оценивается по таблицам производительности Toshiba для этой модели (R32 4–11 кВт) или по её номинальному КПД (другие модели). Если вашего варианта нет в списке, выберите ближайшую мощность той же серии.",
+          "ko": "Estia 모델을 선택하세요. 전력은 해당 모델의 Toshiba 성능표(R32 4–11 kW) 또는 정격 효율(그 외 모델)로 추정합니다. 정확한 모델이 없으면 같은 시리즈에서 가장 가까운 용량을 고르세요.",
+          "ar": "اختر طراز Estia لديك. تُقدَّر القدرة من جداول أداء Toshiba لهذا الطراز (R32 بقدرة 4–11 كيلوواط) أو من كفاءته الاسمية (الطرازات الأخرى). إذا لم يكن طرازك مدرجًا، فاختر أقرب قدرة في السلسلة نفسها."
         },
         "value": "r32-s1-1101",
         "values": [
@@ -765,19 +765,19 @@
           "ar": "قدرة السخان الاحتياطي"
         },
         "hint": {
-          "en": "The resistive heater INSIDE the hydro unit, before the 3-way valve. It assists the heat pump in cold weather AND during DHW production (Toshiba's design). Pick the rating wired by your installer — single-phase models are 3 kW (M3) or 6 kW (M6); three-phase are 6 kW (T6/D6) or 9 kW (T9). Register 40040 tracks its runtime hours.",
-          "nl": "De weerstandverwarmer BINNEN de hydro-unit, vóór de 3-wegklep. Het ondersteunt de warmtepomp bij koud weer EN tijdens de productie van sanitair warm water (Toshiba's ontwerp). Kies de capaciteit die door je installateur is aangesloten — eenfasemodellen zijn 3 kW (M3) of 6 kW (M6); driefasemodellen zijn 6 kW (T6/D6) of 9 kW (T9). Register 40040 houdt de draaiuren bij.",
-          "da": "Den resistive varmelegeme INDE i hydroenheden, før 3-vejs ventilen. Den hjælper varmepumpen i koldt vejr OG under produktion af brugsvand (Toshibas design). Vælg den effekt, som din installatør har tilsluttet — enfasede modeller er 3 kW (M3) eller 6 kW (M6); trefasede er 6 kW (T6/D6) eller 9 kW (T9). Register 40040 sporer dens driftstimer.",
-          "de": "Der Widerstandsheizer befindet sich INNEN in der Hydro-Einheit, vor dem 3-Wege-Ventil. Er unterstützt die Wärmepumpe bei kaltem Wetter UND während der Warmwasserbereitung (Toshibas Design). Wählen Sie die von Ihrem Installateur verdrahtete Leistung — Einphasenmodelle sind 3 kW (M3) oder 6 kW (M6); Dreiphasenmodelle sind 6 kW (T6/D6) oder 9 kW (T9). Register 40040 zeichnet die Betriebsstunden auf.",
-          "es": "El calentador resistivo DENTRO de la unidad hidro, antes de la válvula de 3 vías. Ayuda a la bomba de calor en clima frío Y durante la producción de ACS (diseño de Toshiba). Elige la potencia conectada por tu instalador: los modelos monofásicos son de 3 kW (M3) o 6 kW (M6); los trifásicos son de 6 kW (T6/D6) o 9 kW (T9). El registro 40040 rastrea sus horas de funcionamiento.",
-          "fr": "Le radiateur résistif À L'INTÉRIEUR de l'unité hydro, avant la vanne 3 voies. Il assiste la pompe à chaleur par temps froid ET pendant la production d'ECS (conception de Toshiba). Choisissez la puissance câblée par votre installateur — les modèles monophasés sont de 3 kW (M3) ou 6 kW (M6) ; les modèles triphasés sont de 6 kW (T6/D6) ou 9 kW (T9). Le registre 40040 suit ses heures de fonctionnement.",
-          "it": "Il riscaldatore resistivo ALL'INTERNO dell'unità idronica, prima della valvola a 3 vie. Assiste la pompa di calore in caso di freddo E durante la produzione di ACS (design di Toshiba). Scegli la potenza cablata dal tuo installatore — i modelli monofase sono da 3 kW (M3) o 6 kW (M6); i modelli trifase sono da 6 kW (T6/D6) o 9 kW (T9). Il registro 40040 tiene traccia delle ore di funzionamento.",
-          "no": "Den resistive varmeovnen INNE i hydroenheten, før 3-veisventilen. Den hjelper varmepumpen i kaldt vær OG under produksjon av varmtvann (Toshibas design). Velg effekten som er koblet av installatøren din — enfasemodeller er 3 kW (M3) eller 6 kW (M6); trefasemodeller er 6 kW (T6/D6) eller 9 kW (T9). Register 40040 sporer driftstimene.",
-          "sv": "Den resistiva värmaren INUTI hydroenheten, före 3-vägsventilen. Den hjälper värmepumpen i kallt väder OCH under produktion av tappvarmvatten (Toshibas design). Välj den effekt som din installatör har kopplat — enfasmodeller är 3 kW (M3) eller 6 kW (M6); trefas är 6 kW (T6/D6) eller 9 kW (T9). Register 40040 spårar dess drifttimmar.",
-          "pl": "Grzałka rezystancyjna WEWNĄTRZ jednostki hydro, przed zaworem trójdrożnym. Wspomaga pompę ciepła w zimne dni ORAZ podczas produkcji CWU (projekt Toshiba). Wybierz moc podłączoną przez instalatora — modele jednofazowe to 3 kW (M3) lub 6 kW (M6); trójfazowe to 6 kW (T6/D6) lub 9 kW (T9). Rejestr 40040 śledzi godziny pracy.",
-          "ru": "Резистивный нагреватель ВНУТРИ гидроблока, перед трехходовым клапаном. Он помогает тепловому насосу в холодную погоду И во время производства ГВС (дизайн Toshiba). Выберите мощность, подключенную вашим установщиком — однофазные модели имеют мощность 3 кВт (M3) или 6 кВт (M6); трехфазные — 6 кВт (T6/D6) или 9 кВт (T9). Регистр 40040 отслеживает его рабочие часы.",
-          "ko": "히트 펌프가 추운 날씨와 온수 생산 중에 도움을 주는 하이드로 유닛 내부의 저항 히터는 3방 밸브 앞에 위치해 있습니다 (Toshiba의 설계). 설치자가 연결한 용량을 선택하세요 — 단상 모델은 3 kW (M3) 또는 6 kW (M6); 삼상 모델은 6 kW (T6/D6) 또는 9 kW (T9)입니다. 레지스터 40040은 작동 시간을 추적합니다.",
-          "ar": "السخان المقاوم داخل وحدة الهيدرو، قبل الصمام الثلاثي الاتجاه. يساعد المضخة الحرارية في الطقس البارد وأثناء إنتاج المياه الساخنة (تصميم Toshiba). اختر التصنيف الذي قام بتركيبه الفني الخاص بك - النماذج أحادية الطور هي 3 كيلوواط (M3) أو 6 كيلوواط (M6)؛ النماذج ثلاثية الطور هي 6 كيلوواط (T6/D6) أو 9 كيلوواط (T9). السجل 40040 يتتبع ساعات تشغيله."
+          "en": "The resistive heater INSIDE the hydro unit, before the 3-way valve. It assists the heat pump in cold weather AND during DHW production (Toshiba's design). Pick the rating wired by your installer — single-phase models are 3 kW (M3) or 6 kW (M6); three-phase are 6 kW (T6/D6) or 9 kW (T9). Register 40040 tracks its runtime hours. If only one stage of a 6 kW heater is wired, pick 3 kW.",
+          "nl": "De weerstandverwarmer BINNEN de hydro-unit, vóór de 3-wegklep. Het ondersteunt de warmtepomp bij koud weer EN tijdens de productie van sanitair warm water (Toshiba's ontwerp). Kies de capaciteit die door je installateur is aangesloten — eenfasemodellen zijn 3 kW (M3) of 6 kW (M6); driefasemodellen zijn 6 kW (T6/D6) of 9 kW (T9). Register 40040 houdt de draaiuren bij. Is maar één trap van een 6 kW-verwarmer aangesloten, kies dan 3 kW.",
+          "da": "Den resistive varmelegeme INDE i hydroenheden, før 3-vejs ventilen. Den hjælper varmepumpen i koldt vejr OG under produktion af brugsvand (Toshibas design). Vælg den effekt, som din installatør har tilsluttet — enfasede modeller er 3 kW (M3) eller 6 kW (M6); trefasede er 6 kW (T6/D6) eller 9 kW (T9). Register 40040 sporer dens driftstimer. Hvis kun ét trin af et 6 kW-varmelegeme er tilsluttet, så vælg 3 kW.",
+          "de": "Der Widerstandsheizer befindet sich INNEN in der Hydro-Einheit, vor dem 3-Wege-Ventil. Er unterstützt die Wärmepumpe bei kaltem Wetter UND während der Warmwasserbereitung (Toshibas Design). Wählen Sie die von Ihrem Installateur verdrahtete Leistung — Einphasenmodelle sind 3 kW (M3) oder 6 kW (M6); Dreiphasenmodelle sind 6 kW (T6/D6) oder 9 kW (T9). Register 40040 zeichnet die Betriebsstunden auf. Ist nur eine Stufe eines 6-kW-Heizstabs angeschlossen, wählen Sie 3 kW.",
+          "es": "El calentador resistivo DENTRO de la unidad hidro, antes de la válvula de 3 vías. Ayuda a la bomba de calor en clima frío Y durante la producción de ACS (diseño de Toshiba). Elige la potencia conectada por tu instalador: los modelos monofásicos son de 3 kW (M3) o 6 kW (M6); los trifásicos son de 6 kW (T6/D6) o 9 kW (T9). El registro 40040 rastrea sus horas de funcionamiento. Si solo está conectada una etapa de un calentador de 6 kW, elige 3 kW.",
+          "fr": "Le radiateur résistif À L'INTÉRIEUR de l'unité hydro, avant la vanne 3 voies. Il assiste la pompe à chaleur par temps froid ET pendant la production d'ECS (conception de Toshiba). Choisissez la puissance câblée par votre installateur — les modèles monophasés sont de 3 kW (M3) ou 6 kW (M6) ; les modèles triphasés sont de 6 kW (T6/D6) ou 9 kW (T9). Le registre 40040 suit ses heures de fonctionnement. Si un seul étage d'un appoint de 6 kW est raccordé, choisissez 3 kW.",
+          "it": "Il riscaldatore resistivo ALL'INTERNO dell'unità idronica, prima della valvola a 3 vie. Assiste la pompa di calore in caso di freddo E durante la produzione di ACS (design di Toshiba). Scegli la potenza cablata dal tuo installatore — i modelli monofase sono da 3 kW (M3) o 6 kW (M6); i modelli trifase sono da 6 kW (T6/D6) o 9 kW (T9). Il registro 40040 tiene traccia delle ore di funzionamento. Se è collegato un solo stadio di un riscaldatore da 6 kW, scegli 3 kW.",
+          "no": "Den resistive varmeovnen INNE i hydroenheten, før 3-veisventilen. Den hjelper varmepumpen i kaldt vær OG under produksjon av varmtvann (Toshibas design). Velg effekten som er koblet av installatøren din — enfasemodeller er 3 kW (M3) eller 6 kW (M6); trefasemodeller er 6 kW (T6/D6) eller 9 kW (T9). Register 40040 sporer driftstimene. Hvis bare ett trinn av et 6 kW-varmeelement er koblet til, velg 3 kW.",
+          "sv": "Den resistiva värmaren INUTI hydroenheten, före 3-vägsventilen. Den hjälper värmepumpen i kallt väder OCH under produktion av tappvarmvatten (Toshibas design). Välj den effekt som din installatör har kopplat — enfasmodeller är 3 kW (M3) eller 6 kW (M6); trefas är 6 kW (T6/D6) eller 9 kW (T9). Register 40040 spårar dess drifttimmar. Om bara ett steg av en 6 kW-värmare är inkopplat, välj 3 kW.",
+          "pl": "Grzałka rezystancyjna WEWNĄTRZ jednostki hydro, przed zaworem trójdrożnym. Wspomaga pompę ciepła w zimne dni ORAZ podczas produkcji CWU (projekt Toshiba). Wybierz moc podłączoną przez instalatora — modele jednofazowe to 3 kW (M3) lub 6 kW (M6); trójfazowe to 6 kW (T6/D6) lub 9 kW (T9). Rejestr 40040 śledzi godziny pracy. Jeśli podłączony jest tylko jeden stopień grzałki 6 kW, wybierz 3 kW.",
+          "ru": "Резистивный нагреватель ВНУТРИ гидроблока, перед трехходовым клапаном. Он помогает тепловому насосу в холодную погоду И во время производства ГВС (дизайн Toshiba). Выберите мощность, подключенную вашим установщиком — однофазные модели имеют мощность 3 кВт (M3) или 6 кВт (M6); трехфазные — 6 кВт (T6/D6) или 9 кВт (T9). Регистр 40040 отслеживает его рабочие часы. Если подключена только одна ступень нагревателя 6 кВт, выберите 3 кВт.",
+          "ko": "히트 펌프가 추운 날씨와 온수 생산 중에 도움을 주는 하이드로 유닛 내부의 저항 히터는 3방 밸브 앞에 위치해 있습니다 (Toshiba의 설계). 설치자가 연결한 용량을 선택하세요 — 단상 모델은 3 kW (M3) 또는 6 kW (M6); 삼상 모델은 6 kW (T6/D6) 또는 9 kW (T9)입니다. 레지스터 40040은 작동 시간을 추적합니다. 6 kW 히터 중 한 단만 연결되어 있다면 3 kW를 고르세요.",
+          "ar": "السخان المقاوم داخل وحدة الهيدرو، قبل الصمام الثلاثي الاتجاه. يساعد المضخة الحرارية في الطقس البارد وأثناء إنتاج المياه الساخنة (تصميم Toshiba). اختر التصنيف الذي قام بتركيبه الفني الخاص بك - النماذج أحادية الطور هي 3 كيلوواط (M3) أو 6 كيلوواط (M6)؛ النماذج ثلاثية الطور هي 6 كيلوواط (T6/D6) أو 9 كيلوواط (T9). السجل 40040 يتتبع ساعات تشغيله. إذا كانت مرحلة واحدة فقط من سخان بقدرة 6 كيلوواط موصولة، فاختر 3 كيلوواط."
         },
         "value": "3",
         "values": [
@@ -854,6 +854,127 @@
             }
           }
         ]
+      },
+      {
+        "id": "tankLitres",
+        "type": "number",
+        "value": 210,
+        "attr": {
+          "min": 0,
+          "max": 1000,
+          "step": 10
+        },
+        "units": {
+          "en": "l"
+        },
+        "label": {
+          "en": "Hot water tank volume",
+          "nl": "Inhoud warmwatertank",
+          "da": "Varmtvandsbeholderens volumen",
+          "de": "Volumen des Warmwasserspeichers",
+          "es": "Volumen del depósito de ACS",
+          "fr": "Volume du ballon d'eau chaude",
+          "it": "Volume del serbatoio ACS",
+          "no": "Volum på varmtvannsberederen",
+          "sv": "Varmvattenberedarens volym",
+          "pl": "Pojemność zbiornika c.w.u.",
+          "ru": "Объём бака ГВС",
+          "ko": "온수 탱크 용량",
+          "ar": "سعة خزان الماء الساخن"
+        },
+        "hint": {
+          "en": "Used to learn the water flow from every hot-water heat-up. All-In-One units have 210 l on most models — check the rating plate. Set 0 if you don't know it: the app then uses the rated flow, or the flow you enter below.",
+          "nl": "Wordt gebruikt om bij elke opwarming van het warm water het waterdebiet te leren. All-In-One-units hebben bij de meeste modellen 210 l — kijk op het typeplaatje. Zet op 0 als je het niet weet: de app gebruikt dan het nominale debiet, of het debiet dat je hieronder invult.",
+          "da": "Bruges til at lære vandgennemstrømningen ved hver opvarmning af varmt vand. All-In-One-enheder har 210 l på de fleste modeller — se typeskiltet. Sæt 0, hvis du ikke kender det: appen bruger så den nominelle gennemstrømning eller den, du angiver nedenfor.",
+          "de": "Dient dazu, bei jeder Warmwasser-Aufheizung den Wasserdurchfluss zu lernen. All-In-One-Geräte haben bei den meisten Modellen 210 l — siehe Typenschild. Auf 0 setzen, wenn unbekannt: Die App nutzt dann den Nenndurchfluss oder den unten eingetragenen Durchfluss.",
+          "es": "Sirve para aprender el caudal de agua en cada calentamiento del ACS. Las unidades All-In-One tienen 210 l en la mayoría de los modelos: consulta la placa de características. Pon 0 si no lo sabes: la app usará el caudal nominal o el que indiques abajo.",
+          "fr": "Sert à apprendre le débit d'eau à chaque chauffe de l'eau chaude. Les unités All-In-One ont 210 l sur la plupart des modèles — voir la plaque signalétique. Mettez 0 si vous ne le savez pas : l'app utilise alors le débit nominal, ou celui saisi ci-dessous.",
+          "it": "Serve per apprendere la portata d'acqua a ogni riscaldamento dell'ACS. Le unità All-In-One hanno 210 l nella maggior parte dei modelli: verifica la targhetta. Imposta 0 se non lo sai: l'app userà la portata nominale o quella inserita qui sotto.",
+          "no": "Brukes til å lære vannføringen ved hver oppvarming av varmtvann. All-In-One-enheter har 210 l på de fleste modeller — se typeskiltet. Sett 0 hvis du ikke vet det: appen bruker da nominell vannføring, eller den du angir nedenfor.",
+          "sv": "Används för att lära sig vattenflödet vid varje uppvärmning av varmvatten. All-In-One-enheter har 210 l på de flesta modeller — se typskylten. Ange 0 om du inte vet: appen använder då det nominella flödet, eller det du anger nedan.",
+          "pl": "Służy do nauki przepływu wody przy każdym podgrzewaniu c.w.u. Jednostki All-In-One mają w większości modeli 210 l — sprawdź tabliczkę znamionową. Ustaw 0, jeśli nie wiesz: aplikacja użyje wtedy przepływu znamionowego lub wpisanego poniżej.",
+          "ru": "Нужен, чтобы при каждом нагреве ГВС определять расход воды. У большинства моделей All-In-One бак 210 л — см. заводскую табличку. Укажите 0, если не знаете: приложение возьмёт номинальный расход или расход, указанный ниже.",
+          "ko": "온수를 데울 때마다 물 유량을 학습하는 데 쓰입니다. All-In-One 제품은 대부분 210 l입니다 — 명판을 확인하세요. 모르면 0으로 두세요. 그러면 정격 유량이나 아래에 입력한 유량을 사용합니다.",
+          "ar": "يُستخدم لتعلُّم تدفق الماء عند كل تسخين للماء الساخن. معظم طرازات All-In-One سعتها 210 لترات — راجع لوحة البيانات. اضبطه على 0 إن لم تكن تعرفه: يستخدم التطبيق حينها التدفق الاسمي أو التدفق الذي تُدخله أدناه."
+        }
+      },
+      {
+        "id": "flowLpm",
+        "type": "number",
+        "value": 0,
+        "attr": {
+          "min": 0,
+          "max": 100,
+          "step": 0.5
+        },
+        "units": {
+          "en": "l/min"
+        },
+        "label": {
+          "en": "Water flow",
+          "nl": "Waterdebiet",
+          "da": "Vandgennemstrømning",
+          "de": "Wasserdurchfluss",
+          "es": "Caudal de agua",
+          "fr": "Débit d'eau",
+          "it": "Portata d'acqua",
+          "no": "Vannføring",
+          "sv": "Vattenflöde",
+          "pl": "Przepływ wody",
+          "ru": "Расход воды",
+          "ko": "물 유량",
+          "ar": "تدفق الماء"
+        },
+        "hint": {
+          "en": "0 = automatic: learnt from hot-water heat-ups, the rated flow until the first one. Only enter a value that was measured, e.g. by your installer. Without a hot-water tank this is the only way to correct the flow.",
+          "nl": "0 = automatisch: geleerd uit de opwarmingen van het warm water, tot de eerste het nominale debiet. Vul alleen een gemeten waarde in, bv. van je installateur. Zonder warmwatertank is dit de enige manier om het debiet te corrigeren.",
+          "da": "0 = automatisk: lært af opvarmningerne af varmt vand, den nominelle gennemstrømning indtil den første. Angiv kun en målt værdi, f.eks. fra din installatør. Uden varmtvandsbeholder er dette den eneste måde at rette gennemstrømningen på.",
+          "de": "0 = automatisch: aus den Warmwasser-Aufheizungen gelernt, bis zur ersten der Nenndurchfluss. Tragen Sie nur einen gemessenen Wert ein, z. B. vom Installateur. Ohne Warmwasserspeicher ist dies die einzige Möglichkeit, den Durchfluss zu korrigieren.",
+          "es": "0 = automático: se aprende de los calentamientos del ACS; hasta el primero, el caudal nominal. Introduce solo un valor medido, p. ej. por tu instalador. Sin depósito de ACS es la única forma de corregir el caudal.",
+          "fr": "0 = automatique : appris lors des chauffes de l'eau chaude, débit nominal jusqu'à la première. Ne saisissez qu'une valeur mesurée, par ex. par votre installateur. Sans ballon d'eau chaude, c'est le seul moyen de corriger le débit.",
+          "it": "0 = automatico: appreso dai riscaldamenti dell'ACS, portata nominale fino al primo. Inserisci solo un valore misurato, ad es. dal tuo installatore. Senza serbatoio ACS è l'unico modo per correggere la portata.",
+          "no": "0 = automatisk: lært fra oppvarmingene av varmtvann, nominell vannføring frem til den første. Angi bare en målt verdi, f.eks. fra installatøren. Uten varmtvannsbereder er dette eneste måte å korrigere vannføringen på.",
+          "sv": "0 = automatiskt: inlärt från uppvärmningarna av varmvatten, nominellt flöde fram till den första. Ange bara ett uppmätt värde, t.ex. från din installatör. Utan varmvattenberedare är detta enda sättet att korrigera flödet.",
+          "pl": "0 = automatycznie: uczony z podgrzewań c.w.u., do pierwszego przepływ znamionowy. Wpisz tylko zmierzoną wartość, np. od instalatora. Bez zbiornika c.w.u. to jedyny sposób na skorygowanie przepływu.",
+          "ru": "0 = автоматически: определяется по нагревам ГВС, до первого — номинальный расход. Указывайте только измеренное значение, например от монтажника. Без бака ГВС это единственный способ скорректировать расход.",
+          "ko": "0 = 자동: 온수를 데울 때 학습하며, 첫 학습 전까지는 정격 유량을 씁니다. 설치업체가 측정한 값처럼 실제로 측정한 값만 입력하세요. 온수 탱크가 없으면 유량을 바로잡는 유일한 방법입니다.",
+          "ar": "0 = تلقائي: يُتعلَّم من عمليات تسخين الماء الساخن، والتدفق الاسمي حتى أولها. أدخل قيمة مقيسة فقط، مثلًا من المُركِّب. بدون خزان ماء ساخن هذه هي الطريقة الوحيدة لتصحيح التدفق."
+        }
+      },
+      {
+        "id": "powerStatus",
+        "type": "label",
+        "value": "—",
+        "label": {
+          "en": "Power estimate",
+          "nl": "Vermogensschatting",
+          "da": "Effektestimat",
+          "de": "Leistungsschätzung",
+          "es": "Estimación de potencia",
+          "fr": "Estimation de puissance",
+          "it": "Stima della potenza",
+          "no": "Effektestimat",
+          "sv": "Effektuppskattning",
+          "pl": "Szacowanie mocy",
+          "ru": "Оценка мощности",
+          "ko": "전력 추정",
+          "ar": "تقدير القدرة"
+        },
+        "hint": {
+          "en": "The water flow in use, and how the app sees the compressor run: with the refrigerant sensor (TE, R32 units, after it has been checked during a run) or with the water temperatures.",
+          "nl": "Het waterdebiet dat gebruikt wordt, en hoe de app de compressor ziet draaien: met de koudemiddelvoeler (TE, R32-units, nadat die tijdens een beurt gecontroleerd is) of met de watertemperaturen.",
+          "da": "Den anvendte vandgennemstrømning, og hvordan appen ser kompressoren køre: med kølemiddelføleren (TE, R32-enheder, efter at den er kontrolleret under en drift) eller med vandtemperaturerne.",
+          "de": "Der verwendete Wasserdurchfluss und wie die App den Verdichterlauf erkennt: mit dem Kältemittelfühler (TE, R32-Geräte, nachdem er während eines Laufs geprüft wurde) oder mit den Wassertemperaturen.",
+          "es": "El caudal de agua en uso y cómo detecta la app el funcionamiento del compresor: con la sonda de refrigerante (TE, unidades R32, tras comprobarla durante un ciclo) o con las temperaturas del agua.",
+          "fr": "Le débit d'eau utilisé, et comment l'app voit tourner le compresseur : avec la sonde de réfrigérant (TE, unités R32, après vérification pendant un cycle) ou avec les températures de l'eau.",
+          "it": "La portata d'acqua in uso e come l'app rileva il funzionamento del compressore: con la sonda del refrigerante (TE, unità R32, dopo averla verificata durante un ciclo) o con le temperature dell'acqua.",
+          "no": "Vannføringen som brukes, og hvordan appen ser at kompressoren går: med kuldemedieføleren (TE, R32-enheter, etter at den er kontrollert under en drift) eller med vanntemperaturene.",
+          "sv": "Vattenflödet som används, och hur appen ser att kompressorn går: med köldmediegivaren (TE, R32-enheter, efter att den kontrollerats under en körning) eller med vattentemperaturerna.",
+          "pl": "Używany przepływ wody oraz sposób wykrywania pracy sprężarki: czujnikiem czynnika (TE, jednostki R32, po sprawdzeniu go podczas pracy) lub temperaturami wody.",
+          "ru": "Используемый расход воды и то, как приложение определяет работу компрессора: по датчику хладагента (TE, блоки R32, после проверки во время работы) или по температурам воды.",
+          "ko": "사용 중인 물 유량과 앱이 압축기 운전을 감지하는 방법: 냉매 센서(TE, R32 제품, 운전 중 확인된 뒤) 또는 물 온도.",
+          "ar": "تدفق الماء المستخدم، وكيف يرى التطبيق عمل الضاغط: بمستشعر وسيط التبريد (TE، وحدات R32، بعد التحقق منه أثناء التشغيل) أو بدرجات حرارة الماء."
+        }
       }
     ]
   },

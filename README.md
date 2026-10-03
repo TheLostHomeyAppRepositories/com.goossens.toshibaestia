@@ -19,6 +19,7 @@ Works with the Toshiba **BMS-IFMB0UEW-E** Modbus RTU interface (or any compatibl
 - DHW tank (TTW), heater outlet (THO), and DHW setpoint
 - Live status: heat pump on/off, mode, all energy-saving toggles
 - Alarm flag + decoded fault code (e.g. `F10 [Hydro unit 0]`)
+- Estimated electrical power (W) and energy (kWh): from the heat the water carries and Toshiba's performance tables, with the water flow learnt from hot-water heat-ups (see [AGENTS.md § 7](AGENTS.md#7-live-power--energy-estimation))
 
 ### Write
 

@@ -8,5 +8,12 @@
     "summer": "Summer",
     "midseason": "Mid-season",
     "winter": "Winter"
+  },
+  "power": {
+    "flow_learnt": "learnt from hot-water runs",
+    "flow_rated": "rated, not learnt yet",
+    "flow_set": "set in the settings",
+    "detect_refrigerant": "compressor via refrigerant sensor",
+    "detect_water": "compressor via water temperatures"
   }
 }

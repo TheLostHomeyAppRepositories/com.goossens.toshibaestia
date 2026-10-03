@@ -8,5 +8,12 @@
     "summer": "Lato",
     "midseason": "Okres przejściowy",
     "winter": "Zima"
+  },
+  "power": {
+    "flow_learnt": "nauczony z podgrzewań c.w.u.",
+    "flow_rated": "znamionowy, jeszcze nienauczony",
+    "flow_set": "ustawiony w ustawieniach",
+    "detect_refrigerant": "sprężarka wg czujnika czynnika",
+    "detect_water": "sprężarka wg temperatur wody"
   }
 }

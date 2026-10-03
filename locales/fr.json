@@ -8,5 +8,12 @@
     "summer": "Été",
     "midseason": "Mi-saison",
     "winter": "Hiver"
+  },
+  "power": {
+    "flow_learnt": "appris lors des chauffes d'eau chaude",
+    "flow_rated": "nominal, pas encore appris",
+    "flow_set": "défini dans les réglages",
+    "detect_refrigerant": "compresseur via sonde de réfrigérant",
+    "detect_water": "compresseur via températures de l'eau"
   }
 }

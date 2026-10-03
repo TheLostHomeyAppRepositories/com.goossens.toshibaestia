@@ -8,5 +8,12 @@
     "summer": "Verano",
     "midseason": "Entretiempo",
     "winter": "Invierno"
+  },
+  "power": {
+    "flow_learnt": "aprendido de los calentamientos de ACS",
+    "flow_rated": "nominal, aún no aprendido",
+    "flow_set": "fijado en los ajustes",
+    "detect_refrigerant": "compresor por sonda de refrigerante",
+    "detect_water": "compresor por temperaturas del agua"
   }
 }

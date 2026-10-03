@@ -8,5 +8,12 @@
     "summer": "Estate",
     "midseason": "Mezza stagione",
     "winter": "Inverno"
+  },
+  "power": {
+    "flow_learnt": "appreso dai riscaldamenti ACS",
+    "flow_rated": "nominale, non ancora appreso",
+    "flow_set": "impostato nelle impostazioni",
+    "detect_refrigerant": "compressore tramite sonda refrigerante",
+    "detect_water": "compressore tramite temperature dell'acqua"
   }
 }

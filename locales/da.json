@@ -8,5 +8,12 @@
     "summer": "Sommer",
     "midseason": "Overgangssæson",
     "winter": "Vinter"
+  },
+  "power": {
+    "flow_learnt": "lært af varmtvandsopvarmninger",
+    "flow_rated": "nominel, endnu ikke lært",
+    "flow_set": "angivet i indstillingerne",
+    "detect_refrigerant": "kompressor via kølemiddelføler",
+    "detect_water": "kompressor via vandtemperaturer"
   }
 }

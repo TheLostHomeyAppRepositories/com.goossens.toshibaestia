@@ -8,5 +8,12 @@
     "summer": "Sommer",
     "midseason": "Übergangszeit",
     "winter": "Winter"
+  },
+  "power": {
+    "flow_learnt": "aus Warmwasser-Aufheizungen gelernt",
+    "flow_rated": "Nennwert, noch nicht gelernt",
+    "flow_set": "in den Einstellungen festgelegt",
+    "detect_refrigerant": "Verdichter über Kältemittelfühler",
+    "detect_water": "Verdichter über Wassertemperaturen"
   }
 }

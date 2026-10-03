@@ -64,6 +64,9 @@ export const REGISTERS = {
   waterInletTemp:      { number: 40022, key: 'waterInletTemp',      writable: false, kind: 'temperature', description: 'Water inlet temperature (TWI)' },
   waterOutletTemp:     { number: 40023, key: 'waterOutletTemp',     writable: false, kind: 'temperature', description: 'Water outlet temperature (TWO)' },
   heaterOutletTemp:    { number: 40024, key: 'heaterOutletTemp',    writable: false, kind: 'temperature', description: 'Water heater outlet temperature (THO)' },
+  // Not in EEU-006. Carries TE on an R32 1 Series 11 kW AIO; the power estimator
+  // checks the value behaves like TE before using it (RefrigerantSensorCheck).
+  evaporatorTemp:      { number: 40028, key: 'evaporatorTemp',      writable: false, kind: 'temperature', description: 'Outdoor heat exchanger temperature (TE) — undocumented' },
 
   // Zone device connection status
   zone1DeviceConnected:{ number: 40201, key: 'zone1DeviceConnected',writable: false, kind: 'boolean',     description: 'Zone 1 device connected' },

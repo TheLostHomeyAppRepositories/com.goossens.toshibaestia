@@ -8,5 +8,12 @@
     "summer": "여름",
     "midseason": "간절기",
     "winter": "겨울"
+  },
+  "power": {
+    "flow_learnt": "온수 가열에서 학습",
+    "flow_rated": "정격값, 아직 학습 전",
+    "flow_set": "설정에서 지정",
+    "detect_refrigerant": "냉매 센서로 압축기 감지",
+    "detect_water": "물 온도로 압축기 감지"
   }
 }

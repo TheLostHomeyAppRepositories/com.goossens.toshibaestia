@@ -8,5 +8,12 @@
     "summer": "Zomer",
     "midseason": "Tussenseizoen",
     "winter": "Winter"
+  },
+  "power": {
+    "flow_learnt": "geleerd uit warmwaterbeurten",
+    "flow_rated": "nominaal, nog niet geleerd",
+    "flow_set": "ingesteld in de instellingen",
+    "detect_refrigerant": "compressor via koudemiddelvoeler",
+    "detect_water": "compressor via watertemperaturen"
   }
 }

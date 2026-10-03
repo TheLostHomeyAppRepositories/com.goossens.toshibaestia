@@ -273,40 +273,57 @@ modbus-serial's `client.isOpen` is unreliable for half-closed sockets — it onl
 
 ## 7. Live-power & energy estimation
 
-The BMS-IFMB0UEW-E exposes neither real-time power nor lifetime kWh. We synthesise both from per-mode lifetime hour counters (registers 40035–40040) × per-model nominal electrical input (kW), with delta-T modulation for live W.
+The BMS-IFMB0UEW-E exposes no power, kWh, flow or compressor-frequency register. Since 1.2.0 the estimate is physical, in [`drivers/heatpump/power-model.ts`](drivers/heatpump/power-model.ts) (pure, no Homey imports, replay-tested in `test/power-model.test.ts`):
 
-### MODEL_PRESETS — what the numbers represent
+```
+thermal  = water flow × 4.186 × |TWO − TWI|          (ΔT smoothed, τ 60 s)
+electric = Toshiba part-load table (thermal, outdoor °C, leaving water °C)
+kWh      = ∫ electric dt                              (meter_power)
+```
 
-`MODEL_PRESETS` in [`drivers/heatpump/device.ts`](drivers/heatpump/device.ts) holds rated **electrical input** in kW @ Toshiba's standard rating points (heating A7/W35, cooling A35/W7, DHW A7/W55), pulled directly from datasheets. **COP is not modelled explicitly** — the rated values implicitly encode it (e.g. R32 1101: 2.39 kW input → 11 kW thermal = COP 4.6 baked in). This is accurate within ±10–20 % at typical conditions but underestimates in cold weather (real COP drops to ~2.5 at A−7) and overestimates at mild outdoor temps. The OSS community consensus is that anyone needing invoice-grade accuracy fits a Shelly EM clamp; we don't try to compete with that.
+`device.ts → updatePower()` only builds a `PowerSample` per poll, feeds the estimator, integrates the watts into `meter_power` and persists what was learnt.
 
-### R32 1 Series and 2 Series share electrical inputs
+### Inputs and their sources
 
-Verified against Toshiba Klima Austria S2 datasheets (4 / 6 / 8 / 14 kW). The S1 → S2 refresh changed the indoor hydro module code from `F21` → `S21` and upgraded the cabinet (stainless tank, 10-bar pressure, 595 mm width) but reused the same outdoor units (`HWT-_HW-E`) and same compressor → identical input ratings to the digit. **One MODEL_PRESETS entry per kW class is correct**; there's no S1/S2 distinction worth exposing in the dropdown.
+| Input | Source |
+|---|---|
+| Performance | R32 401/601/801/1101: "part load capacity and input" + "average heating capacity" tables of the Estia R32 Engineering Data Book (`data/r32-tables.json`; input excludes the water pump). Other models (R32 1401, R410A S4/S5/Hi Power): rated COP from `MODEL_PRESETS` (capacity ÷ heating input at A7/W35), shaped by the 1101 COP curve over outdoor/water temperature. Above LWT 55 °C the part-load result is scaled by the max-frequency COP ratio. |
+| Water flow | Learnt from hot-water heat-ups: `flow = tank litres × tank rise / ∫ΔT dt` over compressor-only DHW segments (≥ 10 min, ≥ 8 K rise; tank start = the reading before the run, the sensor dips ~1 K when the pump starts), median of the last 7. Until then the rated flow (capacity at 5 K ΔT). The `flowLpm` setting overrides both — the only way to correct it on installs without a tank. |
+| Compressor on/off | Register **40028 (TE, undocumented)** when `RefrigerantSensorCheck` trusts it: \|TE − TO\| ≥ 4 K. Trusted only after ≥ 20 quiet-water polls with TE within 2 K of outdoor **and** ≥ 10 polls where the water side shows a run and TE is ≥ 4 K away (misses ≤ 20 %): a constant or an outdoor-like value never passes. Read in its own request; three refusals in a row → water only until restart. Otherwise the water side: on at a **start** (TWO moving ≥ 2 K away from TWI within 2 min, in the expected direction) or a steady ΔT ≥ 3 K with TWO flat for 5 min; off after two polls without the expected ΔT. |
+| What is served | DHW only on → `dhw` (the 3-way valve can only point at the tank). Zone only → `heating`/`cooling` from register 40003. Both → ΔT sign, tank rising. **Register 40003 is only used while the zone is on** — it keeps "cool" while the zone is off, which made pre-1.2.0 versions treat DHW heat-ups as cooling (no power during the run, phantom power during the cool-down after it). |
+| Backup heater | THO − TWO ≥ 2 K for ≥ 60 s, TWI steady, and the water flowing: with the compressor on, TWO and THO steady; with it off, TWO within +1/−3 K of TWI. Power = heater steps (3 kW) from flow × (THO − TWO), capped at the `backupHeaterKW` setting. |
+| Immersion | Only once register 40039 (cylinder heater hours) has ticked (store flag `immersionSeen`): 2.75 kW while DHW is on, the tank rises and nothing else heats. |
 
-### Heater configuration: HWT All-In-One has only the BUH
+### Field lessons (R32 11 kW AIO, 2026-10-03, 15 s polls + whole-house meter)
 
-Verified against the HWT AIO IM, the Wall-Mounted Hydro IM, and the Estia Engineering Data Book E23-103. The AIO range (`HWT-_F21S` / `HWT-_S21S`) ships with **only one electric heater** — the BUH on the primary heating-water circuit. There is **no separate cylinder immersion** in the integrated 210–220 L tank. The Wall-Mounted hydro variants optionally pair with an `HWS-CSHM3-E` external cylinder that *can* contain a 2.75 kW immersion, but only if the installer wires it.
+- After the pump stops, the standing water keeps TWO and TWI apart for 20+ minutes (51 vs 43 °C, then 27 vs 25 °C) and THO 2–5 K above TWO. A water ΔT alone is not a running compressor and THO − TWO alone is not a heater — hence the start signature and the "water flowing" test.
+- When the pump starts, warm water from the coil passes TWI, TWO and THO in turn: THO can read 2 K above TWO for ~20 s (hence the 60 s minimum for the heater).
+- DHW end on this unit: the compressor stops when the return (TWI) reaches 56 °C (52 °C on smaller units, service manual § 7-3) and the backup heater takes over; TWO and THO drop a few K at the handover while TWI stays. The model sees the heater ~2 min after the handover.
+- The whole-house meter has other appliances switching up to ~1 kW (a 2.1 kW one-minute spike, an 860 W step with no heat pump sensor change). The trustworthy references are **single-poll steps** with a matching sensor change and the **tank heat-up**.
 
-The BMS-IFMB0UEW-E exposes register 40039 ("DHW cylinder heater hours") on **all** Estia models because the gateway firmware is generic — meaningful only when an immersion is physically wired. **Detection is auto by delta-hours**: the immersion contributes to `meter_power` only when 40039 actually ticks between polls. AIO owners see 0 W from immersion forever; split-system owners with a wired CSHM cylinder get correct billing without configuration. The hardcoded rating is **2.75 kW** (Toshiba's only spec); no user setting.
+### Validation (`npm test`, fixtures in `test/fixtures/`)
 
-### Live W algorithm (`measure_power`)
+| Check | Result |
+|---|---|
+| Compressor power before the stop vs the house step (−1973 W at 10:08:01 UTC) | 1937 W (−2 %) |
+| Thermal energy vs tank heat-up (210 l × rise) | 3.77 vs 3.91 kWh; 1.54 vs 1.47 kWh |
+| DHW run 29 → 45 °C, energy vs house meter | within 15 % (refrigerant), 20 % (water only) |
+| Heater power vs its house step (−3185 W) | 3000 W (nominal at 230 V) |
+| Full 26 h replay at 15 s and 60 s polls, with and without TE | no phantom power; learnt flow 17.5 l/min every time (measured 17–18) |
 
-Computed each poll in `applySnapshot` (`device.ts`):
+**Known limits:**
+- DHW with return water at 54–56 °C (end of a heat-up to > 50 °C): the compressor drew ~25 % more than the tables give (real COP ≈ 2.5 vs 3.6). One run only — collect more before adding a correction.
+- Before the first learnt flow, the rated flow is used: on the test unit that's 1.8× the real flow, so the first DHW run reads ~2× too high.
+- Integer °C (DIP S4-1 off): ΔT of 3 K is ±17 %. Units set to decidegrees get better live values.
+- The water pump (not in Toshiba's input figures) and supply voltage (heater 3.2 kW at ~235 V) are not modelled.
 
-1. **Demand gate** — if neither `zone1OnOff` nor `hotWaterOnOff` is set, watts from compressor are forced to 0.
-2. **Active-running gate** — `|TWO − TWI| > 1.5 °C` (heat exchange occurring) AND TWO moving in the right direction for the current mode (rising in heating, falling in cooling — kills residual-stratification false positives).
-3. **Demand-transition state machine** — 60 s starting hysteresis (suppresses compressor ramp) and 180 s post-cycle lock (suppresses water-side delta-T after demand drops).
-4. **Modulation** — `ratedKw × clip(|ΔT| / 5°C, 0.5, 1.5)`. Captures inverter modulation: a unit at 30 % load shows roughly half rated, a unit in defrost recovery shows up to 1.5×. Old `rated × on/off` always reported full-rated and was hugely wrong during normal modulation.
-5. **BUH** — `THO − TWO > 1.0 °C` flips BUH to "running" and adds `ratedBackup × 1000` W. Independent of compressor — the BUH heats whichever side the 3-way valve points at.
-6. **Immersion** — delta-hours only (40039 ticked between polls). The anti-bacteria flag (40011) is a *config* bit ("feature enabled"), not runtime — using it as "currently running" caused a permanent 2700 W false positive (see commit history). Tank-temperature heuristics also misfire on integer-quantised readings.
+### meter_power
 
-### Lifetime kWh (`meter_power`)
+Integrated from the live estimate and continued from the value the device already had, so Homey Energy never sees the meter go backwards. Totals from before 1.2.0 (hour counters × rated input) stay in that starting value. The per-mode `meter_power.*` sub-capabilities stay removed (`DEPRECATED_CAPABILITIES`).
 
-`Σ (hour_counter × rated_input_kW)` for each of the five sources, with a **monotonicity guard**: a single bad register read can produce a kWh value lower than the previous one, and lifetime totals must be non-decreasing — drop the new value and keep the last known good one if it tries to roll back.
+### Store keys
 
-The five per-mode `meter_power.heating/cooling/dhw/backup/immersion` sub-capabilities were removed in favour of a single `meter_power` total (cleaner device card; Insights still tracks the total over time). The sub-cap names are in `DEPRECATED_CAPABILITIES` so existing devices auto-clean on the next `onInit`.
-
----
+`powerLearnt` (`{ flowSamplesLpm }`, cleared when `tankLitres` changes), `refrigerantCheck` (counters; saved when the verdict changes or every 30 min), `immersionSeen`.
 
 ## 8. Localization workflow
 
@@ -343,9 +360,9 @@ Languages currently shipped: `en`, `nl`, `da`, `de`, `es`, `fr`, `it`, `no`, `sv
 - ✅ **Phase 2**: writable on/off, mode (heat/cool), setpoints (Zone 1 + DHW), DHW boost, frost protection, night setback, auto-temp, anti-bacteria. Flow cards: `fault_triggered` trigger, `alarm_is_active` condition, `dhw_boost_for` action.
 - ✅ **Season detection (1.1.0)**: see 9b.
 - ✅ **Phase 3 — Energy estimation & connection robustness**: estimated `measure_power` (W) gated on demand + delta-T direction + ΔT modulation, with starting hysteresis and post-cycle lock; lifetime `meter_power` (kWh) from per-mode hour counters with monotonicity guard; auto-detection of cylinder immersion via register 40039 delta-hours (no user setting); three-layer dead-socket recovery in the controller (socket events + TCP keepalive + read/write error trap); poll-interval default tuned to gateway behaviour (60 s, reconnect-each-poll).
+- ✅ **Power model (1.2.0)**: physical estimate replacing the Phase 3 one — flow × ΔT through Toshiba's part-load tables, flow learnt from the tank, TE (40028) when it proves itself, kWh integrated. See § 7.
 - ⏳ **Phase 4 (not started)**:
   - Zone 2 setpoint + per-zone flow cards (gated on `enableZone2`).
-  - COP-aware live-power scaling: per-model COP curve indexed by outdoor temp + flow temp. Gets us within ±10 % year-round instead of being weather-blind. ~50 LOC, needs datasheet curve data baked in.
   - mDNS discovery for the Waveshare (low priority — the gateway doesn't announce cleanly; manual IP works).
   - Multiple virtual devices per heat pump (one per setpoint) to escape the title-locking. Reorganise drivers into `heatpump_zone1`, `heatpump_dhw`, `heatpump_zone2`. Significant refactor — only justified if users demand truly distinct labels.
 
@@ -378,6 +395,7 @@ Languages currently shipped: `en`, `nl`, `da`, `de`, `es`, `fr`, `it`, `no`, `sv
 | Set `pollInterval` equal to gateway's `tcp_to` (default 30 s) | ~50% of polls land on a freshly-closed socket → spurious failures | Pick `pollInterval` strictly below (persistent, e.g. 20 s) **or** strictly above (reconnect-each-poll, e.g. 60 s). Never *equal* to `tcp_to`. |
 | Recommend `tcp_to=0` to "fix" idle drops | Zombie sockets accumulate from every Homey crash / network drop; eventually need gateway power-cycle | Leave `tcp_to=30` and rely on the dead-detection layer in `modbus/controller.ts`. |
 | Use `antibacteriaOnOff` (reg 40011) as "currently running" | Permanent 2700 W phantom from immersion when feature is just *enabled* | It's a config bit, not a runtime status. Use delta-hours on `immersionHeaterHours` (40039) only. |
+| Use `operationMode` (reg 40003) while the zone is off | DHW heat-ups read as cooling: no power during the run, phantom power after it | 40003 keeps the last zone mode; only use it while `zone1OnOff` is on (see § 7). |
 
 ---
 
