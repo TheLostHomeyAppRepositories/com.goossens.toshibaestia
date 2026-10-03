@@ -187,8 +187,8 @@ const DEPRECATED_CAPABILITIES: string[] = [
 const MANIFEST_CAPABILITY_OPTIONS: Record<string, Record<string, unknown>> = {
   'measure_temperature':           { title: { en: 'Zone 1 temperature',  nl: 'Zone 1 temperatuur' } },
   'measure_temperature.outdoor':   { title: { en: 'Outdoor temperature', nl: 'Buitentemperatuur' } },
-  'measure_temperature.water_inlet':  { title: { en: 'Water inlet (TWI)',  nl: 'Aanvoertemperatuur' } },
-  'measure_temperature.water_outlet': { title: { en: 'Water outlet (TWO)', nl: 'Retourtemperatuur' } },
+  'measure_temperature.water_inlet':  { title: { en: 'Water inlet (TWI)',  nl: 'Retourtemperatuur (TWI)' } },
+  'measure_temperature.water_outlet': { title: { en: 'Water outlet (TWO)', nl: 'Aanvoertemperatuur (TWO)' } },
   'alarm_generic':                 { title: { en: 'Heat pump alarm',     nl: 'Warmtepomp alarm' } },
 };
 

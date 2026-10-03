@@ -1138,7 +1138,7 @@
         "measure_temperature.water_inlet": {
           "title": {
             "en": "Water inlet (TWI)",
-            "nl": "Aanvoertemperatuur",
+            "nl": "Retourtemperatuur (TWI)",
             "da": "Vandindløb (TWI)",
             "de": "Wassereinlass (TWI)",
             "es": "Entrada de agua (TWI)",
@@ -1155,7 +1155,7 @@
         "measure_temperature.water_outlet": {
           "title": {
             "en": "Water outlet (TWO)",
-            "nl": "Retourtemperatuur",
+            "nl": "Aanvoertemperatuur (TWO)",
             "da": "Vandudløb (TWO)",
             "de": "Wasserauslass (TWO)",
             "es": "Salida de agua (TWO)",
