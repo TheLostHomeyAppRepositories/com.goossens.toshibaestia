@@ -273,21 +273,40 @@ modbus-serial's `client.isOpen` is unreliable for half-closed sockets — it onl
 
 ## 7. Live-power & energy estimation
 
-The BMS-IFMB0UEW-E exposes no power, kWh, flow or compressor-frequency register. Since 1.2.0 the estimate is physical, in [`drivers/heatpump/power-model.ts`](drivers/heatpump/power-model.ts) (pure, no Homey imports, replay-tested in `test/power-model.test.ts`):
+The BMS-IFMB0UEW-E exposes no power, kWh, current or flow register. A full read-only scan (holding 40001–42000 and input registers, idle and at 41 Hz) found only the registers below; the remote controller's WF (flow), CT (outdoor current), PMV and HPS are **not** on the interface. Since 1.2.0 the estimate lives in [`drivers/heatpump/power-model.ts`](drivers/heatpump/power-model.ts) (pure, replay-tested in `test/power-model.test.ts`).
+
+### Undocumented registers (R32, verified against the remote's "Sensor information")
+
+| Register | Value |
+|---|---|
+| 40021 | TC — condensing temperature (°C) |
+| 40027 | LPS × 0.01 MPa (barely moves; unused) |
+| 40028 / 40029 / 40030 | TE / TD / TS (°C) |
+| 40032 | compressor frequency (Hz); lags the real stop by ~35 s |
+| 40033 | FAN1 (rpm) |
+
+Read in one separate request (40021–40032) so a unit that rejects them can't break the main poll; three refusals in a row → not read until restart.
+
+### Frequency model (R32 units, primary)
 
 ```
-thermal  = water flow × 4.186 × |TWO − TWI|          (ΔT smoothed, τ 60 s)
-electric = Toshiba part-load table (thermal, outdoor °C, leaving water °C)
-kWh      = ∫ electric dt                              (meter_power)
+electric = Hz × C × n/(n−1) · p1 · ((p2/p1)^((n−1)/n) − 1)      n = 1.2, R32 saturation pressures
+p1 = psat(min(TE, TC)), p2 = psat(max(TE, TC))                    (heating: TE evaporates; cooling/defrost reversed)
 ```
 
-`device.ts → updatePower()` only builds a `PowerSample` per poll, feeds the estimator, integrates the watts into `meter_power` and persists what was learnt.
+`C` (cm³) = compressor displacement ÷ overall efficiency, one constant per compressor. Per model from the Data Book's maximum-frequency tables (input at max Hz: 401 80, 601 99, 801 89, 1101 99 Hz; TE ≈ TO − 8, TC ≈ LWT + 3, TO ≤ 12 °C), scaled so the 1101 matches the measured unit: 401 17.0, 601 15.2, 801 29.2, 1101 29.3. 1401 and R410A have no default; the user can calibrate any R32 unit by typing the CT current (setting `ctCurrentA`) during a run: `C = I × 230 V × 0.97 / (Hz × work)`, stored as `compressorCm3`, cleared on a model change.
+
+Validation (11 kW AIO): CT 14.6 A at 71 Hz (3362 W), stop step 1973 W at 45 Hz, 45 → 30 Hz step 678 W — one constant within ±6 %; **independent** stop step 3168 W at 67 Hz: model +1.7 %.
+
+The registers are used only when `RefrigerantSensorCheck` trusts them (store key `sensorCheck`): ≥ 20 idle polls with 0 Hz and TE within 2 K of outdoor, ≥ 5 polls where the water side shows a run with Hz > 0, TE ≥ 4 K away and TC ≥ TWO − 3, and at most one miss per two confirmations. A register stuck at 0, a constant or an outdoor-like value never passes.
+
+### Water model (fallback: R410A, 1401 without calibration, or before the check passes)
 
 ### Inputs and their sources
 
 | Input | Source |
 |---|---|
-| Performance | R32 401/601/801/1101: "part load capacity and input" + "average heating capacity" tables of the Estia R32 Engineering Data Book (`data/r32-tables.json`; input excludes the water pump). Other models (R32 1401, R410A S4/S5/Hi Power): rated COP from `MODEL_PRESETS` (capacity ÷ heating input at A7/W35), shaped by the 1101 COP curve over outdoor/water temperature. Above LWT 55 °C the part-load result is scaled by the max-frequency COP ratio. |
+| Performance (water model) | R32 401/601/801/1101: "part load capacity and input" + "average heating capacity" tables of the Estia R32 Engineering Data Book (`data/r32-tables.json`; input excludes the water pump). Other models (R32 1401, R410A S4/S5/Hi Power): rated COP from `MODEL_PRESETS` (capacity ÷ heating input at A7/W35), shaped by the 1101 COP curve over outdoor/water temperature. Above LWT 55 °C the part-load result is scaled by the max-frequency COP ratio. |
 | Water flow | Learnt from hot-water heat-ups: `flow = tank litres × tank rise / ∫ΔT dt` over compressor-only DHW segments (≥ 10 min, ≥ 8 K rise; tank start = the reading before the run, the sensor dips ~1 K when the pump starts), median of the last 7. Until then the rated flow (capacity at 5 K ΔT). The `flowLpm` setting overrides both — the only way to correct it on installs without a tank. |
 | Compressor on/off | Register **40028 (TE, undocumented)** when `RefrigerantSensorCheck` trusts it: \|TE − TO\| ≥ 4 K. Trusted only after ≥ 20 quiet-water polls with TE within 2 K of outdoor **and** ≥ 10 polls where the water side shows a run and TE is ≥ 4 K away (misses ≤ 20 %): a constant or an outdoor-like value never passes. Read in its own request; three refusals in a row → water only until restart. Otherwise the water side: on at a **start** (TWO moving ≥ 2 K away from TWI within 2 min, in the expected direction) or a steady ΔT ≥ 3 K with TWO flat for 5 min; off after two polls without the expected ΔT. |
 | What is served | DHW only on → `dhw` (the 3-way valve can only point at the tank). Zone only → `heating`/`cooling` from register 40003. Both → ΔT sign, tank rising. **Register 40003 is only used while the zone is on** — it keeps "cool" while the zone is off, which made pre-1.2.0 versions treat DHW heat-ups as cooling (no power during the run, phantom power during the cool-down after it). |
@@ -311,9 +330,10 @@ kWh      = ∫ electric dt                              (meter_power)
 | Heater power vs its house step (−3185 W) | 3000 W (nominal at 230 V) |
 | Full 26 h replay at 15 s and 60 s polls, with and without TE | no phantom power; learnt flow 17.5 l/min every time (measured 17–18) |
 
-**Known limits:**
-- DHW with return water at 54–56 °C (end of a heat-up to > 50 °C): the compressor drew ~25 % more than the tables give (real COP ≈ 2.5 vs 3.6). One run only — collect more before adding a correction.
-- Before the first learnt flow, the rated flow is used: on the test unit that's 1.8× the real flow, so the first DHW run reads ~2× too high.
+**Known limits of the water model** (why the frequency model exists):
+- The tank-learnt flow was 17.5 l/min while the unit's flow sensor (WF on the remote) showed 11.5: the tank method overestimates the flow (~+50 %).
+- Toshiba's part-load tables overestimate the COP in DHW (real ≈ 2.2 at TO 23 / TC 61 vs ~3.1 in the tables). On the test unit both errors cancelled at one point (−2 %), which is luck, not accuracy.
+- Before the first learnt flow, the rated flow is used: 2.7× the real flow on the test unit (5.7 kW shown for 3.3 kW real).
 - Integer °C (DIP S4-1 off): ΔT of 3 K is ±17 %. Units set to decidegrees get better live values.
 - The water pump (not in Toshiba's input figures) and supply voltage (heater 3.2 kW at ~235 V) are not modelled.
 
