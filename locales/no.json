@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "Modbus forespørsel mislyktes: {{reason}}",
     "season_order": "Sesongens byttepunkter må være i denne rekkefølgen: Vinter fra < Vinter til ≤ Sommer til < Sommer fra.",
-    "no_hot_water": "Varmtvann er ikke slått på for denne varmepumpen (enhetsinnstillinger)."
+    "no_hot_water": "Varmtvann er ikke slått på for denne varmepumpen (enhetsinnstillinger).",
+    "ct_not_running": "Kompressoren går ikke akkurat nå. Skriv inn CT-verdien mens den går.",
+    "ct_r32_only": "Kalibrering med CT-strømmen fungerer bare for R32-modeller.",
+    "ct_implausible": "Den CT-verdien passer ikke til gjeldende frekvens. Sjekk verdien og prøv igjen under en rolig drift."
   },
   "season": {
     "summer": "Sommer",
@@ -14,6 +17,9 @@
     "flow_rated": "nominell, ikke lært ennå",
     "flow_set": "angitt i innstillingene",
     "detect_refrigerant": "kompressor via kuldemedieføler",
-    "detect_water": "kompressor via vanntemperaturer"
+    "detect_water": "kompressor via vanntemperaturer",
+    "detect_frequency": "kompressorfrekvens målt",
+    "calibrated": "kalibrert med CT",
+    "from_databook": "fra Data Book"
   }
 }

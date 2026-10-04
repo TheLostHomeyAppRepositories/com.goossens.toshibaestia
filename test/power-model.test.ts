@@ -18,6 +18,7 @@ import fs from 'fs';
 import path from 'path';
 import {
   PowerEstimator, PowerConfig, PowerSample, RefrigerantSensorCheck, compressorInputKw, energyKwh,
+  compressorCm3FromCurrent, frequencyModelWatts,
 } from '../drivers/heatpump/power-model';
 
 interface Row extends PowerSample { houseW: number }
@@ -42,6 +43,8 @@ function load(file: string, evaporator: 'te' | 'none' | 'outdoor' | 'constant' =
       thoC: num(c.tho),
       tankC: num(c.tank),
       evaporatorC,
+      condensingC: evaporator === 'te' ? num(c.tc) : null,
+      compressorHz: evaporator === 'te' ? num(c.hz) : null,
       houseW: Number(c.houseW),
     };
   });
@@ -57,6 +60,9 @@ const R32_1101_AIO: PowerConfig = {
   immersionKw: 0,
   tankLitres: 210,
 };
+
+/** Same unit with the frequency model: C from the CT reading and house-meter steps below. */
+const R32_1101_HZ: PowerConfig = { ...R32_1101_AIO, compressorCm3: 29.3 };
 
 const FIXTURE = 'r32s1-1101-dhw-2026-10-03.csv';
 const FIXTURE_HEATER = 'r32s1-1101-dhw-heater-2026-10-03.csv';
@@ -230,4 +236,74 @@ test('register 40028 is trusted only when it behaves like TE', () => {
   assert.equal(run('constant').trusted, false, 'a constant never sits at the outdoor temperature');
   // The verdict survives a restart.
   assert.equal(new RefrigerantSensorCheck(run('te').snapshot).trusted, true);
+});
+
+// ── Frequency model ────────────────────────────────────────────────────────────
+// References on the same 11 kW unit, each a direct electrical measurement:
+// - CT on the remote controller, 2026-10-04 11:40: 14.6 A at 71 Hz, TE 13 °C, TC 59 °C
+//   → 14.6 A × 235 V × 0.98 (Toshiba's power factor) = 3362 W;
+// - compressor stop, 2026-10-03 10:08:01 UTC: −1973 W in one poll at 45 Hz;
+// - 45 → 30 Hz, 2026-10-03 12:16:56 UTC: −678 W in one poll.
+// C = 29.3 cm³ is fitted on these three; the Data Book's maximum-frequency table gives
+// 33.5 cm³ for this model before scaling (see AGENTS.md § 7).
+
+test('frequency model: the three electrical references agree on one constant (±6 %)', () => {
+  const ct = 14.6 * 235 * 0.98;
+  assert.ok(Math.abs(frequencyModelWatts(29.3, 71, 13, 59) - ct) / ct < 0.06, `${frequencyModelWatts(29.3, 71, 13, 59).toFixed(0)} W vs CT ${ct.toFixed(0)} W`);
+  const rows = load(FIXTURE);
+  const stop = rows.filter((r) => r.timeMs < at('2026-10-03T10:08:01Z')).pop()!;
+  const atStop = frequencyModelWatts(29.3, stop.compressorHz!, stop.evaporatorC!, stop.condensingC!);
+  assert.ok(Math.abs(atStop - 1973) / 1973 < 0.06, `${atStop.toFixed(0)} W vs step 1973 W at ${stop.compressorHz} Hz`);
+  const heater = load(FIXTURE_HEATER);
+  const before = heater.filter((r) => r.timeMs < at('2026-10-03T12:16:56Z')).pop()!;
+  const drop = frequencyModelWatts(29.3, 45, before.evaporatorC!, before.condensingC!) - frequencyModelWatts(29.3, 30, before.evaporatorC!, before.condensingC!);
+  assert.ok(Math.abs(drop - 678) / 678 < 0.1, `${drop.toFixed(0)} W vs step 678 W`);
+  // The calibration helper recovers the constant from the CT reading.
+  assert.ok(Math.abs(compressorCm3FromCurrent(14.6, 71, 13, 59, 235, 0.98)! - 30.7) < 0.5);
+});
+
+test('frequency model: zero watts whenever the compressor reports 0 Hz, heater still seen', () => {
+  for (const file of [FIXTURE, FIXTURE_HEATER, 'r32s1-1101-standing-water-2026-10-03.csv']) {
+    const est = new PowerEstimator(R32_1101_HZ, { flowSamplesLpm: [17.4] });
+    load(file).forEach((r) => {
+      const reading = est.update(r);
+      assert.equal(reading.detection, 'frequency');
+      if (r.compressorHz === 0) assert.equal(reading.compressorW, 0, `${file} ${new Date(r.timeMs).toISOString()}`);
+      if (r.compressorHz! > 0) assert.ok(reading.compressorW > 0);
+    });
+  }
+  const est = new PowerEstimator(R32_1101_HZ, { flowSamplesLpm: [17.4] });
+  const readings = load(FIXTURE_HEATER).map((r) => est.update(r));
+  assert.ok(readings.some((x) => x.heaterW === 3000), 'backup heater not seen');
+});
+
+test('frequency model: register checks need Hz at 0 while quiet and above 0 during a run', () => {
+  const run = (hz: (r: Row) => number | null) => {
+    const check = new RefrigerantSensorCheck();
+    const est = new PowerEstimator(R32_1101_AIO, { flowSamplesLpm: [17.8] });
+    load(FIXTURE).forEach((r) => {
+      const sample = { ...r, compressorHz: hz(r) };
+      check.update(sample, est.update({ ...sample, evaporatorC: null }).waterSaysOn);
+    });
+    return check.trusted;
+  };
+  assert.equal(run((r) => r.compressorHz ?? null), true);
+  assert.equal(run(() => 0), false, 'a register stuck at 0 is not a frequency');
+  assert.equal(run(() => 63), false, 'a constant is not a frequency');
+});
+
+test('frequency model: independent check on a 71 Hz run (2026-10-04), not used for the constant', () => {
+  // The run ended with a −3168 W step in the house meter at 09:50:18 UTC (4050 → 882 W);
+  // the frequency register only drops to 0 one or two polls later (interface lag ~35 s).
+  const rows = load('r32s1-1101-dhw-71hz-2026-10-04.csv');
+  const est = new PowerEstimator(R32_1101_HZ, { flowSamplesLpm: [17.4] });
+  const readings = rows.map((r) => est.update(r));
+  const i = rows.findIndex((r) => r.timeMs >= at('2026-10-04T09:50:18Z'));
+  const step = rows[i - 1].houseW - rows[i].houseW;
+  assert.ok(Math.abs(readings[i - 1].compressorW - step) / step < 0.05, `model ${readings[i - 1].compressorW} W vs step ${step} W`);
+  // At the app's 60 s poll the registers are trusted during this 14-minute run.
+  const check = new RefrigerantSensorCheck();
+  const water = new PowerEstimator(R32_1101_AIO);
+  rows.filter((_, k) => k % 4 === 0).forEach((r) => check.update(r, water.update({ ...r, evaporatorC: null, compressorHz: null }).waterSaysOn));
+  assert.equal(check.trusted, true, JSON.stringify(check.snapshot));
 });

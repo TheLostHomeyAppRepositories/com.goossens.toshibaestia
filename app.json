@@ -2287,6 +2287,49 @@
               }
             },
             {
+              "id": "ctCurrentA",
+              "type": "number",
+              "value": 0,
+              "attr": {
+                "min": 0,
+                "max": 60,
+                "step": 0.1
+              },
+              "units": {
+                "en": "A"
+              },
+              "label": {
+                "en": "Calibrate: CT current now",
+                "nl": "Kalibreren: CT-stroom nu",
+                "da": "Kalibrér: CT-strøm nu",
+                "de": "Kalibrieren: CT-Strom jetzt",
+                "es": "Calibrar: corriente CT ahora",
+                "fr": "Calibrer : courant CT maintenant",
+                "it": "Calibra: corrente CT ora",
+                "no": "Kalibrer: CT-strøm nå",
+                "sv": "Kalibrera: CT-ström nu",
+                "pl": "Kalibracja: prąd CT teraz",
+                "ru": "Калибровка: ток CT сейчас",
+                "ko": "보정: 현재 CT 전류",
+                "ar": "المعايرة: تيار CT الآن"
+              },
+              "hint": {
+                "en": "R32 units: while the compressor runs, open Sensor information on the remote controller and enter the CT value shown (outdoor unit current, e.g. 14.6). The app works out your compressor's constant from it and the current frequency, TE and TC; the field then empties again. Calibrating once makes the estimate match your unit.",
+                "nl": "R32-units: open terwijl de compressor draait de Sensorinformatie op de afstandsbediening en vul de getoonde CT-waarde in (stroom van de buitenunit, bv. 14,6). De app berekent daarmee en met de huidige frequentie, TE en TC de constante van jouw compressor; daarna wordt het veld weer leeg. Eén keer kalibreren laat de schatting kloppen met jouw toestel.",
+                "da": "R32-enheder: Åbn Sensorinformation på fjernbetjeningen, mens kompressoren kører, og indtast den viste CT-værdi (udedelens strøm, f.eks. 14,6). Appen beregner ud fra den og den aktuelle frekvens, TE og TC din kompressors konstant; feltet tømmes derefter igen. Én kalibrering får estimatet til at passe til din enhed.",
+                "de": "R32-Geräte: Öffnen Sie bei laufendem Verdichter die Sensorinformationen auf der Fernbedienung und tragen Sie den angezeigten CT-Wert ein (Strom des Außengeräts, z. B. 14,6). Die App berechnet daraus und aus der aktuellen Frequenz, TE und TC die Konstante Ihres Verdichters; danach wird das Feld wieder geleert. Einmal kalibrieren lässt die Schätzung zu Ihrem Gerät passen.",
+                "es": "Unidades R32: con el compresor en marcha, abre Información de sensores en el mando y escribe el valor CT que aparece (corriente de la unidad exterior, p. ej. 14,6). La app calcula con él y con la frecuencia, TE y TC actuales la constante de tu compresor; después el campo se vacía. Calibrar una vez ajusta la estimación a tu equipo.",
+                "fr": "Unités R32 : compresseur en marche, ouvrez Informations sondes sur la télécommande et saisissez la valeur CT affichée (courant de l'unité extérieure, p. ex. 14,6). L'app en déduit, avec la fréquence, TE et TC actuels, la constante de votre compresseur ; le champ se vide ensuite. Un seul étalonnage aligne l'estimation sur votre appareil.",
+                "it": "Unità R32: con il compressore in funzione, apri Informazioni sensori sul comando e inserisci il valore CT mostrato (corrente dell'unità esterna, es. 14,6). L'app ricava da questo e dalla frequenza, TE e TC attuali la costante del tuo compressore; poi il campo si svuota. Una sola calibrazione adatta la stima alla tua unità.",
+                "no": "R32-enheter: Åpne Sensorinformasjon på fjernkontrollen mens kompressoren går, og skriv inn CT-verdien som vises (utedelens strøm, f.eks. 14,6). Appen regner ut kompressorens konstant fra den og gjeldende frekvens, TE og TC; feltet tømmes deretter. Én kalibrering får estimatet til å passe enheten din.",
+                "sv": "R32-enheter: Öppna Sensorinformation på fjärrkontrollen medan kompressorn går och ange det visade CT-värdet (utedelens ström, t.ex. 14,6). Appen räknar fram kompressorns konstant ur det och aktuell frekvens, TE och TC; fältet töms sedan igen. En kalibrering får uppskattningen att stämma med din enhet.",
+                "pl": "Jednostki R32: gdy sprężarka pracuje, otwórz Informacje o czujnikach na sterowniku i wpisz pokazaną wartość CT (prąd jednostki zewnętrznej, np. 14,6). Aplikacja wyliczy z niej oraz z bieżącej częstotliwości, TE i TC stałą Twojej sprężarki; potem pole się wyczyści. Jedna kalibracja dopasowuje szacunek do Twojego urządzenia.",
+                "ru": "Блоки R32: при работающем компрессоре откройте «Информация датчиков» на пульте и введите показанное значение CT (ток наружного блока, например 14,6). По нему и текущим частоте, TE и TC приложение вычислит константу вашего компрессора; затем поле очистится. Одна калибровка подгоняет оценку под ваш блок.",
+                "ko": "R32 제품: 압축기가 도는 동안 리모컨의 센서 정보를 열고 표시된 CT 값(실외기 전류, 예: 14.6)을 입력하세요. 앱이 이 값과 현재 주파수, TE, TC로 압축기 상수를 계산한 뒤 칸을 비웁니다. 한 번만 보정하면 추정치가 내 기기에 맞춰집니다.",
+                "ar": "وحدات R32: أثناء عمل الضاغط افتح معلومات المستشعرات في جهاز التحكم وأدخل قيمة CT المعروضة (تيار الوحدة الخارجية، مثلًا 14.6). يحسب التطبيق منها ومن التردد وTE وTC الحالية ثابت الضاغط لديك، ثم يُفرَّغ الحقل. معايرة واحدة تجعل التقدير مطابقًا لجهازك."
+              }
+            },
+            {
               "id": "powerStatus",
               "type": "label",
               "value": "—",
@@ -2306,19 +2349,19 @@
                 "ar": "تقدير القدرة"
               },
               "hint": {
-                "en": "The water flow in use, and how the app sees the compressor run: with the refrigerant sensor (TE, R32 units, after it has been checked during a run) or with the water temperatures.",
-                "nl": "Het waterdebiet dat gebruikt wordt, en hoe de app de compressor ziet draaien: met de koudemiddelvoeler (TE, R32-units, nadat die tijdens een beurt gecontroleerd is) of met de watertemperaturen.",
-                "da": "Den anvendte vandgennemstrømning, og hvordan appen ser kompressoren køre: med kølemiddelføleren (TE, R32-enheder, efter at den er kontrolleret under en drift) eller med vandtemperaturerne.",
-                "de": "Der verwendete Wasserdurchfluss und wie die App den Verdichterlauf erkennt: mit dem Kältemittelfühler (TE, R32-Geräte, nachdem er während eines Laufs geprüft wurde) oder mit den Wassertemperaturen.",
-                "es": "El caudal de agua en uso y cómo detecta la app el funcionamiento del compresor: con la sonda de refrigerante (TE, unidades R32, tras comprobarla durante un ciclo) o con las temperaturas del agua.",
-                "fr": "Le débit d'eau utilisé, et comment l'app voit tourner le compresseur : avec la sonde de réfrigérant (TE, unités R32, après vérification pendant un cycle) ou avec les températures de l'eau.",
-                "it": "La portata d'acqua in uso e come l'app rileva il funzionamento del compressore: con la sonda del refrigerante (TE, unità R32, dopo averla verificata durante un ciclo) o con le temperature dell'acqua.",
-                "no": "Vannføringen som brukes, og hvordan appen ser at kompressoren går: med kuldemedieføleren (TE, R32-enheter, etter at den er kontrollert under en drift) eller med vanntemperaturene.",
-                "sv": "Vattenflödet som används, och hur appen ser att kompressorn går: med köldmediegivaren (TE, R32-enheter, efter att den kontrollerats under en körning) eller med vattentemperaturerna.",
-                "pl": "Używany przepływ wody oraz sposób wykrywania pracy sprężarki: czujnikiem czynnika (TE, jednostki R32, po sprawdzeniu go podczas pracy) lub temperaturami wody.",
-                "ru": "Используемый расход воды и то, как приложение определяет работу компрессора: по датчику хладагента (TE, блоки R32, после проверки во время работы) или по температурам воды.",
-                "ko": "사용 중인 물 유량과 앱이 압축기 운전을 감지하는 방법: 냉매 센서(TE, R32 제품, 운전 중 확인된 뒤) 또는 물 온도.",
-                "ar": "تدفق الماء المستخدم، وكيف يرى التطبيق عمل الضاغط: بمستشعر وسيط التبريد (TE، وحدات R32، بعد التحقق منه أثناء التشغيل) أو بدرجات حرارة الماء."
+                "en": "How the app estimates power: from the compressor frequency (R32 units, once the extra registers have been checked during a run, with the constant from the Data Book or your calibration), or from the water flow and temperatures.",
+                "nl": "Hoe de app het vermogen schat: uit de compressorfrequentie (R32-units, zodra de extra registers tijdens een beurt gecontroleerd zijn, met de constante uit het Data Book of jouw kalibratie), of uit het waterdebiet en de watertemperaturen.",
+                "da": "Hvordan appen anslår effekten: ud fra kompressorfrekvensen (R32-enheder, når de ekstra registre er kontrolleret under en drift, med konstanten fra Data Book eller din kalibrering) eller ud fra vandgennemstrømning og vandtemperaturer.",
+                "de": "Wie die App die Leistung schätzt: aus der Verdichterfrequenz (R32-Geräte, sobald die zusätzlichen Register während eines Laufs geprüft wurden, mit der Konstante aus dem Data Book oder Ihrer Kalibrierung) oder aus Wasserdurchfluss und Wassertemperaturen.",
+                "es": "Cómo estima la app la potencia: a partir de la frecuencia del compresor (unidades R32, una vez comprobados los registros adicionales durante un ciclo, con la constante del Data Book o tu calibración) o a partir del caudal y las temperaturas del agua.",
+                "fr": "Comment l'app estime la puissance : à partir de la fréquence du compresseur (unités R32, une fois les registres supplémentaires vérifiés pendant un cycle, avec la constante du Data Book ou votre étalonnage), ou à partir du débit et des températures de l'eau.",
+                "it": "Come l'app stima la potenza: dalla frequenza del compressore (unità R32, dopo aver verificato i registri aggiuntivi durante un ciclo, con la costante del Data Book o la tua calibrazione) oppure da portata e temperature dell'acqua.",
+                "no": "Hvordan appen anslår effekten: fra kompressorfrekvensen (R32-enheter, når de ekstra registrene er kontrollert under en drift, med konstanten fra Data Book eller kalibreringen din) eller fra vannføring og vanntemperaturer.",
+                "sv": "Hur appen uppskattar effekten: ur kompressorns frekvens (R32-enheter, när de extra registren kontrollerats under en körning, med konstanten från Data Book eller din kalibrering) eller ur vattenflöde och vattentemperaturer.",
+                "pl": "Jak aplikacja szacuje moc: z częstotliwości sprężarki (jednostki R32, po sprawdzeniu dodatkowych rejestrów podczas pracy, ze stałą z Data Book lub z Twojej kalibracji) albo z przepływu i temperatur wody.",
+                "ru": "Как приложение оценивает мощность: по частоте компрессора (блоки R32, после проверки дополнительных регистров во время работы, с константой из Data Book или вашей калибровки) или по расходу и температурам воды.",
+                "ko": "앱이 전력을 추정하는 방법: 압축기 주파수(R32 제품, 운전 중 추가 레지스터를 확인한 뒤, Data Book 상수 또는 내 보정값 사용) 또는 물 유량과 물 온도.",
+                "ar": "كيف يقدّر التطبيق القدرة: من تردد الضاغط (وحدات R32، بعد التحقق من السجلات الإضافية أثناء التشغيل، بالثابت من Data Book أو من معايرتك)، أو من تدفق الماء ودرجات حرارته."
               }
             }
           ]

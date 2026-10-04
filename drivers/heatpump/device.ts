@@ -23,6 +23,7 @@ import {
 import {
   PowerEstimator,
   RefrigerantSensorCheck,
+  compressorCm3FromCurrent,
   energyKwh,
   type LearntState,
   type PowerConfig,
@@ -60,6 +61,7 @@ interface DeviceSettings {
   backupHeaterKW?: string;     // dropdown: "0" | "3" | "6" | "9"
   tankLitres?: number;         // hot water tank volume, used to learn the water flow
   flowLpm?: number;            // water flow set by the user; 0 = learn it
+  ctCurrentA?: number;         // calibration: CT current read on the remote during a run
   powerStatus?: string;        // read-only: flow in use + how the compressor is detected
   detectedSeries?: string;
   detectedSlaveAddress?: string;
@@ -93,17 +95,22 @@ const seasonConfig = (s: DeviceSettings): SeasonConfig => ({
  * with tables get the part-load model; the others their rated COP, shaped over
  * outdoor and water temperature (power-model.ts).
  *
+ * compressorCm3: the frequency model's constant (compressor displacement ÷ overall
+ * efficiency). From the Data Book's maximum-frequency tables, scaled so the 11 kW unit
+ * matches its measured CT current and house-meter steps (AGENTS.md § 7). 1401 and
+ * R410A units only get it by calibration (ctCurrentA).
+ *
  * NOTE: backup heater wattage is NOT here — it's an installation choice
  * (3/6/9 kW typically) and lives in its own settings dropdown.
  */
-const MODEL_PRESETS: Record<string, { capacityKw: number; heatInputKw: number; tables?: string }> = {
+const MODEL_PRESETS: Record<string, { capacityKw: number; heatInputKw: number; tables?: string; compressorCm3?: number }> = {
   // R32 1 Series (F21 indoor) and 2 Series (S21 indoor) share the same outdoor
   // units (HWT-_HW-E codes) and the same compressor → identical input ratings.
   // One entry per kW class; covers both generations.
-  'r32-s1-401':   { capacityKw: 4,   heatInputKw: 0.77, tables: '401' },  // outdoor HWT-401HW-E
-  'r32-s1-601':   { capacityKw: 6,   heatInputKw: 1.25, tables: '601' },  // outdoor HWT-601HW-E
-  'r32-s1-801':   { capacityKw: 8,   heatInputKw: 1.54, tables: '801' },  // outdoor HWT-801HW-E
-  'r32-s1-1101':  { capacityKw: 11,  heatInputKw: 2.39, tables: '1101' }, // outdoor HWT-1101HW-E (e.g. F21SM3 / S21SM3)
+  'r32-s1-401':   { capacityKw: 4,   heatInputKw: 0.77, tables: '401', compressorCm3: 17.0 },  // outdoor HWT-401HW-E
+  'r32-s1-601':   { capacityKw: 6,   heatInputKw: 1.25, tables: '601', compressorCm3: 15.2 },  // outdoor HWT-601HW-E
+  'r32-s1-801':   { capacityKw: 8,   heatInputKw: 1.54, tables: '801', compressorCm3: 29.2 },  // outdoor HWT-801HW-E
+  'r32-s1-1101':  { capacityKw: 11,  heatInputKw: 2.39, tables: '1101', compressorCm3: 29.3 }, // outdoor HWT-1101HW-E (e.g. F21SM3 / S21SM3)
   'r32-s1-1401':  { capacityKw: 14,  heatInputKw: 3.04 },                 // outdoor HWT-1401H8W-E (not in the Data Book tables)
   // R410A Series 5 (2017-2021)
   'r410a-s5-455': { capacityKw: 4.5, heatInputKw: 0.92 },
@@ -130,6 +137,8 @@ const BACKUP_STEP_KW = 3;
 const RATED_DELTA_T_K = 5;
 /** Settings that change the power estimate. */
 const POWER_SETTINGS = ['modelKey', 'backupHeaterKW', 'tankLitres', 'flowLpm', 'enableDhw'];
+/** Undocumented R32 registers read on their own: TC (40021) … compressor Hz (40032). */
+const UNDOCUMENTED_REGISTERS = Array.from({ length: 12 }, (_, i) => REGISTERS.condensingTemp.number + i);
 
 /**
  * Feature-gated capabilities. NEVER list these in driver.compose.json.
@@ -284,9 +293,10 @@ export default class HeatpumpDevice extends Homey.Device {
   private power!: PowerEstimator;
   private refrigerantCheck!: RefrigerantSensorCheck;
   private lastPower: { watts: number; timeMs: number } | null = null;
+  private lastPowerSample: PowerSample | null = null;
   private meterKwh = 0;
-  // Consecutive failed reads of register 40028; after three it's left alone until an app restart.
-  private evaporatorFailures = 0;
+  // Consecutive failed reads of the undocumented registers; after three they're left alone until an app restart.
+  private undocumentedFailures = 0;
   private refrigerantCheckSavedMs = 0;
   // Outdoor samples of the current hour; stored as one hourly average when the hour ends.
   private outdoorHour: { hour: number; sum: number; count: number } | null = null;
@@ -391,6 +401,17 @@ export default class HeatpumpDevice extends Homey.Device {
 
     if (changedKeys.includes('pollInterval')) {
       this.schedulePolling(Number(s.pollInterval));
+    }
+
+    if (changedKeys.includes('modelKey')) {
+      // A calibration belongs to the compressor it was made on.
+      await this.unsetStoreValue('compressorCm3');
+    }
+    if (changedKeys.includes('ctCurrentA') && Number(s.ctCurrentA) > 0) {
+      await this.calibrateFromCurrent(Number(s.ctCurrentA), s);
+      this.homey.setTimeout(() => {
+        this.setSettings({ ctCurrentA: 0 }).catch((err) => this.error('setSettings ctCurrentA', err));
+      }, 500);
     }
 
     if (changedKeys.includes('tankLitres')) {
@@ -674,12 +695,37 @@ export default class HeatpumpDevice extends Homey.Device {
       backupStepKw: BACKUP_STEP_KW,
       immersionKw: this.getStoreValue('immersionSeen') ? IMMERSION_KW : 0,
       tankLitres: s.enableDhw && tankLitres > 0 ? tankLitres : null,
+      compressorCm3: (s.modelKey ?? DEFAULT_MODEL).startsWith('r32')
+        ? (this.getStoreValue('compressorCm3') as number | null) ?? preset.compressorCm3 ?? null
+        : null,
     };
+  }
+
+  /**
+   * Frequency-model constant from the CT current the user read on the remote controller
+   * during a run, with the frequency, TE and TC of the latest poll.
+   */
+  private async calibrateFromCurrent(currentA: number, s: DeviceSettings): Promise<void> {
+    if (!(s.modelKey ?? DEFAULT_MODEL).startsWith('r32')) throw new Error(this.homey.__('error.ct_r32_only'));
+    const x = this.lastPowerSample;
+    if (!x || Date.now() - x.timeMs > 3 * 60_000 || !x.compressorHz || x.evaporatorC == null || x.condensingC == null) {
+      throw new Error(this.homey.__('error.ct_not_running'));
+    }
+    const cm3 = compressorCm3FromCurrent(
+      currentA, x.compressorHz, Math.min(x.evaporatorC, x.condensingC), Math.max(x.evaporatorC, x.condensingC),
+    );
+    if (cm3 == null || cm3 < 5 || cm3 > 100) throw new Error(this.homey.__('error.ct_implausible'));
+    this.log(`Calibrated from CT ${currentA} A at ${x.compressorHz} Hz, TE ${x.evaporatorC}, TC ${x.condensingC}: ${cm3.toFixed(1)} cm³`);
+    await this.setStoreValue('compressorCm3', cm3);
+    this.power.setConfig(this.powerConfig(s));
   }
 
   private initPower(s: DeviceSettings): void {
     const learnt = this.getStoreValue('powerLearnt') as LearntState | null;
-    const check = this.getStoreValue('refrigerantCheck') as RefrigerantCheckState | null;
+    // 'sensorCheck' also judges TC and the compressor frequency; the 1.2.0 test builds'
+    // TE-only 'refrigerantCheck' doesn't carry over.
+    if (this.getStoreValue('refrigerantCheck') != null) this.unsetStoreValue('refrigerantCheck').catch(() => undefined);
+    const check = this.getStoreValue('sensorCheck') as RefrigerantCheckState | null;
     this.power = new PowerEstimator(this.powerConfig(s), learnt ?? undefined);
     this.refrigerantCheck = new RefrigerantSensorCheck(check ?? undefined);
     // meter_power keeps counting from where it is (also the hours-based totals of
@@ -688,19 +734,20 @@ export default class HeatpumpDevice extends Homey.Device {
   }
 
   /**
-   * Register 40028 (TE) isn't in Toshiba's list: read it on its own so a unit that
-   * rejects it can't break the main poll, and stop asking after three refusals in a row.
+   * Registers 40021–40032 (TC, TE, compressor Hz, …) aren't in Toshiba's list: read them
+   * on their own so a unit that rejects them can't break the main poll, and stop asking
+   * after three refusals in a row.
    */
-  private async readEvaporator(endpoint: ModbusEndpoint): Promise<number | undefined> {
-    if (this.evaporatorFailures >= 3) return undefined;
+  private async readUndocumented(endpoint: ModbusEndpoint): Promise<Record<number, number> | undefined> {
+    if (this.undocumentedFailures >= 3) return undefined;
     try {
-      const snap = await this.app.modbus.readRegisters(endpoint, [REGISTERS.evaporatorTemp.number]);
-      this.evaporatorFailures = 0;
-      return snap[REGISTERS.evaporatorTemp.number];
+      const snap = await this.app.modbus.readRegisters(endpoint, UNDOCUMENTED_REGISTERS);
+      this.undocumentedFailures = 0;
+      return snap;
     } catch (err) {
-      this.evaporatorFailures += 1;
-      if (this.evaporatorFailures >= 3) {
-        this.log(`Register ${REGISTERS.evaporatorTemp.number} not readable, power estimate uses water temperatures only:`, err instanceof Error ? err.message : err);
+      this.undocumentedFailures += 1;
+      if (this.undocumentedFailures >= 3) {
+        this.log('Registers 40021–40032 not readable, power estimate uses water temperatures only:', err instanceof Error ? err.message : err);
       }
       return undefined;
     }
@@ -711,7 +758,7 @@ export default class HeatpumpDevice extends Homey.Device {
    * from the heat the water carries (flow × ΔT) and Toshiba's performance tables,
    * integrated over time. See power-model.ts and AGENTS.md § 7.
    */
-  private async updatePower(snapshot: Record<number, number>, s: DeviceSettings, evaporatorRaw?: number): Promise<void> {
+  private async updatePower(snapshot: Record<number, number>, s: DeviceSettings, extra?: Record<number, number>): Promise<void> {
     const temp = (reg: number): number | null => {
       const raw = snapshot[reg];
       return raw === undefined ? null : this.scale(raw, s);
@@ -737,10 +784,20 @@ export default class HeatpumpDevice extends Homey.Device {
       twoC: temp(REGISTERS.waterOutletTemp.number),
       thoC: temp(REGISTERS.heaterOutletTemp.number),
       tankC: s.enableDhw ? temp(REGISTERS.dhwTankTemp.number) : null,
-      evaporatorC: evaporatorRaw === undefined ? null : this.scale(evaporatorRaw, s),
+      evaporatorC: extra?.[REGISTERS.evaporatorTemp.number] === undefined ? null : this.scale(extra[REGISTERS.evaporatorTemp.number], s),
+      condensingC: extra?.[REGISTERS.condensingTemp.number] === undefined ? null : this.scale(extra[REGISTERS.condensingTemp.number], s),
+      compressorHz: extra?.[REGISTERS.compressorFrequency.number] ?? null,
     };
-    const reading = this.power.update({ ...sample, evaporatorC: this.refrigerantCheck.trusted ? sample.evaporatorC : null });
+    // The undocumented registers only count once they've proven themselves on this unit.
+    const trusted = this.refrigerantCheck.trusted;
+    const reading = this.power.update({
+      ...sample,
+      evaporatorC: trusted ? sample.evaporatorC : null,
+      condensingC: trusted ? sample.condensingC : null,
+      compressorHz: trusted ? sample.compressorHz : null,
+    });
     this.refrigerantCheck.update(sample, reading.waterSaysOn);
+    this.lastPowerSample = sample;
 
     if (this.lastPower) this.meterKwh += energyKwh(this.lastPower.watts, reading.watts, sample.timeMs - this.lastPower.timeMs);
     this.lastPower = { watts: reading.watts, timeMs: sample.timeMs };
@@ -755,17 +812,24 @@ export default class HeatpumpDevice extends Homey.Device {
     const learnt = this.power.learnt;
     if (JSON.stringify(learnt) !== JSON.stringify(this.getStoreValue('powerLearnt'))) await this.setStoreValue('powerLearnt', learnt);
     // The check's counters move every poll: save when its verdict changes, else every 30 min.
-    const saved = this.getStoreValue('refrigerantCheck') as RefrigerantCheckState | null;
+    const saved = this.getStoreValue('sensorCheck') as RefrigerantCheckState | null;
     const verdictChanged = new RefrigerantSensorCheck(saved ?? undefined).trusted !== this.refrigerantCheck.trusted;
     if (verdictChanged || sample.timeMs - this.refrigerantCheckSavedMs > 30 * 60_000) {
-      await this.setStoreValue('refrigerantCheck', this.refrigerantCheck.snapshot);
+      await this.setStoreValue('sensorCheck', this.refrigerantCheck.snapshot);
       this.refrigerantCheckSavedMs = sample.timeMs;
     }
-    let flowSource = this.homey.__('power.flow_rated');
-    if (Number(s.flowLpm) > 0) flowSource = this.homey.__('power.flow_set');
-    else if (this.power.flowIsLearnt) flowSource = `${this.homey.__('power.flow_learnt')} (${learnt.flowSamplesLpm.length})`;
-    const detection = this.homey.__(this.refrigerantCheck.trusted ? 'power.detect_refrigerant' : 'power.detect_water');
-    const powerStatus = `${this.power.flowLpm.toFixed(1)} l/min, ${flowSource} · ${detection}`;
+    let powerStatus: string;
+    const cm3 = this.powerConfig(s).compressorCm3;
+    if (reading.detection === 'frequency' && cm3) {
+      const source = this.homey.__(this.getStoreValue('compressorCm3') != null ? 'power.calibrated' : 'power.from_databook');
+      powerStatus = `${this.homey.__('power.detect_frequency')} · ${cm3.toFixed(1)} cm³, ${source}`;
+    } else {
+      let flowSource = this.homey.__('power.flow_rated');
+      if (Number(s.flowLpm) > 0) flowSource = this.homey.__('power.flow_set');
+      else if (this.power.flowIsLearnt) flowSource = `${this.homey.__('power.flow_learnt')} (${learnt.flowSamplesLpm.length})`;
+      const detection = this.homey.__(reading.detection === 'refrigerant' ? 'power.detect_refrigerant' : 'power.detect_water');
+      powerStatus = `${this.power.flowLpm.toFixed(1)} l/min, ${flowSource} · ${detection}`;
+    }
     if (s.powerStatus !== powerStatus) await this.setSettings({ powerStatus }).catch((err) => this.error('setSettings powerStatus', err));
   }
 
@@ -788,8 +852,8 @@ export default class HeatpumpDevice extends Homey.Device {
     const registers = this.buildRegisterList(settings);
     try {
       const snapshot = await this.app.modbus.readRegisters(endpoint, registers);
-      const evaporatorRaw = await this.readEvaporator(endpoint);
-      await this.applySnapshot(snapshot, settings, evaporatorRaw);
+      const extra = await this.readUndocumented(endpoint);
+      await this.applySnapshot(snapshot, settings, extra);
       await this.setAvailable();
       await this.setSettings({ lastSeen: new Date().toISOString() }).catch(() => undefined);
 
@@ -824,7 +888,7 @@ export default class HeatpumpDevice extends Homey.Device {
     return s.tempScaling === 'x10' ? signed / 10 : signed;
   }
 
-  private async applySnapshot(snapshot: Record<number, number>, s: DeviceSettings, evaporatorRaw?: number): Promise<void> {
+  private async applySnapshot(snapshot: Record<number, number>, s: DeviceSettings, extra?: Record<number, number>): Promise<void> {
     const setTemp = async (cap: string, regNumber: number) => {
       if (!this.hasCapability(cap)) return;
       const raw = snapshot[regNumber];
@@ -883,7 +947,7 @@ export default class HeatpumpDevice extends Homey.Device {
     await setBool('auto_temp',        REGISTERS.autoTempOnOff.number);
 
     // ── Energy estimation ────────────────────────────────────────────────
-    await this.updatePower(snapshot, s, evaporatorRaw).catch((err) => this.error('updatePower', err));
+    await this.updatePower(snapshot, s, extra).catch((err) => this.error('updatePower', err));
 
     // Alarm flag + rich trigger on transition
     const alarmRaw = snapshot[REGISTERS.alarmStatus.number];

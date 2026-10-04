@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "Modbus 폴링에 실패했습니다: {{reason}}",
     "season_order": "계절 전환 기준은 다음 순서여야 합니다: 겨울 시작 < 겨울 종료 ≤ 여름 종료 < 여름 시작.",
-    "no_hot_water": "이 히트 펌프에는 온수가 활성화되어 있지 않습니다(기기 설정)."
+    "no_hot_water": "이 히트 펌프에는 온수가 활성화되어 있지 않습니다(기기 설정).",
+    "ct_not_running": "지금은 압축기가 돌지 않습니다. 압축기가 도는 동안 CT 값을 입력하세요.",
+    "ct_r32_only": "CT 전류 보정은 R32 모델에서만 됩니다.",
+    "ct_implausible": "이 CT 값은 현재 주파수와 맞지 않습니다. 값을 확인하고 안정적으로 운전 중일 때 다시 시도하세요."
   },
   "season": {
     "summer": "여름",
@@ -14,6 +17,9 @@
     "flow_rated": "정격값, 아직 학습 전",
     "flow_set": "설정에서 지정",
     "detect_refrigerant": "냉매 센서로 압축기 감지",
-    "detect_water": "물 온도로 압축기 감지"
+    "detect_water": "물 온도로 압축기 감지",
+    "detect_frequency": "압축기 주파수 측정",
+    "calibrated": "CT로 보정됨",
+    "from_databook": "Data Book 기준"
   }
 }

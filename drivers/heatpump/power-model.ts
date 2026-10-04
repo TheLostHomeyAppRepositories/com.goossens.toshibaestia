@@ -1,19 +1,28 @@
 /**
  * Electrical power estimation for Toshiba Estia heat pumps.
  *
- * The BMS-IFMB0UEW-E exposes no power, flow or compressor-frequency register, so
- * electrical input is derived from physics plus Toshiba's own performance data:
+ * The BMS-IFMB0UEW-E exposes no power, current or flow register (the remote
+ * controller shows CT and WF, the interface doesn't pass them on). Two models:
  *
- *   thermal  = water flow × 4.186 kJ/(kg·K) × |TWO − TWI|
- *   electric = input(thermal, outdoor temperature, leaving water temperature)
+ * 1. Frequency model (R32 units that report compressor frequency, TE and TC in the
+ *    undocumented registers 40032 / 40028 / 40021):
  *
- * `input()` interpolates the "part load capacity and input" tables of the Estia R32
- * Engineering Data Book (data/r32-tables.json). Units without tables fall back to
- * their rated COP, shaped by the same tables' COP-versus-temperature curve.
+ *      electric = compressor Hz × C × compression work per m³ of R32 between TE and TC
  *
- * Water flow is installation-specific (pump setting, pipework, coil): it is learnt
- * from domestic-hot-water runs, where the tank's temperature rise gives the
- * delivered heat (tank volume × ΔTTW) independently of the flow.
+ *    C is the compressor's displacement over its overall efficiency (cm³), one constant
+ *    per compressor: from Toshiba's Data Book, scaled on a measured unit, or calibrated
+ *    by the user from the CT current on the remote controller.
+ *
+ * 2. Water model (everything else):
+ *
+ *      thermal  = water flow × 4.186 kJ/(kg·K) × |TWO − TWI|
+ *      electric = input(thermal, outdoor temperature, leaving water temperature)
+ *
+ *    `input()` interpolates the "part load capacity and input" tables of the Estia R32
+ *    Engineering Data Book (data/r32-tables.json); units without tables use their rated
+ *    COP, shaped by the same tables' COP-versus-temperature curve. Water flow is learnt
+ *    from domestic-hot-water runs (tank volume × ΔTTW). Both the learnt flow and the
+ *    tables' COP proved optimistic on a measured unit — see AGENTS.md § 7.
  *
  * Pure module — no Homey imports — so it can be replayed against recorded data.
  * See AGENTS.md § 7 for the design notes and the validation data.
@@ -44,6 +53,10 @@ export interface PowerSample {
    * the unit doesn't provide it; detection then uses the water sensors.
    */
   evaporatorC?: number | null;
+  /** Condensing temperature (TC, register 40021, undocumented). */
+  condensingC?: number | null;
+  /** Compressor frequency (Hz, register 40032, undocumented); 0 while stopped. */
+  compressorHz?: number | null;
 }
 
 export interface PowerConfig {
@@ -63,6 +76,11 @@ export interface PowerConfig {
   immersionKw: number;
   /** Domestic hot water tank volume (l), or null when there is no tank. */
   tankLitres: number | null;
+  /**
+   * Compressor displacement ÷ overall efficiency (cm³) for the frequency model, or null
+   * when unknown (the water model is used then).
+   */
+  compressorCm3?: number | null;
 }
 
 export type Activity = 'idle' | 'dhw' | 'heating' | 'cooling';
@@ -75,8 +93,11 @@ export interface PowerReading {
   thermalW: number;
   activity: Activity;
   compressorOn: boolean;
-  /** Which signals decided "compressor on": refrigerant sensors or water temperatures. */
-  detection: 'refrigerant' | 'water';
+  /**
+   * How the compressor was judged: its frequency (frequency model), the refrigerant
+   * sensor TE, or the water temperatures.
+   */
+  detection: 'frequency' | 'refrigerant' | 'water';
   /** The water-side verdict on its own (also computed when the refrigerant sensor decides). */
   waterSaysOn: boolean;
 }
@@ -94,6 +115,50 @@ interface ModelTables {
   heatingMax: MaxTable;
 }
 const MODELS = (tables as unknown as { models: Record<string, ModelTables> }).models;
+
+// R32 saturation pressure (MPa abs.) every 10 °C from −30 to 70 °C (REFPROP).
+const R32_SAT_C = [-30, -20, -10, 0, 10, 20, 30, 40, 50, 60, 70];
+const R32_SAT_MPA = [0.273, 0.406, 0.581, 0.813, 1.107, 1.474, 1.927, 2.478, 3.140, 3.927, 4.855];
+const POLYTROPIC_N = 1.2;
+
+/** R32 saturation pressure (Pa) at a temperature, interpolated in ln(p) over 1/T. */
+export function r32SaturationPa(tempC: number): number {
+  const x = 1 / (tempC + 273.15);
+  let i = R32_SAT_C.findIndex((t) => t > tempC) - 1;
+  if (i < 0) i = tempC < R32_SAT_C[0] ? 0 : R32_SAT_C.length - 2;
+  const x0 = 1 / (R32_SAT_C[i] + 273.15);
+  const x1 = 1 / (R32_SAT_C[i + 1] + 273.15);
+  const y = Math.log(R32_SAT_MPA[i]) + ((x - x0) / (x1 - x0)) * (Math.log(R32_SAT_MPA[i + 1]) - Math.log(R32_SAT_MPA[i]));
+  return Math.exp(y) * 1e6;
+}
+
+/**
+ * Polytropic compression work (J) per m³ of R32 drawn in at the evaporating pressure and
+ * pushed to the condensing pressure: n/(n−1) · p1 · ((p2/p1)^((n−1)/n) − 1).
+ */
+export function compressionWorkJPerM3(evaporatingC: number, condensingC: number): number {
+  const p1 = r32SaturationPa(evaporatingC);
+  const p2 = r32SaturationPa(Math.max(condensingC, evaporatingC));
+  const k = (POLYTROPIC_N - 1) / POLYTROPIC_N;
+  return (1 / k) * p1 * ((p2 / p1) ** k - 1);
+}
+
+/** Electrical input (W) of the compressor from its frequency (frequency model). */
+export function frequencyModelWatts(cm3: number, hz: number, evaporatingC: number, condensingC: number): number {
+  return hz <= 0 ? 0 : hz * cm3 * 1e-6 * compressionWorkJPerM3(evaporatingC, condensingC);
+}
+
+/**
+ * C (cm³) from one reading of the outdoor unit's current (CT on the remote controller):
+ * P = V × I × power factor (Toshiba: 0.95–0.98 at rated load).
+ */
+export function compressorCm3FromCurrent(
+  currentA: number, hz: number, evaporatingC: number, condensingC: number, volts = 230, powerFactor = 0.97,
+): number | null {
+  const work = compressionWorkJPerM3(evaporatingC, condensingC);
+  if (hz <= 0 || currentA <= 0 || work <= 0) return null;
+  return (currentA * volts * powerFactor) / (hz * work * 1e-6);
+}
 
 // Detection thresholds. Temperatures arrive as whole degrees unless the interface's
 // DIP switch S4-1 selects decidegrees, so thresholds sit at ≥ 2 K.
@@ -322,7 +387,12 @@ export class PowerEstimator {
     const waterSaysOn = this.waterDetector(s, rawDt, demand);
     let compressorOn: boolean;
     let detection: PowerReading['detection'];
-    if (s.evaporatorC != null && s.outdoorC != null) {
+    const frequencyModel = !!this.config.compressorCm3 && s.compressorHz != null
+      && s.evaporatorC != null && s.condensingC != null;
+    if (frequencyModel) {
+      detection = 'frequency';
+      compressorOn = s.compressorHz! > 0;
+    } else if (s.evaporatorC != null && s.outdoorC != null) {
       detection = 'refrigerant';
       compressorOn = Math.abs(s.evaporatorC - s.outdoorC) >= REFRIGERANT_ON_K;
     } else {
@@ -346,7 +416,15 @@ export class PowerEstimator {
     const thermalKw = compressorOn ? Math.max(0, flowLps * WATER_KJ_PER_L_K * Math.abs(this.dtSmoothed)) : 0;
     const outdoor = s.outdoorC ?? 7;
     const mode = activity === 'cooling' ? 'cooling' : 'heating';
-    let compressorKw = compressorOn ? compressorInputKw(this.config, mode, thermalKw, outdoor, s.twoC) : 0;
+    let compressorKw: number;
+    if (detection === 'frequency') {
+      // Heating: TE evaporates, TC condenses; cooling and defrost reverse the cycle.
+      const low = Math.min(s.evaporatorC!, s.condensingC!);
+      const high = Math.max(s.evaporatorC!, s.condensingC!);
+      compressorKw = frequencyModelWatts(this.config.compressorCm3!, s.compressorHz!, low, high) / 1000;
+    } else {
+      compressorKw = compressorOn ? compressorInputKw(this.config, mode, thermalKw, outdoor, s.twoC) : 0;
+    }
     // The refrigerant sensors prove the compressor turns: it draws at least its lowest
     // modulation step, also while the water loop is still warming up after a start.
     if (compressorOn && detection === 'refrigerant') {
@@ -520,15 +598,16 @@ export interface RefrigerantCheckState {
 }
 
 const CHECK_MIN_IDLE = 20;
-const CHECK_MIN_RUN = 10;
+const CHECK_MIN_RUN = 5; // polls; with the frequency in the check, a few are conclusive
 const CHECK_COUNT_CAP = 1000;
 
 /**
- * Register 40028 carries TE on the R32 unit this was built on, but it's not in Toshiba's
- * register list, so another unit may put something else there. Trust it only once it
- * behaved like TE on this unit: next to the outdoor temperature while the water is
- * quiet, and well away from it while the water side shows the compressor running.
- * A constant or an outdoor-like value never passes both.
+ * Registers 40028 (TE), 40032 (compressor Hz) and 40021 (TC) carry these values on the
+ * R32 unit this was built on, but they're not in Toshiba's register list, so another
+ * unit may put something else there. Trust them only once they behaved that way on this
+ * unit: TE next to the outdoor temperature and 0 Hz while the water is quiet; TE well
+ * away from outdoor, Hz above 0 and TC at or above the leaving water while the water
+ * side shows a run. A constant or an outdoor-like value never passes both.
  */
 export class RefrigerantSensorCheck {
   private state: RefrigerantCheckState;
@@ -544,7 +623,8 @@ export class RefrigerantSensorCheck {
 
   get trusted(): boolean {
     const { idleAgree, runConfirm, runMiss } = this.state;
-    return idleAgree >= CHECK_MIN_IDLE && runConfirm >= CHECK_MIN_RUN && runMiss * 5 <= runConfirm;
+    // A wrong register misses on every running poll; real ones only around starts and stops.
+    return idleAgree >= CHECK_MIN_IDLE && runConfirm >= CHECK_MIN_RUN && runMiss * 2 <= runConfirm;
   }
 
   /** `waterSaysOn`: the estimator's water-side verdict for the same poll (PowerReading.waterSaysOn). */
@@ -555,12 +635,19 @@ export class RefrigerantSensorCheck {
     }
     const away = Math.abs(s.evaporatorC - s.outdoorC);
     const waterDt = Math.abs(s.twoC - s.twiC);
+    const hz = s.compressorHz;
     this.runStreak = waterSaysOn ? this.runStreak + 1 : 0;
     const bump = (key: keyof RefrigerantCheckState) => {
       this.state[key] = Math.min(CHECK_COUNT_CAP, this.state[key] + 1);
     };
-    if (this.runStreak >= 3) bump(away >= REFRIGERANT_ON_K ? 'runConfirm' : 'runMiss');
-    else if (waterDt <= 1 && away <= 2) bump('idleAgree');
+    if (this.runStreak >= 3) {
+      // While heating, the refrigerant condenses at or above the leaving water (TC ≥ TWO − 3 K).
+      const tcOk = s.condensingC == null || s.twoC <= s.twiC || s.condensingC >= s.twoC - 3;
+      bump(away >= REFRIGERANT_ON_K && (hz == null || hz > 0) && tcOk ? 'runConfirm' : 'runMiss');
+    } else if (away <= 2 && (hz == null ? waterDt <= 1 : hz === 0)) {
+      // Standing water keeps TWI and TWO apart for hours; with a frequency, 0 Hz says idle.
+      bump('idleAgree');
+    }
   }
 }
 

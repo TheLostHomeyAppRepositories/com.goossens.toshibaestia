@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "Modbus-uitlezing mislukt",
     "season_order": "De schakelpunten van het seizoen moeten in deze volgorde staan: Winter vanaf < Winter tot ≤ Zomer tot < Zomer vanaf.",
-    "no_hot_water": "Warm water staat niet aan voor deze warmtepomp (apparaatinstellingen)."
+    "no_hot_water": "Warm water staat niet aan voor deze warmtepomp (apparaatinstellingen).",
+    "ct_not_running": "De compressor draait nu niet. Vul de CT-waarde in terwijl hij draait.",
+    "ct_r32_only": "Kalibreren met de CT-stroom kan alleen bij R32-modellen.",
+    "ct_implausible": "Die CT-waarde past niet bij de huidige frequentie. Controleer de waarde en probeer opnieuw tijdens een rustige beurt."
   },
   "season": {
     "summer": "Zomer",
@@ -14,6 +17,9 @@
     "flow_rated": "nominaal, nog niet geleerd",
     "flow_set": "ingesteld in de instellingen",
     "detect_refrigerant": "compressor via koudemiddelvoeler",
-    "detect_water": "compressor via watertemperaturen"
+    "detect_water": "compressor via watertemperaturen",
+    "detect_frequency": "compressorfrequentie gemeten",
+    "calibrated": "gekalibreerd met CT",
+    "from_databook": "uit het Data Book"
   }
 }

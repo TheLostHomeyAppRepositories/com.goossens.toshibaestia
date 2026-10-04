@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "Modbus poll failed",
     "season_order": "The season switch points must be in this order: Winter from < Winter until ≤ Summer until < Summer from.",
-    "no_hot_water": "Hot water is not enabled for this heat pump (device settings)."
+    "no_hot_water": "Hot water is not enabled for this heat pump (device settings).",
+    "ct_not_running": "The compressor isn't running right now. Enter the CT value while it runs.",
+    "ct_r32_only": "Calibration with the CT current works for R32 models only.",
+    "ct_implausible": "That CT value doesn't fit the current frequency. Check the value and try again during a steady run."
   },
   "season": {
     "summer": "Summer",
@@ -14,6 +17,9 @@
     "flow_rated": "rated, not learnt yet",
     "flow_set": "set in the settings",
     "detect_refrigerant": "compressor via refrigerant sensor",
-    "detect_water": "compressor via water temperatures"
+    "detect_water": "compressor via water temperatures",
+    "detect_frequency": "compressor frequency measured",
+    "calibrated": "calibrated with CT",
+    "from_databook": "from the Data Book"
   }
 }

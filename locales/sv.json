@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "Modbus-pollen misslyckades: {{reason}}",
     "season_order": "Säsongens brytpunkter måste vara i denna ordning: Vinter från < Vinter till ≤ Sommar till < Sommar från.",
-    "no_hot_water": "Varmvatten är inte aktiverat för den här värmepumpen (enhetsinställningar)."
+    "no_hot_water": "Varmvatten är inte aktiverat för den här värmepumpen (enhetsinställningar).",
+    "ct_not_running": "Kompressorn går inte just nu. Ange CT-värdet medan den går.",
+    "ct_r32_only": "Kalibrering med CT-strömmen fungerar bara för R32-modeller.",
+    "ct_implausible": "Det CT-värdet passar inte den aktuella frekvensen. Kontrollera värdet och försök igen under en lugn körning."
   },
   "season": {
     "summer": "Sommar",
@@ -14,6 +17,9 @@
     "flow_rated": "nominellt, inte inlärt än",
     "flow_set": "angivet i inställningarna",
     "detect_refrigerant": "kompressor via köldmediegivare",
-    "detect_water": "kompressor via vattentemperaturer"
+    "detect_water": "kompressor via vattentemperaturer",
+    "detect_frequency": "kompressorfrekvens uppmätt",
+    "calibrated": "kalibrerad med CT",
+    "from_databook": "från Data Book"
   }
 }

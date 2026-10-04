@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "Modbus-Abfrage fehlgeschlagen: {{reason}}",
     "season_order": "Die Schaltpunkte der Jahreszeit müssen in dieser Reihenfolge stehen: Winter ab < Winter bis ≤ Sommer bis < Sommer ab.",
-    "no_hot_water": "Warmwasser ist für diese Wärmepumpe nicht aktiviert (Geräteeinstellungen)."
+    "no_hot_water": "Warmwasser ist für diese Wärmepumpe nicht aktiviert (Geräteeinstellungen).",
+    "ct_not_running": "Der Verdichter läuft gerade nicht. Tragen Sie den CT-Wert ein, während er läuft.",
+    "ct_r32_only": "Die Kalibrierung mit dem CT-Strom funktioniert nur bei R32-Modellen.",
+    "ct_implausible": "Dieser CT-Wert passt nicht zur aktuellen Frequenz. Prüfen Sie den Wert und versuchen Sie es während eines ruhigen Laufs erneut."
   },
   "season": {
     "summer": "Sommer",
@@ -14,6 +17,9 @@
     "flow_rated": "Nennwert, noch nicht gelernt",
     "flow_set": "in den Einstellungen festgelegt",
     "detect_refrigerant": "Verdichter über Kältemittelfühler",
-    "detect_water": "Verdichter über Wassertemperaturen"
+    "detect_water": "Verdichter über Wassertemperaturen",
+    "detect_frequency": "Verdichterfrequenz gemessen",
+    "calibrated": "mit CT kalibriert",
+    "from_databook": "aus dem Data Book"
   }
 }

@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "Błąd ankiety Modbus: {{reason}}",
     "season_order": "Progi pory roku muszą być w tej kolejności: Zima od < Zima do ≤ Lato do < Lato od.",
-    "no_hot_water": "Ciepła woda nie jest włączona dla tej pompy ciepła (ustawienia urządzenia)."
+    "no_hot_water": "Ciepła woda nie jest włączona dla tej pompy ciepła (ustawienia urządzenia).",
+    "ct_not_running": "Sprężarka teraz nie pracuje. Wpisz wartość CT, gdy pracuje.",
+    "ct_r32_only": "Kalibracja prądem CT działa tylko dla modeli R32.",
+    "ct_implausible": "Ta wartość CT nie pasuje do bieżącej częstotliwości. Sprawdź wartość i spróbuj ponownie podczas stabilnej pracy."
   },
   "season": {
     "summer": "Lato",
@@ -14,6 +17,9 @@
     "flow_rated": "znamionowy, jeszcze nienauczony",
     "flow_set": "ustawiony w ustawieniach",
     "detect_refrigerant": "sprężarka wg czujnika czynnika",
-    "detect_water": "sprężarka wg temperatur wody"
+    "detect_water": "sprężarka wg temperatur wody",
+    "detect_frequency": "zmierzona częstotliwość sprężarki",
+    "calibrated": "skalibrowane z CT",
+    "from_databook": "z Data Book"
   }
 }

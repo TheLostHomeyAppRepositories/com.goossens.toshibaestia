@@ -64,9 +64,13 @@ export const REGISTERS = {
   waterInletTemp:      { number: 40022, key: 'waterInletTemp',      writable: false, kind: 'temperature', description: 'Water inlet temperature (TWI)' },
   waterOutletTemp:     { number: 40023, key: 'waterOutletTemp',     writable: false, kind: 'temperature', description: 'Water outlet temperature (TWO)' },
   heaterOutletTemp:    { number: 40024, key: 'heaterOutletTemp',    writable: false, kind: 'temperature', description: 'Water heater outlet temperature (THO)' },
-  // Not in EEU-006. Carries TE on an R32 1 Series 11 kW AIO; the power estimator
-  // checks the value behaves like TE before using it (RefrigerantSensorCheck).
+  // Not in EEU-006. Verified on an R32 1 Series 11 kW AIO against the remote
+  // controller's sensor information; the power estimator checks they behave that way
+  // before using them (RefrigerantSensorCheck). 40027 = LPS (× 0.01 MPa), 40029 = TD,
+  // 40030 = TS, 40033 = FAN1 (rpm); WF, CT, PMV and HPS are not on the interface.
+  condensingTemp:      { number: 40021, key: 'condensingTemp',      writable: false, kind: 'temperature', description: 'Condensing temperature (TC) — undocumented' },
   evaporatorTemp:      { number: 40028, key: 'evaporatorTemp',      writable: false, kind: 'temperature', description: 'Outdoor heat exchanger temperature (TE) — undocumented' },
+  compressorFrequency: { number: 40032, key: 'compressorFrequency', writable: false, kind: 'uint',        description: 'Compressor frequency (Hz) — undocumented' },
 
   // Zone device connection status
   zone1DeviceConnected:{ number: 40201, key: 'zone1DeviceConnected',writable: false, kind: 'boolean',     description: 'Zone 1 device connected' },

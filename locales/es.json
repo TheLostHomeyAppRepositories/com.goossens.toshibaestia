@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "La encuesta de Modbus falló: {{reason}}",
     "season_order": "Los puntos de cambio de estación deben seguir este orden: Invierno desde < Invierno hasta ≤ Verano hasta < Verano desde.",
-    "no_hot_water": "El agua caliente no está habilitada para esta bomba de calor (ajustes del dispositivo)."
+    "no_hot_water": "El agua caliente no está habilitada para esta bomba de calor (ajustes del dispositivo).",
+    "ct_not_running": "El compresor no está en marcha ahora. Introduce el valor CT mientras funciona.",
+    "ct_r32_only": "La calibración con la corriente CT solo funciona en modelos R32.",
+    "ct_implausible": "Ese valor CT no encaja con la frecuencia actual. Revisa el valor y vuelve a intentarlo durante un ciclo estable."
   },
   "season": {
     "summer": "Verano",
@@ -14,6 +17,9 @@
     "flow_rated": "nominal, aún no aprendido",
     "flow_set": "fijado en los ajustes",
     "detect_refrigerant": "compresor por sonda de refrigerante",
-    "detect_water": "compresor por temperaturas del agua"
+    "detect_water": "compresor por temperaturas del agua",
+    "detect_frequency": "frecuencia del compresor medida",
+    "calibrated": "calibrado con CT",
+    "from_databook": "del Data Book"
   }
 }

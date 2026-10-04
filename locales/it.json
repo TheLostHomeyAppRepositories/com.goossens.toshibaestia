@@ -2,7 +2,10 @@
   "error": {
     "poll_failed": "Il polling Modbus non è riuscito: {{reason}}",
     "season_order": "Le soglie della stagione devono essere in questo ordine: Inverno da < Inverno fino a ≤ Estate fino a < Estate da.",
-    "no_hot_water": "L'acqua calda non è abilitata per questa pompa di calore (impostazioni del dispositivo)."
+    "no_hot_water": "L'acqua calda non è abilitata per questa pompa di calore (impostazioni del dispositivo).",
+    "ct_not_running": "Il compressore non è in funzione ora. Inserisci il valore CT mentre funziona.",
+    "ct_r32_only": "La calibrazione con la corrente CT funziona solo per i modelli R32.",
+    "ct_implausible": "Questo valore CT non corrisponde alla frequenza attuale. Controlla il valore e riprova durante un ciclo stabile."
   },
   "season": {
     "summer": "Estate",
@@ -14,6 +17,9 @@
     "flow_rated": "nominale, non ancora appreso",
     "flow_set": "impostato nelle impostazioni",
     "detect_refrigerant": "compressore tramite sonda refrigerante",
-    "detect_water": "compressore tramite temperature dell'acqua"
+    "detect_water": "compressore tramite temperature dell'acqua",
+    "detect_frequency": "frequenza del compressore misurata",
+    "calibrated": "calibrato con CT",
+    "from_databook": "dal Data Book"
   }
 }
