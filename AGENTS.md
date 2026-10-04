@@ -294,7 +294,7 @@ electric = Hz × C × n/(n−1) · p1 · ((p2/p1)^((n−1)/n) − 1)      n = 1.
 p1 = psat(min(TE, TC)), p2 = psat(max(TE, TC))                    (heating: TE evaporates; cooling/defrost reversed)
 ```
 
-`C` (cm³) = compressor displacement ÷ overall efficiency, one constant per compressor. Per model from the Data Book's maximum-frequency tables (input at max Hz: 401 80, 601 99, 801 89, 1101 99 Hz; TE ≈ TO − 8, TC ≈ LWT + 3, TO ≤ 12 °C), scaled so the 1101 matches the measured unit: 401 17.0, 601 15.2, 801 29.2, 1101 29.3. 1401 and R410A have no default; the user can calibrate any R32 unit by typing the CT current (setting `ctCurrentA`) during a run: `C = I × 230 V × 0.97 / (Hz × work)`, stored as `compressorCm3`, cleared on a model change.
+`C` (cm³) = compressor displacement ÷ overall efficiency. Displacements from the service manual's part list (Toshiba's model number is the displacement in 0.1 cm³): DX150A1T (401/601) 15.0, NX220A1FJ (801/1101 1-phase) 22.0, DX380A2TJ (1401 1-phase) and RX380A2TJ (801/1101/1401 3-phase H8W) 38.0 cm³. Overall efficiency 0.75, measured on an 1101 → C = 20.0 / 29.3 / 50.7. The 3-phase 801/1101 have their own model entries (bigger compressor). R410A units have no default; the user can calibrate any R32 unit by typing the CT current (setting `ctCurrentA`) during a run: `C = I × 230 V × 0.97 / (Hz × work)`, stored as `compressorCm3`, cleared on a model change. Uncalibrated units other than the 1101: expect ±10–15 % (efficiency differs per compressor).
 
 Validation (11 kW AIO): CT 14.6 A at 71 Hz (3362 W), stop step 1973 W at 45 Hz, 45 → 30 Hz step 678 W — one constant within ±6 %; **independent** stop step 3168 W at 67 Hz: model +1.7 %.
 

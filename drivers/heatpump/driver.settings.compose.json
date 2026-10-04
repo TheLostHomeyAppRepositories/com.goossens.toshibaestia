@@ -511,6 +511,42 @@
             }
           },
           {
+            "id": "r32-s1-801-3ph",
+            "label": {
+              "en": "R32 Series 1/S2 — 8 kW 3-phase (HWT-801H8W-E)",
+              "nl": "R32 Serie 1/S2 — 8 kW driefasig (HWT-801H8W-E)",
+              "da": "R32 Serie 1/S2 — 8 kW 3-faset (HWT-801H8W-E)",
+              "de": "R32 Serie 1/S2 — 8 kW 3-phasig (HWT-801H8W-E)",
+              "es": "Serie R32 1/S2 — 8 kW trifásica (HWT-801H8W-E)",
+              "fr": "Série R32 1/S2 — 8 kW triphasé (HWT-801H8W-E)",
+              "it": "Serie R32 1/S2 — 8 kW trifase (HWT-801H8W-E)",
+              "no": "R32 Series 1/S2 — 8 kW 3-faset (HWT-801H8W-E)",
+              "sv": "R32 Series 1/S2 — 8 kW 3-fas (HWT-801H8W-E)",
+              "pl": "Seria R32 1/S2 — 8 kW 3-fazowa (HWT-801H8W-E)",
+              "ru": "Серия R32 1/S2 — 8 кВт 3-фазный (HWT-801H8W-E)",
+              "ko": "R32 시리즈 1/S2 — 8 kW 3상 (HWT-801H8W-E)",
+              "ar": "سلسلة R32 1/S2 — 8 كيلو واط ثلاثي الطور (HWT-801H8W-E)"
+            }
+          },
+          {
+            "id": "r32-s1-1101-3ph",
+            "label": {
+              "en": "R32 Series 1/S2 — 11 kW 3-phase (HWT-1101H8W-E)",
+              "nl": "R32 Serie 1/S2 — 11 kW driefasig (HWT-1101H8W-E)",
+              "da": "R32 Serie 1/S2 — 11 kW 3-faset (HWT-1101H8W-E)",
+              "de": "R32 Serie 1/S2 — 11 kW 3-phasig (HWT-1101H8W-E)",
+              "es": "Serie R32 1/S2 — 11 kW trifásica (HWT-1101H8W-E)",
+              "fr": "Série R32 1/S2 — 11 kW triphasé (HWT-1101H8W-E)",
+              "it": "Serie R32 1/S2 — 11 kW trifase (HWT-1101H8W-E)",
+              "no": "R32 Series 1/S2 — 11 kW 3-faset (HWT-1101H8W-E)",
+              "sv": "R32 Series 1/S2 — 11 kW 3-fas (HWT-1101H8W-E)",
+              "pl": "Seria R32 1/S2 — 11 kW 3-fazowa (HWT-1101H8W-E)",
+              "ru": "Серия R32 1/S2 — 11 кВт 3-фазный (HWT-1101H8W-E)",
+              "ko": "R32 시리즈 1/S2 — 11 kW 3상 (HWT-1101H8W-E)",
+              "ar": "سلسلة R32 1/S2 — 11 كيلوواط ثلاثي الطور (HWT-1101H8W-E)"
+            }
+          },
+          {
             "id": "r32-s1-1401",
             "label": {
               "en": "R32 Series 1/S2 — 14 kW (HWT-1401H8W-E)",

@@ -95,10 +95,12 @@ const seasonConfig = (s: DeviceSettings): SeasonConfig => ({
  * with tables get the part-load model; the others their rated COP, shaped over
  * outdoor and water temperature (power-model.ts).
  *
- * compressorCm3: the frequency model's constant (compressor displacement ÷ overall
- * efficiency). From the Data Book's maximum-frequency tables, scaled so the 11 kW unit
- * matches its measured CT current and house-meter steps (AGENTS.md § 7). 1401 and
- * R410A units only get it by calibration (ctCurrentA).
+ * compressorCm3: the frequency model's constant = compressor displacement ÷ overall
+ * efficiency. Displacements from the service manual's parts list (Toshiba's model number
+ * is the displacement in 0.1 cm³): DX150 (401/601) 15.0, NX220 (801/1101 1-phase) 22.0,
+ * DX380 / RX380 (1401, and the 3-phase H8W units) 38.0 cm³. Efficiency 0.75, measured
+ * on an 1101 (CT current and house-meter steps, AGENTS.md § 7). R410A units only get
+ * it by calibration (ctCurrentA).
  *
  * NOTE: backup heater wattage is NOT here — it's an installation choice
  * (3/6/9 kW typically) and lives in its own settings dropdown.
@@ -107,11 +109,13 @@ const MODEL_PRESETS: Record<string, { capacityKw: number; heatInputKw: number; t
   // R32 1 Series (F21 indoor) and 2 Series (S21 indoor) share the same outdoor
   // units (HWT-_HW-E codes) and the same compressor → identical input ratings.
   // One entry per kW class; covers both generations.
-  'r32-s1-401':   { capacityKw: 4,   heatInputKw: 0.77, tables: '401', compressorCm3: 17.0 },  // outdoor HWT-401HW-E
-  'r32-s1-601':   { capacityKw: 6,   heatInputKw: 1.25, tables: '601', compressorCm3: 15.2 },  // outdoor HWT-601HW-E
-  'r32-s1-801':   { capacityKw: 8,   heatInputKw: 1.54, tables: '801', compressorCm3: 29.2 },  // outdoor HWT-801HW-E
-  'r32-s1-1101':  { capacityKw: 11,  heatInputKw: 2.39, tables: '1101', compressorCm3: 29.3 }, // outdoor HWT-1101HW-E (e.g. F21SM3 / S21SM3)
-  'r32-s1-1401':  { capacityKw: 14,  heatInputKw: 3.04 },                 // outdoor HWT-1401H8W-E (not in the Data Book tables)
+  'r32-s1-401':   { capacityKw: 4,   heatInputKw: 0.77, tables: '401', compressorCm3: 20.0 },  // outdoor HWT-401HW-E, DX150
+  'r32-s1-601':   { capacityKw: 6,   heatInputKw: 1.25, tables: '601', compressorCm3: 20.0 },  // outdoor HWT-601HW-E, DX150
+  'r32-s1-801':   { capacityKw: 8,   heatInputKw: 1.54, tables: '801', compressorCm3: 29.3 },  // outdoor HWT-801HW-E, NX220
+  'r32-s1-1101':  { capacityKw: 11,  heatInputKw: 2.39, tables: '1101', compressorCm3: 29.3 }, // outdoor HWT-1101HW-E (e.g. F21SM3 / S21SM3), NX220
+  'r32-s1-801-3ph':  { capacityKw: 8,  heatInputKw: 1.54, tables: '801', compressorCm3: 50.7 },  // outdoor HWT-801H8W-E, RX380
+  'r32-s1-1101-3ph': { capacityKw: 11, heatInputKw: 2.39, tables: '1101', compressorCm3: 50.7 }, // outdoor HWT-1101H8W-E, RX380
+  'r32-s1-1401':  { capacityKw: 14,  heatInputKw: 3.04, compressorCm3: 50.7 }, // outdoor HWT-1401H(8)W-E, DX380 / RX380 (not in the Data Book tables)
   // R410A Series 5 (2017-2021)
   'r410a-s5-455': { capacityKw: 4.5, heatInputKw: 0.92 },
   'r410a-s5-805': { capacityKw: 8,   heatInputKw: 1.79 },
