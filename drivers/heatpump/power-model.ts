@@ -100,6 +100,11 @@ export interface PowerReading {
   detection: 'frequency' | 'refrigerant' | 'water';
   /** The water-side verdict on its own (also computed when the refrigerant sensor decides). */
   waterSaysOn: boolean;
+  /**
+   * Energy (kWh) the watts trace missed and that belongs to the meter: when the heater is
+   * recognised just after the compressor stopped (DHW hand-over), the time between.
+   */
+  backfillKwh: number;
 }
 
 /** Persisted between restarts (device store). */
@@ -176,6 +181,7 @@ const HEATER_ON_K = 2; // THO − TWO; sensor offset alone is 0–1 K
 // When the pump starts, warm water from the coil passes TWI, TWO and THO in turn and
 // THO can read 2 K above TWO for a few seconds; a heater keeps that up for minutes.
 const HEATER_MIN_MS = 60_000;
+const HANDOVER_BACKFILL_MS = 5 * 60_000; // heater recognised this soon after a compressor stop: count from the stop
 const DT_SMOOTHING_S = 60; // ΔT time constant against whole-degree jitter
 const HEATER_MAX_TWO_DROP_K = 1; // TWO/TWI may fall at most this much per 2 min while the heater runs
 const MAX_GAP_MS = 5 * 60_000; // longer gaps reset the trackers
@@ -322,6 +328,9 @@ export class PowerEstimator {
   private waterOffStreak = 0;
   private waterDtSinceMs: number | null = null;
   private heaterSinceMs: number | null = null;
+  private compressorWasOn = false;
+  private compressorStopMs: number | null = null;
+  private heaterWasOn = false;
   private flowSamples: number[];
   private segment: { startMs: number; lastMs: number; tank0: number; tankLast: number; kSeconds: number; clean: boolean } | null = null;
   private tankHistory: Array<{ t: number; c: number }> = [];
@@ -372,7 +381,7 @@ export class PowerEstimator {
     }
 
     const idle: PowerReading = {
-      watts: 0, compressorW: 0, heaterW: 0, immersionW: 0, thermalW: 0, activity: 'idle', compressorOn: false, detection: 'water', waterSaysOn: false,
+      watts: 0, compressorW: 0, heaterW: 0, immersionW: 0, thermalW: 0, activity: 'idle', compressorOn: false, detection: 'water', waterSaysOn: false, backfillKwh: 0,
     };
     if (s.twiC == null || s.twoC == null) return idle;
     const rawDt = s.twoC - s.twiC;
@@ -469,6 +478,20 @@ export class PowerEstimator {
       activity = 'dhw';
     }
 
+    // DHW hand-over: the heater takes over the moment the compressor stops, but is only
+    // recognised once the water has settled (1–3 polls later). Book the gap on the meter.
+    if (this.compressorWasOn && !compressorOn) this.compressorStopMs = s.timeMs;
+    let backfillKwh = 0;
+    if (heaterKw > 0 && !this.heaterWasOn && prev && this.compressorStopMs != null
+      && s.timeMs - this.compressorStopMs <= HANDOVER_BACKFILL_MS) {
+      // The trapezoid from the previous poll already counts half of that interval.
+      const missedMs = s.timeMs - this.compressorStopMs - (s.timeMs - prev.timeMs) / 2;
+      backfillKwh = (heaterKw * Math.max(0, missedMs)) / 3_600_000;
+    }
+    if (compressorOn) this.compressorStopMs = null;
+    this.compressorWasOn = compressorOn;
+    this.heaterWasOn = heaterKw > 0;
+
     this.learnFlow(s, activity, compressorOn, heaterKw > 0);
 
     const watts = Math.round((compressorKw + heaterKw + immersionKw) * 1000);
@@ -482,6 +505,7 @@ export class PowerEstimator {
       compressorOn,
       detection,
       waterSaysOn,
+      backfillKwh,
     };
   }
 
@@ -527,6 +551,9 @@ export class PowerEstimator {
     this.waterOffStreak = 0;
     this.waterDtSinceMs = null;
     this.heaterSinceMs = null;
+    this.compressorWasOn = false;
+    this.compressorStopMs = null;
+    this.heaterWasOn = false;
     this.segment = null;
     this.tankHistory = [];
     this.twoHistory = [];

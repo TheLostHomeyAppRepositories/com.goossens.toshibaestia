@@ -804,6 +804,7 @@ export default class HeatpumpDevice extends Homey.Device {
     this.lastPowerSample = sample;
 
     if (this.lastPower) this.meterKwh += energyKwh(this.lastPower.watts, reading.watts, sample.timeMs - this.lastPower.timeMs);
+    this.meterKwh += reading.backfillKwh;
     this.lastPower = { watts: reading.watts, timeMs: sample.timeMs };
     if (this.hasCapability('measure_power')) {
       await this.setCapabilityValue('measure_power', reading.watts).catch(() => undefined);

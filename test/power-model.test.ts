@@ -307,3 +307,28 @@ test('frequency model: independent check on a 71 Hz run (2026-10-04), not used f
   rows.filter((_, k) => k % 4 === 0).forEach((r) => check.update(r, water.update({ ...r, evaporatorC: null, compressorHz: null }).waterSaysOn));
   assert.equal(check.trusted, true, JSON.stringify(check.snapshot));
 });
+
+test('backup heater at the DHW hand-over: energy within 12 % of its house-meter steps', () => {
+  // Heater on/off steps: 2026-10-03 12:28:03 → 12:40:36 UTC at 3185 W, 2026-10-04
+  // 12:29:58 → 12:40:30 UTC at 3066 W (a 3 kW element above 230 V). The model rates it at
+  // 3000 W and books the minutes before it can recognise the heater (backfillKwh).
+  for (const [file, on, off, watts] of [
+    [FIXTURE_HEATER, '2026-10-03T12:28:03Z', '2026-10-03T12:40:36Z', 3185],
+    ['r32s1-1101-dhw-heater-2026-10-04.csv', '2026-10-04T12:29:58Z', '2026-10-04T12:40:30Z', 3066],
+  ] as const) {
+    for (const config of [R32_1101_AIO, R32_1101_HZ]) {
+      const rows = load(file);
+      const est = new PowerEstimator(config, { flowSamplesLpm: [17.4] });
+      let kwh = 0;
+      let prev: ReturnType<PowerEstimator['update']> | null = null;
+      rows.forEach((r, i) => {
+        const x = est.update(r);
+        if (prev) kwh += energyKwh(prev.heaterW, x.heaterW, r.timeMs - rows[i - 1].timeMs);
+        kwh += x.backfillKwh;
+        prev = x;
+      });
+      const real = (watts * (at(off) - at(on))) / 3_600_000_000;
+      assert.ok(Math.abs(kwh - real) / real < 0.12, `${file} ${config.compressorCm3 ? 'Hz' : 'water'}: heater ${kwh.toFixed(3)} vs ${real.toFixed(3)} kWh`);
+    }
+  }
+});

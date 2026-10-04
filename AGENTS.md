@@ -310,7 +310,7 @@ The registers are used only when `RefrigerantSensorCheck` trusts them (store key
 | Water flow | Learnt from hot-water heat-ups: `flow = tank litres × tank rise / ∫ΔT dt` over compressor-only DHW segments (≥ 10 min, ≥ 8 K rise; tank start = the reading before the run, the sensor dips ~1 K when the pump starts), median of the last 7. Until then the rated flow (capacity at 5 K ΔT). The `flowLpm` setting overrides both — the only way to correct it on installs without a tank. |
 | Compressor on/off | Register **40028 (TE, undocumented)** when `RefrigerantSensorCheck` trusts it: \|TE − TO\| ≥ 4 K. Trusted only after ≥ 20 quiet-water polls with TE within 2 K of outdoor **and** ≥ 10 polls where the water side shows a run and TE is ≥ 4 K away (misses ≤ 20 %): a constant or an outdoor-like value never passes. Read in its own request; three refusals in a row → water only until restart. Otherwise the water side: on at a **start** (TWO moving ≥ 2 K away from TWI within 2 min, in the expected direction) or a steady ΔT ≥ 3 K with TWO flat for 5 min; off after two polls without the expected ΔT. |
 | What is served | DHW only on → `dhw` (the 3-way valve can only point at the tank). Zone only → `heating`/`cooling` from register 40003. Both → ΔT sign, tank rising. **Register 40003 is only used while the zone is on** — it keeps "cool" while the zone is off, which made pre-1.2.0 versions treat DHW heat-ups as cooling (no power during the run, phantom power during the cool-down after it). |
-| Backup heater | THO − TWO ≥ 2 K for ≥ 60 s, TWI steady, and the water flowing: with the compressor on, TWO and THO steady; with it off, TWO within +1/−3 K of TWI. Power = heater steps (3 kW) from flow × (THO − TWO), capped at the `backupHeaterKW` setting. |
+| Backup heater | Recognised 1–3 polls after a DHW hand-over; when that's ≤ 5 min after the compressor stopped, the gap is booked on the meter (`backfillKwh`). THO − TWO ≥ 2 K for ≥ 60 s, TWI steady, and the water flowing: with the compressor on, TWO and THO steady; with it off, TWO within +1/−3 K of TWI. Power = heater steps (3 kW) from flow × (THO − TWO), capped at the `backupHeaterKW` setting. |
 | Immersion | Only once register 40039 (cylinder heater hours) has ticked (store flag `immersionSeen`): 2.75 kW while DHW is on, the tank rises and nothing else heats. |
 
 ### Field lessons (R32 11 kW AIO, 2026-10-03, 15 s polls + whole-house meter)
@@ -335,7 +335,8 @@ The registers are used only when `RefrigerantSensorCheck` trusts them (store key
 - Toshiba's part-load tables overestimate the COP in DHW (real ≈ 2.2 at TO 23 / TC 61 vs ~3.1 in the tables). On the test unit both errors cancelled at one point (−2 %), which is luck, not accuracy.
 - Before the first learnt flow, the rated flow is used: 2.7× the real flow on the test unit (5.7 kW shown for 3.3 kW real).
 - Integer °C (DIP S4-1 off): ΔT of 3 K is ±17 %. Units set to decidegrees get better live values.
-- The water pump (not in Toshiba's input figures) and supply voltage (heater 3.2 kW at ~235 V) are not modelled.
+- The water pump (not in Toshiba's input figures) and supply voltage are not modelled: the 3 kW heater measured 3066–3185 W, so heater energy reads 5–10 % low.
+- The frequency register lags the real compressor stop by 35–70 s (the heater backfill starts from the register's stop).
 
 ### meter_power
 
