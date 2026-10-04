@@ -198,6 +198,18 @@ test('zero watts while the compressor is off, even with the stored zone mode on 
   });
 });
 
+test('standing water after the hot-water window: no heater, no compressor (evening of 2026-10-03)', () => {
+  // Zone and hot water off; the water in the unit cools slowly with THO 2 K above TWO.
+  for (const step of [1, 4]) { // every poll (~17 s) and every 4th (~70 s, like the app)
+    const rows = load('r32s1-1101-standing-water-2026-10-03.csv').filter((_, i) => i % step === 0);
+    const est = new PowerEstimator(R32_1101_AIO, { flowSamplesLpm: [17.4] });
+    rows.forEach((r) => {
+      const reading = est.update({ ...r, evaporatorC: null });
+      assert.equal(reading.watts, 0, `${reading.watts} W at ${new Date(r.timeMs).toISOString()}`);
+    });
+  }
+});
+
 test('learns the installation flow from the tank, starting from the rated flow', () => {
   const est = new PowerEstimator(R32_1101_AIO);
   assert.equal(est.flowIsLearnt, false);

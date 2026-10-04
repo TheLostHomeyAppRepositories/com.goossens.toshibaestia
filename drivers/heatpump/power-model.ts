@@ -369,7 +369,11 @@ export class PowerEstimator {
       && (s.thoC == null || drop(this.thoHistory, s.thoC) <= HEATER_MAX_TWO_DROP_K);
     const flowing = compressorOn ? twoThoSteady : rawDt <= 1 && rawDt >= -3 && (s.twiC >= s.twoC || twoThoSteady);
     const waterSteady = drop(this.twiHistory, s.twiC) <= HEATER_MAX_TWO_DROP_K && flowing;
-    const heaterPossible = this.config.backupHeaterKw > 0 && heaterDt >= HEATER_ON_K && waterSteady;
+    // Standing water can also cool so slowly that it looks steady and flowing (seen: TWI 43,
+    // TWO 44, THO 46 °C for 25 minutes with nothing asked for). A heater only runs for a
+    // demand, or for anti-legionella / a boost outside it — which then heats the tank.
+    const heaterPossible = this.config.backupHeaterKw > 0 && heaterDt >= HEATER_ON_K && waterSteady
+      && (demand || this.tankRising());
     if (!heaterPossible) this.heaterSinceMs = null;
     else if (this.heaterSinceMs == null) this.heaterSinceMs = s.timeMs;
     if (this.heaterSinceMs != null && s.timeMs - this.heaterSinceMs >= HEATER_MIN_MS) {
