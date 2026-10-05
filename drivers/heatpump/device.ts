@@ -62,6 +62,7 @@ interface DeviceSettings {
   tankLitres?: number;         // hot water tank volume, used to learn the water flow
   flowLpm?: number;            // water flow set by the user; 0 = learn it
   ctCurrentA?: number;         // calibration: CT current read on the remote during a run
+  lastCalibration?: string;    // read-only: the latest calibration and its operating point
   powerStatus?: string;        // read-only: flow in use + how the compressor is detected
   detectedSeries?: string;
   detectedSlaveAddress?: string;
@@ -729,6 +730,12 @@ export default class HeatpumpDevice extends Homey.Device {
     });
     await this.setStoreValue('ctCalibrations', history);
     await this.setStoreValue('compressorCm3', cm3);
+    const lastCalibration = `${new Date(x.timeMs).toISOString().slice(0, 16).replace('T', ' ')} UTC: ${currentA} A, ${x.compressorHz} Hz, `
+      + `TE ${x.evaporatorC} °C, TC ${x.condensingC} °C, TO ${x.outdoorC} °C → ${cm3.toFixed(1)} cm³`;
+    // Settings can't be written from within onSettings; do it right after.
+    this.homey.setTimeout(() => {
+      this.setSettings({ lastCalibration }).catch((err) => this.error('setSettings lastCalibration', err));
+    }, 1000);
     this.power.setConfig(this.powerConfig(s));
   }
 

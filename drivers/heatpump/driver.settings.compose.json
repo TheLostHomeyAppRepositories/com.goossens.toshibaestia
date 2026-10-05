@@ -1021,6 +1021,41 @@
         }
       },
       {
+        "id": "lastCalibration",
+        "type": "label",
+        "value": "—",
+        "label": {
+          "en": "Last calibration",
+          "nl": "Laatste kalibratie",
+          "da": "Seneste kalibrering",
+          "de": "Letzte Kalibrierung",
+          "es": "Última calibración",
+          "fr": "Dernier étalonnage",
+          "it": "Ultima calibrazione",
+          "no": "Siste kalibrering",
+          "sv": "Senaste kalibrering",
+          "pl": "Ostatnia kalibracja",
+          "ru": "Последняя калибровка",
+          "ko": "마지막 보정",
+          "ar": "آخر معايرة"
+        },
+        "hint": {
+          "en": "The CT current you entered, the operating point at that moment and the constant worked out from it.",
+          "nl": "De CT-stroom die je invulde, het werkpunt op dat moment en de constante die daaruit berekend is.",
+          "da": "Den CT-strøm, du indtastede, driftspunktet på det tidspunkt og den konstant, der blev beregnet ud fra det.",
+          "de": "Der eingegebene CT-Strom, der Betriebspunkt in diesem Moment und die daraus berechnete Konstante.",
+          "es": "La corriente CT que introdujiste, el punto de funcionamiento en ese momento y la constante calculada con ellos.",
+          "fr": "Le courant CT saisi, le point de fonctionnement à ce moment et la constante qui en a été déduite.",
+          "it": "La corrente CT inserita, il punto di funzionamento in quel momento e la costante ricavata.",
+          "no": "CT-strømmen du skrev inn, driftspunktet i det øyeblikket og konstanten som ble regnet ut.",
+          "sv": "CT-strömmen du angav, driftpunkten i det ögonblicket och konstanten som räknades fram.",
+          "pl": "Wpisany prąd CT, punkt pracy w tej chwili i wyliczona z nich stała.",
+          "ru": "Введённый ток CT, рабочая точка в тот момент и вычисленная по ним константа.",
+          "ko": "입력한 CT 전류, 그 순간의 운전점, 그리고 이를 바탕으로 계산한 상수.",
+          "ar": "تيار CT الذي أدخلته، ونقطة التشغيل في تلك اللحظة، والثابت المحسوب منهما."
+        }
+      },
+      {
         "id": "powerStatus",
         "type": "label",
         "value": "—",
