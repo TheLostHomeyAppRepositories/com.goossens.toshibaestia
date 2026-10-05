@@ -315,6 +315,7 @@ test('backup heater at the DHW hand-over: energy within 12 % of its house-meter 
   for (const [file, on, off, watts] of [
     [FIXTURE_HEATER, '2026-10-03T12:28:03Z', '2026-10-03T12:40:36Z', 3185],
     ['r32s1-1101-dhw-heater-2026-10-04.csv', '2026-10-04T12:29:58Z', '2026-10-04T12:40:30Z', 3066],
+    ['r32s1-1101-dhw-heater-2026-10-05.csv', '2026-10-05T11:26:35Z', '2026-10-05T11:36:49Z', 3105],
   ] as const) {
     for (const config of [R32_1101_AIO, R32_1101_HZ]) {
       const rows = load(file);
@@ -329,6 +330,22 @@ test('backup heater at the DHW hand-over: energy within 12 % of its house-meter 
       });
       const real = (watts * (at(off) - at(on))) / 3_600_000_000;
       assert.ok(Math.abs(kwh - real) / real < 0.12, `${file} ${config.compressorCm3 ? 'Hz' : 'water'}: heater ${kwh.toFixed(3)} vs ${real.toFixed(3)} kWh`);
+    }
+  }
+});
+
+test('no backup heater while the compressor runs with THO 1–2 K above TWO (2026-10-05, every poll phase)', () => {
+  // 13:06–13:27 local the compressor ran alone (45 → 30 Hz); the heater only came on at
+  // 11:26:35 UTC (+3157 W step) after the compressor stopped. At a 60 s poll one of the
+  // four phases used to count it at 11:13:28 UTC from a 2 K sensor offset.
+  const rows = load('r32s1-1101-dhw-heater-2026-10-05.csv');
+  for (const config of [R32_1101_AIO, R32_1101_HZ]) {
+    for (let phase = 0; phase < 4; phase += 1) {
+      const est = new PowerEstimator(config, { flowSamplesLpm: [17.4] });
+      rows.filter((_, i) => i % 4 === phase).forEach((r) => {
+        const x = est.update(r);
+        if (r.timeMs < at('2026-10-05T11:26:35Z')) assert.equal(x.heaterW, 0, `phase ${phase}: heater at ${new Date(r.timeMs).toISOString()}`);
+      });
     }
   }
 });

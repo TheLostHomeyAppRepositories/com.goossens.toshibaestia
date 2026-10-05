@@ -459,7 +459,12 @@ export class PowerEstimator {
     // Standing water can also cool so slowly that it looks steady and flowing (seen: TWI 43,
     // TWO 44, THO 46 °C for 25 minutes with nothing asked for). A heater only runs for a
     // demand, or for anti-legionella / a boost outside it — which then heats the tank.
-    const heaterPossible = this.config.backupHeaterKw > 0 && heaterDt >= HEATER_ON_K && waterSteady
+    // With the compressor running, THO sits 1–2 K above TWO from sensor offsets alone
+    // (whole degrees flip between 1 and 2); a 3 kW step at the Estia's hot-water flow
+    // (~12 l/min) adds ~3.6 K. In space heating at ~30 l/min a step adds only ~1.4 K, too
+    // little to see next to a running compressor with whole-degree sensors.
+    const heaterOnK = compressorOn ? HEATER_ON_K + 1 : HEATER_ON_K;
+    const heaterPossible = this.config.backupHeaterKw > 0 && heaterDt >= heaterOnK && waterSteady
       && (demand || this.tankRising());
     if (!heaterPossible) this.heaterSinceMs = null;
     else if (this.heaterSinceMs == null) this.heaterSinceMs = s.timeMs;

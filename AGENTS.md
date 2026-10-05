@@ -337,6 +337,7 @@ The registers are used only when `RefrigerantSensorCheck` trusts them (store key
 - Integer °C (DIP S4-1 off): ΔT of 3 K is ±17 %. Units set to decidegrees get better live values.
 - The water pump (not in Toshiba's input figures) and supply voltage are not modelled: the 3 kW heater measured 3066–3185 W, so heater energy reads 5–10 % low.
 - The frequency register lags the real compressor stop by 35–70 s (the heater backfill starts from the register's stop).
+- Backup heater **while the compressor runs** needs THO − TWO ≥ 3 K (sensor offset alone flips between 1 and 2 K). At hot-water flow (~12 l/min) a 3 kW step adds ~3.6 K and is seen; in space heating at ~30 l/min it adds ~1.4 K and is **not** seen next to a running compressor. Idea (not built): reconcile with register 40040 (backup heater hours, whole hours) — book the hours the model missed.
 
 ### meter_power
 
