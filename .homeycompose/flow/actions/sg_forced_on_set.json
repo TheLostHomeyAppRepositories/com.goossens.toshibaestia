@@ -1,0 +1,97 @@
+{
+  "id": "sg_forced_on_set",
+  "title": {
+    "en": "Report SG Ready Forced ON",
+    "nl": "SG Ready Forced ON melden",
+    "da": "Meld SG Ready Forced ON",
+    "de": "SG Ready Forced ON melden",
+    "es": "Comunicar SG Ready Forced ON",
+    "fr": "Signaler SG Ready Forced ON",
+    "it": "Segnala SG Ready Forced ON",
+    "no": "Meld SG Ready Forced ON",
+    "sv": "Rapportera SG Ready Forced ON",
+    "pl": "Zgłoś SG Ready Forced ON",
+    "ru": "Сообщить SG Ready Forced ON",
+    "ko": "SG Ready Forced ON 알림",
+    "ar": "الإبلاغ عن SG Ready Forced ON"
+  },
+  "titleFormatted": {
+    "en": "SG Ready Forced ON is [[state]]",
+    "nl": "SG Ready Forced ON is [[state]]",
+    "da": "SG Ready Forced ON er [[state]]",
+    "de": "SG Ready Forced ON ist [[state]]",
+    "es": "SG Ready Forced ON: [[state]]",
+    "fr": "SG Ready Forced ON : [[state]]",
+    "it": "SG Ready Forced ON: [[state]]",
+    "no": "SG Ready Forced ON er [[state]]",
+    "sv": "SG Ready Forced ON är [[state]]",
+    "pl": "SG Ready Forced ON: [[state]]",
+    "ru": "SG Ready Forced ON: [[state]]",
+    "ko": "SG Ready Forced ON: [[state]]",
+    "ar": "SG Ready Forced ON: [[state]]"
+  },
+  "hint": {
+    "en": "Use this when a Flow switches the SG Ready contacts (I/P7 + I/P8 closed = System Forced ON). The app can't read the contacts; knowing about the boost lets it count the backup heater, which Forced ON switches on at once (DN 6CE = 0).",
+    "nl": "Gebruik dit als een Flow de SG Ready-contacten schakelt (I/P7 + I/P8 dicht = System Forced ON). De app kan de contacten niet lezen; weet hij van de boost, dan telt hij de bijverwarming mee, die Forced ON meteen aanzet (DN 6CE = 0).",
+    "da": "Brug dette, når et Flow skifter SG Ready-kontakterne (I/P7 + I/P8 lukket = System Forced ON). Appen kan ikke læse kontakterne; når den kender til boostet, tæller den backupvarmeren med, som Forced ON tænder med det samme (DN 6CE = 0).",
+    "de": "Verwenden, wenn ein Flow die SG-Ready-Kontakte schaltet (I/P7 + I/P8 geschlossen = System Forced ON). Die App kann die Kontakte nicht lesen; weiß sie vom Boost, zählt sie den Zusatzheizstab mit, den Forced ON sofort einschaltet (DN 6CE = 0).",
+    "es": "Úsalo cuando un Flow conmute los contactos SG Ready (I/P7 + I/P8 cerrados = System Forced ON). La app no puede leer los contactos; si sabe del boost, cuenta el calentador de apoyo, que Forced ON enciende de inmediato (DN 6CE = 0).",
+    "fr": "À utiliser quand un Flow commute les contacts SG Ready (I/P7 + I/P8 fermés = System Forced ON). L'app ne peut pas lire les contacts ; si elle connaît le boost, elle compte l'appoint électrique, que Forced ON allume aussitôt (DN 6CE = 0).",
+    "it": "Usalo quando un Flow commuta i contatti SG Ready (I/P7 + I/P8 chiusi = System Forced ON). L'app non può leggere i contatti; se sa del boost conta il riscaldatore di backup, che Forced ON accende subito (DN 6CE = 0).",
+    "no": "Bruk dette når et Flow kobler SG Ready-kontaktene (I/P7 + I/P8 lukket = System Forced ON). Appen kan ikke lese kontaktene; når den vet om boosten, teller den med reservevarmeren, som Forced ON slår på med en gang (DN 6CE = 0).",
+    "sv": "Använd detta när ett Flow kopplar SG Ready-kontakterna (I/P7 + I/P8 slutna = System Forced ON). Appen kan inte läsa kontakterna; vet den om boosten räknar den med reservvärmaren, som Forced ON slår på direkt (DN 6CE = 0).",
+    "pl": "Użyj, gdy Flow przełącza styki SG Ready (I/P7 + I/P8 zwarte = System Forced ON). Aplikacja nie odczytuje styków; wiedząc o boostcie, liczy grzałkę rezerwową, którą Forced ON włącza od razu (DN 6CE = 0).",
+    "ru": "Используйте, когда Flow переключает контакты SG Ready (I/P7 + I/P8 замкнуты = System Forced ON). Приложение не видит контакты; зная о бусте, оно учитывает резервный нагреватель, который Forced ON включает сразу (DN 6CE = 0).",
+    "ko": "Flow가 SG Ready 접점을 전환할 때(I/P7 + I/P8 닫힘 = System Forced ON) 사용하세요. 앱은 접점을 읽을 수 없으며, 부스트를 알면 Forced ON이 바로 켜는 보조 히터(DN 6CE = 0)를 함께 셉니다.",
+    "ar": "استخدمه عندما يبدّل Flow تلامسات SG Ready (‏I/P7 + I/P8 مغلقة = System Forced ON). لا يستطيع التطبيق قراءة التلامسات؛ وإذا علم بالتعزيز احتسب السخان الاحتياطي الذي يشغّله Forced ON فورًا (DN 6CE = 0)."
+  },
+  "args": [
+    {
+      "name": "device",
+      "type": "device",
+      "filter": "driver_id=heatpump"
+    },
+    {
+      "name": "state",
+      "type": "dropdown",
+      "values": [
+        {
+          "id": "on",
+          "label": {
+            "en": "on",
+            "nl": "aan",
+            "da": "til",
+            "de": "ein",
+            "es": "activada",
+            "fr": "activée",
+            "it": "attiva",
+            "no": "på",
+            "sv": "på",
+            "pl": "włączona",
+            "ru": "вкл.",
+            "ko": "켜기",
+            "ar": "تشغيل"
+          }
+        },
+        {
+          "id": "off",
+          "label": {
+            "en": "off",
+            "nl": "uit",
+            "da": "fra",
+            "de": "aus",
+            "es": "desactivada",
+            "fr": "désactivée",
+            "it": "disattiva",
+            "no": "av",
+            "sv": "av",
+            "pl": "wyłączona",
+            "ru": "выкл.",
+            "ko": "끄기",
+            "ar": "إيقاف"
+          }
+        }
+      ]
+    }
+  ]
+}

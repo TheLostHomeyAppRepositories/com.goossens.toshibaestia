@@ -104,6 +104,17 @@ export default class HeatpumpDriver extends Homey.Driver {
       this.error('register hot water cards', err);
     }
 
+    // SG Ready Forced ON reported by a Flow (the app can't read the contacts): lets the power
+    // estimate count the backup heater during a Forced ON boost.
+    try {
+      this.homey.flow.getActionCard('sg_forced_on_set')
+        .registerRunListener(async (args: { device: HeatpumpDevice; state: 'on' | 'off' }) => {
+          await args.device.setSgForcedOn(args.state === 'on');
+        });
+    } catch (err) {
+      this.error('register sg_forced_on_set', err);
+    }
+
     // Season (1.1.0): the season_changed trigger is fired from device.ts.
     try {
       this.homey.flow.getConditionCard('season_is')

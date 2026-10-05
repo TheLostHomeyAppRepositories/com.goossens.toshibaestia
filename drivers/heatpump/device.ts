@@ -62,6 +62,7 @@ interface DeviceSettings {
   tankLitres?: number;         // hot water tank volume, used to learn the water flow
   flowLpm?: number;            // water flow set by the user; 0 = learn it
   ctCurrentA?: number;         // calibration: CT current read on the remote during a run
+  sgHeaterAllowed?: boolean;   // DN 6CE = 0: backup heater allowed in SG Ready "System Forced ON"
   lastCalibration?: string;    // read-only: the latest calibration and its operating point
   powerStatus?: string;        // read-only: flow in use + how the compressor is detected
   detectedSeries?: string;
@@ -270,6 +271,8 @@ const ALWAYS_ON_REGISTERS = [
   REGISTERS.frostProtectionOnOff.number,
   // Cylinder immersion hours: ticking proves an immersion is wired (power estimate)
   REGISTERS.immersionHeaterHours.number,
+  // Backup heater hours: the power estimate books heater time it missed (reconcileHeaterHours)
+  REGISTERS.backupHeaterHours.number,
 ] as const;
 
 /** Registers polled only when Zone 2 is installed. */
@@ -285,6 +288,7 @@ const DHW_REGISTERS = [
   REGISTERS.dhwSetpointTemp.number,
   REGISTERS.hotWaterBoostOnOff.number,
   REGISTERS.antibacteriaOnOff.number,
+  REGISTERS.hotWaterBoostSetpoint.number,
 ] as const;
 
 export default class HeatpumpDevice extends Homey.Device {
@@ -299,6 +303,9 @@ export default class HeatpumpDevice extends Homey.Device {
   private refrigerantCheck!: RefrigerantSensorCheck;
   private lastPower: { watts: number; timeMs: number } | null = null;
   private lastPowerSample: PowerSample | null = null;
+  // Heater-hours reconciliation: the heater time counted since the counter last ticked, and
+  // how much of that period the app was actually polling (gaps over 5 min don't count).
+  private heaterHours: { value: number; sinceMs: number; countedS: number; coveredS: number } | null = null;
   private meterKwh = 0;
   // Consecutive failed reads of the undocumented registers; after three they're left alone until an app restart.
   private undocumentedFailures = 0;
@@ -773,6 +780,38 @@ export default class HeatpumpDevice extends Homey.Device {
   }
 
   /**
+   * The unit counts backup heater time in whole hours (register 40040). Whenever it ticks,
+   * compare with the heater time the model counted over the same period and book the minutes
+   * it missed (heater detection from temperatures can miss a heater at high water flow).
+   * Only when the app polled at least 90 % of the period; missed time at one heater step
+   * (3 kW), so multi-stage heaters are not over-booked. Returns the kWh to add.
+   */
+  private reconcileHeaterHours(hours: number | undefined, heaterW: number, nowMs: number, s: DeviceSettings): number {
+    if (hours === undefined || hours === NO_SENSOR_VALUE) return 0;
+    const prev = this.heaterHours;
+    if (!prev || hours < prev.value) {
+      this.heaterHours = { value: hours, sinceMs: nowMs, countedS: 0, coveredS: 0 };
+      return 0;
+    }
+    const dtS = this.lastPower ? Math.min(300, Math.max(0, (nowMs - this.lastPower.timeMs) / 1000)) : 0;
+    prev.coveredS += dtS;
+    if (heaterW > 0) prev.countedS += dtS;
+    if (hours === prev.value) return 0;
+    const periodS = (nowMs - prev.sinceMs) / 1000;
+    const missingS = (hours - prev.value) * 3600 - prev.countedS;
+    this.heaterHours = { value: hours, sinceMs: nowMs, countedS: 0, coveredS: 0 };
+    if (prev.coveredS < 0.9 * periodS || missingS < 300) return 0;
+    const stepKw = Math.min(BACKUP_STEP_KW, parseFloat(s.backupHeaterKW ?? '3') || 0);
+    this.log(`Backup heater hours ${prev.value} → ${hours}: counted ${Math.round(prev.countedS / 60)} min, booking ${Math.round(missingS / 60)} min more`);
+    return (stepKw * missingS) / 3600;
+  }
+
+  /** Records whether SG Ready "System Forced ON" is active (Flow card sg_forced_on_set). */
+  public async setSgForcedOn(on: boolean): Promise<void> {
+    await this.setStoreValue('sgForcedOn', on);
+  }
+
+  /**
    * Live power (W) and energy (kWh) from the power model: electrical input derived
    * from the heat the water carries (flow × ΔT) and Toshiba's performance tables,
    * integrated over time. See power-model.ts and AGENTS.md § 7.
@@ -806,6 +845,11 @@ export default class HeatpumpDevice extends Homey.Device {
       evaporatorC: extra?.[REGISTERS.evaporatorTemp.number] === undefined ? null : this.scale(extra[REGISTERS.evaporatorTemp.number], s),
       condensingC: extra?.[REGISTERS.condensingTemp.number] === undefined ? null : this.scale(extra[REGISTERS.condensingTemp.number], s),
       compressorHz: extra?.[REGISTERS.compressorFrequency.number] ?? null,
+      // A boost switches the backup heater on: the Modbus/remote boost (40009), or SG Ready
+      // "System Forced ON" when a Flow reported it (card sg_forced_on_set) and DN 6CE = 0.
+      boostActive: s.enableDhw && (snapshot[REGISTERS.hotWaterBoostOnOff.number] === 1
+        || (this.getStoreValue('sgForcedOn') === true && s.sgHeaterAllowed !== false)),
+      boostSetpointC: temp(REGISTERS.hotWaterBoostSetpoint.number),
     };
     // The undocumented registers only count once they've proven themselves on this unit.
     const trusted = this.refrigerantCheck.trusted;
@@ -820,6 +864,7 @@ export default class HeatpumpDevice extends Homey.Device {
 
     if (this.lastPower) this.meterKwh += energyKwh(this.lastPower.watts, reading.watts, sample.timeMs - this.lastPower.timeMs);
     this.meterKwh += reading.backfillKwh;
+    this.meterKwh += this.reconcileHeaterHours(snapshot[REGISTERS.backupHeaterHours.number], reading.heaterW, sample.timeMs, s);
     this.lastPower = { watts: reading.watts, timeMs: sample.timeMs };
     if (this.hasCapability('measure_power')) {
       await this.setCapabilityValue('measure_power', reading.watts).catch(() => undefined);

@@ -57,6 +57,13 @@ export interface PowerSample {
   condensingC?: number | null;
   /** Compressor frequency (Hz, register 40032, undocumented); 0 while stopped. */
   compressorHz?: number | null;
+  /**
+   * A hot-water boost that switches the backup heater on: the Modbus boost (40009), or
+   * SG Ready "System Forced ON" with DN 6CE = 0.
+   */
+  boostActive?: boolean;
+  /** Boost set point (register 40213, DN 09). */
+  boostSetpointC?: number | null;
 }
 
 export interface PowerConfig {
@@ -181,6 +188,8 @@ const HEATER_ON_K = 2; // THO − TWO; sensor offset alone is 0–1 K
 // When the pump starts, warm water from the coil passes TWI, TWO and THO in turn and
 // THO can read 2 K above TWO for a few seconds; a heater keeps that up for minutes.
 const HEATER_MIN_MS = 60_000;
+// In a boost the heater is on by design; THO ≥ TWO + 1 K for this long confirms the water flows past it.
+const BOOST_HEATER_MIN_MS = 120_000;
 const HANDOVER_BACKFILL_MS = 5 * 60_000; // heater recognised this soon after a compressor stop: count from the stop
 const DT_SMOOTHING_S = 60; // ΔT time constant against whole-degree jitter
 const HEATER_MAX_TWO_DROP_K = 1; // TWO/TWI may fall at most this much per 2 min while the heater runs
@@ -328,6 +337,7 @@ export class PowerEstimator {
   private waterOffStreak = 0;
   private waterDtSinceMs: number | null = null;
   private heaterSinceMs: number | null = null;
+  private boostHeaterSinceMs: number | null = null;
   private compressorWasOn = false;
   private compressorStopMs: number | null = null;
   private heaterWasOn = false;
@@ -468,7 +478,18 @@ export class PowerEstimator {
       && (demand || this.tankRising());
     if (!heaterPossible) this.heaterSinceMs = null;
     else if (this.heaterSinceMs == null) this.heaterSinceMs = s.timeMs;
-    if (this.heaterSinceMs != null && s.timeMs - this.heaterSinceMs >= HEATER_MIN_MS) {
+    // Boost: Toshiba switches the backup heater on at once and keeps it on until the tank
+    // reaches the boost set point (service manual § 7-3, items 8 and 10). The water flow is
+    // then anything from ~12 to ~26 l/min (seen), so its ΔT says too little: count the
+    // heater's rating while THO stays above TWO.
+    const boostHeater = this.config.backupHeaterKw > 0 && !!s.boostActive && s.dhwOn && s.thoC != null
+      && heaterDt >= 1 && (s.boostSetpointC == null || s.tankC == null || s.tankC < s.boostSetpointC);
+    if (!boostHeater) this.boostHeaterSinceMs = null;
+    else if (this.boostHeaterSinceMs == null) this.boostHeaterSinceMs = s.timeMs;
+    if (this.boostHeaterSinceMs != null && s.timeMs - this.boostHeaterSinceMs >= BOOST_HEATER_MIN_MS) {
+      heaterKw = this.config.backupHeaterKw;
+      if (activity === 'idle') activity = 'dhw';
+    } else if (this.heaterSinceMs != null && s.timeMs - this.heaterSinceMs >= HEATER_MIN_MS) {
       const step = this.config.backupStepKw > 0 ? this.config.backupStepKw : this.config.backupHeaterKw;
       const measured = flowLps * WATER_KJ_PER_L_K * heaterDt;
       const steps = Math.max(1, Math.round(measured / step));
@@ -556,6 +577,7 @@ export class PowerEstimator {
     this.waterOffStreak = 0;
     this.waterDtSinceMs = null;
     this.heaterSinceMs = null;
+    this.boostHeaterSinceMs = null;
     this.compressorWasOn = false;
     this.compressorStopMs = null;
     this.heaterWasOn = false;

@@ -978,6 +978,41 @@
         }
       },
       {
+        "id": "sgHeaterAllowed",
+        "type": "checkbox",
+        "value": true,
+        "label": {
+          "en": "Backup heater in SG Ready Forced ON (DN 6CE = 0)",
+          "nl": "Bijverwarming in SG Ready Forced ON (DN 6CE = 0)",
+          "da": "Backupvarmer i SG Ready Forced ON (DN 6CE = 0)",
+          "de": "Zusatzheizung bei SG Ready Forced ON (DN 6CE = 0)",
+          "es": "Calentador de apoyo en SG Ready Forced ON (DN 6CE = 0)",
+          "fr": "Appoint électrique en SG Ready Forced ON (DN 6CE = 0)",
+          "it": "Riscaldatore di backup in SG Ready Forced ON (DN 6CE = 0)",
+          "no": "Reservevarmer i SG Ready Forced ON (DN 6CE = 0)",
+          "sv": "Reservvärmare i SG Ready Forced ON (DN 6CE = 0)",
+          "pl": "Grzałka rezerwowa w SG Ready Forced ON (DN 6CE = 0)",
+          "ru": "Резервный нагреватель в SG Ready Forced ON (DN 6CE = 0)",
+          "ko": "SG Ready Forced ON 시 보조 히터 (DN 6CE = 0)",
+          "ar": "السخان الاحتياطي في SG Ready Forced ON ‏(DN 6CE = 0)"
+        },
+        "hint": {
+          "en": "Match DN 6CE on the unit: on (Toshiba's default, 6CE = 0) when Forced ON may use the backup heater, off when 6CE = 1. Only used when a Flow reports Forced ON with the card \"Report SG Ready Forced ON\".",
+          "nl": "Volgens DN 6CE op het toestel: aan (Toshiba-standaard, 6CE = 0) als Forced ON de bijverwarming mag gebruiken, uit bij 6CE = 1. Alleen gebruikt als een Flow Forced ON meldt met de kaart \"SG Ready Forced ON melden\".",
+          "da": "Svarende til DN 6CE på enheden: til (Toshibas standard, 6CE = 0), når Forced ON må bruge backupvarmeren, fra ved 6CE = 1. Bruges kun, når et Flow melder Forced ON med kortet \"Meld SG Ready Forced ON\".",
+          "de": "Entsprechend DN 6CE am Gerät: ein (Toshiba-Standard, 6CE = 0), wenn Forced ON den Zusatzheizstab nutzen darf, aus bei 6CE = 1. Nur genutzt, wenn ein Flow Forced ON mit der Karte \"SG Ready Forced ON melden\" meldet.",
+          "es": "Según DN 6CE en el equipo: activado (valor de Toshiba, 6CE = 0) si Forced ON puede usar el calentador de apoyo, desactivado con 6CE = 1. Solo se usa si un Flow comunica Forced ON con la tarjeta \"Comunicar SG Ready Forced ON\".",
+          "fr": "Selon DN 6CE sur l'unité : activé (valeur Toshiba, 6CE = 0) si Forced ON peut utiliser l'appoint électrique, désactivé si 6CE = 1. Utilisé seulement si un Flow signale Forced ON avec la carte \"Signaler SG Ready Forced ON\".",
+          "it": "Secondo DN 6CE sull'unità: attivo (valore Toshiba, 6CE = 0) se Forced ON può usare il riscaldatore di backup, disattivo con 6CE = 1. Usato solo se un Flow segnala Forced ON con la scheda \"Segnala SG Ready Forced ON\".",
+          "no": "I tråd med DN 6CE på enheten: på (Toshibas standard, 6CE = 0) når Forced ON kan bruke reservevarmeren, av ved 6CE = 1. Brukes bare når et Flow melder Forced ON med kortet \"Meld SG Ready Forced ON\".",
+          "sv": "Enligt DN 6CE på enheten: på (Toshibas standard, 6CE = 0) när Forced ON får använda reservvärmaren, av vid 6CE = 1. Används bara när ett Flow rapporterar Forced ON med kortet \"Rapportera SG Ready Forced ON\".",
+          "pl": "Zgodnie z DN 6CE w urządzeniu: włączone (domyślnie Toshiba, 6CE = 0), gdy Forced ON może używać grzałki rezerwowej, wyłączone przy 6CE = 1. Używane tylko, gdy Flow zgłasza Forced ON kartą \"Zgłoś SG Ready Forced ON\".",
+          "ru": "Согласно DN 6CE на блоке: вкл. (по умолчанию Toshiba, 6CE = 0), если Forced ON может использовать резервный нагреватель, выкл. при 6CE = 1. Используется только когда Flow сообщает Forced ON карточкой \"Сообщить SG Ready Forced ON\".",
+          "ko": "장치의 DN 6CE에 맞추세요: Forced ON에서 보조 히터를 써도 되면 켬(Toshiba 기본값, 6CE = 0), 6CE = 1이면 끔. Flow가 \"SG Ready Forced ON 알림\" 카드로 Forced ON을 알릴 때만 사용합니다.",
+          "ar": "وفق DN 6CE في الجهاز: تشغيل (افتراضي Toshiba، ‏6CE = 0) إذا كان Forced ON يستطيع استخدام السخان الاحتياطي، وإيقاف عند 6CE = 1. يُستخدم فقط إذا أبلغ Flow عن Forced ON ببطاقة \"الإبلاغ عن SG Ready Forced ON\"."
+        }
+      },
+      {
         "id": "ctCurrentA",
         "type": "number",
         "value": 0,

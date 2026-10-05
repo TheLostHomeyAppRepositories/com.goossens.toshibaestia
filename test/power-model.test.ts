@@ -349,3 +349,27 @@ test('no backup heater while the compressor runs with THO 1–2 K above TWO (202
     }
   }
 });
+
+test('SG Ready Forced ON boost (DN 6CE = 0): heater counted at any water flow, energy within 12 % of the house meter', () => {
+  // 2026-10-05: contact closed since 12:16 UTC, DN 6CE set to 0 at ~12:57 UTC (unit restart).
+  // From 13:01:53 UTC the heater ran (+3.4 kW step) and the compressor joined twice (to ~41 Hz,
+  // the house up to 5.9 kW); in boost the pump ran ~26 l/min, so THO was only 1–3 K above TWO.
+  const rows = load('r32s1-1101-sg-boost-2026-10-05.csv');
+  const base = rows.filter((r) => r.timeMs < at('2026-10-05T12:57:00Z')).map((r) => r.houseW).sort((a, b) => a - b)[3];
+  for (let phase = 0; phase < 2; phase += 1) {
+    const est = new PowerEstimator(R32_1101_HZ, { flowSamplesLpm: [17.4] });
+    let model = 0;
+    let real = 0;
+    let prev: { t: number; w: number; real: number } | null = null;
+    rows.filter((_, i) => i % 2 === phase).forEach((r) => {
+      const x = est.update({ ...r, boostActive: r.timeMs >= at('2026-10-05T12:58:20Z'), boostSetpointC: 60 });
+      const realW = Math.max(0, r.houseW - base);
+      if (prev && r.timeMs >= at('2026-10-05T12:58:20Z')) {
+        model += energyKwh(prev.w, x.watts, r.timeMs - prev.t) + x.backfillKwh;
+        real += energyKwh(prev.real, realW, r.timeMs - prev.t);
+      }
+      prev = { t: r.timeMs, w: x.watts, real: realW };
+    });
+    assert.ok(Math.abs(model - real) / real < 0.12, `phase ${phase}: model ${model.toFixed(2)} kWh vs house ${real.toFixed(2)} kWh (base ${base} W)`);
+  }
+});
