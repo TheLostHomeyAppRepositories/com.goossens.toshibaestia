@@ -720,6 +720,14 @@ export default class HeatpumpDevice extends Homey.Device {
     );
     if (cm3 == null || cm3 < 5 || cm3 > 100) throw new Error(this.homey.__('error.ct_implausible'));
     this.log(`Calibrated from CT ${currentA} A at ${x.compressorHz} Hz, TE ${x.evaporatorC}, TC ${x.condensingC}: ${cm3.toFixed(1)} cm³`);
+    // Keep every calibration with its operating point: comparing them (summer hot water,
+    // winter heating) shows whether one constant fits all conditions.
+    const history = ((this.getStoreValue('ctCalibrations') as unknown[] | null) ?? []).slice(-19);
+    history.push({
+      time: new Date(x.timeMs).toISOString(), currentA, hz: x.compressorHz, te: x.evaporatorC, tc: x.condensingC,
+      twi: x.twiC, two: x.twoC, outdoor: x.outdoorC, zoneOn: x.zoneOn, dhwOn: x.dhwOn, cm3: Math.round(cm3 * 10) / 10,
+    });
+    await this.setStoreValue('ctCalibrations', history);
     await this.setStoreValue('compressorCm3', cm3);
     this.power.setConfig(this.powerConfig(s));
   }
