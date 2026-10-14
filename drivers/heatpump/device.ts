@@ -349,6 +349,7 @@ export default class HeatpumpDevice extends Homey.Device {
   // how much of that period the app was actually polling (gaps over 5 min don't count).
   private heaterHours: { value: number; sinceMs: number; countedS: number; coveredS: number } | null = null;
   private meterKwh = 0;
+  private meterKwhSavedMs = 0;
   // Consecutive failed reads of the undocumented registers; after three they're left alone until an app restart.
   private undocumentedFailures = 0;
   private refrigerantCheckSavedMs = 0;
@@ -412,6 +413,7 @@ export default class HeatpumpDevice extends Homey.Device {
 
   async onUninit(): Promise<void> {
     this.clearPolling();
+    await this.setStoreValue('meterKwh', this.meterKwh).catch(() => undefined);
     this.closeExternalMeter();
     if (this.dhwBoostOffTimer) {
       this.homey.clearTimeout(this.dhwBoostOffTimer);
@@ -916,8 +918,10 @@ export default class HeatpumpDevice extends Homey.Device {
     this.power = new PowerEstimator(this.powerConfig(s), learnt ?? undefined);
     this.refrigerantCheck = new RefrigerantSensorCheck(check ?? undefined);
     // meter_power keeps counting from where it is (also the hours-based totals of
-    // versions before 1.2.0), so Homey Energy never sees the meter go backwards.
-    this.meterKwh = Number(this.getCapabilityValue('meter_power')) || 0;
+    // versions before 1.2.0), so Homey Energy never sees the meter go backwards. After a
+    // power cut Homey restored a capability value weeks old (seen 2026-10-12: back to the
+    // value of 09-28), so the app also keeps its own copy and takes the higher one.
+    this.meterKwh = Math.max(Number(this.getCapabilityValue('meter_power')) || 0, Number(this.getStoreValue('meterKwh')) || 0);
   }
 
   /**
@@ -1056,6 +1060,10 @@ export default class HeatpumpDevice extends Homey.Device {
     }
     if (this.hasCapability('meter_power')) {
       await this.setCapabilityValue('meter_power', Math.round(this.meterKwh * 1000) / 1000).catch(() => undefined);
+      if (sample.timeMs - this.meterKwhSavedMs >= 10 * 60_000) {
+        await this.setStoreValue('meterKwh', this.meterKwh).catch(() => undefined);
+        this.meterKwhSavedMs = sample.timeMs;
+      }
     }
 
     // Persist what was learnt, and show it in the settings.
