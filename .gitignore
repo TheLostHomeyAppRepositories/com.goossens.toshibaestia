@@ -4,3 +4,4 @@ env.json
 *.log
 .DS_Store
 modbus-test/probe-*.ts
+.vscode/
