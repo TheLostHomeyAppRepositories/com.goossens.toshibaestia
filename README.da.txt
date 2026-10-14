@@ -3,4 +3,7 @@ Bring din Toshiba Estia luft-til-vand varmepumpe ind i Homey. Kommunikerer direk
 Kræver et Toshiba BMS-IFMB0UEW-E (eller lignende) Modbus RTU interface, der er tilsluttet varmepumpens AB-bus, samt en hvilken som helst Modbus TCP-gateway tilsluttet interface (Waveshare RS485-til-WiFi/ETH, Elfin EW-11, USR-W630 eller lignende). Din Homey Pro skal kunne nå gatewayen på det lokale LAN.
 
 Understøtter R410A 4 Series WM, R410A 5 Series WM, og R32 1/2 Series (WM og AIO) Estia hydroenheder. Enkeltzone- eller dobbeltzoneinstallationer, med eller uden en husholdningsvarmtvandstank — skift hver enkelt i enhedsindstillingerne, og kun de relevante funktioner vises.
+
+Appen anslår også varmepumpens elektriske effekt og forbrug (en beregning, ikke en måling). Måler du allerede varmepumpen med sin egen energimåler i Homey, for eksempel en Shelly EM? Så udelad denne enhed fra Homey Energy i dens indstillinger, så forbruget ikke tælles to gange.
+
 Toshiba og Estia er varemærker tilhørende Toshiba Corporation. Dette er en fællesskabsudviklet app og er ikke tilknyttet eller godkendt af Toshiba.

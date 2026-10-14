@@ -3,4 +3,7 @@ Bringe deine Toshiba Estia Luft-Wasser-Wärmepumpe zu Homey. Kommuniziert direkt
 Benötigt eine Toshiba BMS-IFMB0UEW-E (oder ähnlich) Modbus RTU-Schnittstelle, die mit dem AB-Bus der Wärmepumpe verbunden ist, sowie ein beliebiges Modbus TCP-Gateway, das mit der Schnittstelle verbunden ist (Waveshare RS485-to-WiFi/ETH, Elfin EW-11, USR-W630 oder ähnliches). Dein Homey Pro muss das Gateway im lokalen LAN erreichen können.
 
 Unterstützt R410A 4 Series WM, R410A 5 Series WM und R32 1/2 Series (WM und AIO) Estia Hydro Einheiten. Einzonen- oder Zweizonen-Installationen, mit oder ohne einen Warmwasserspeicher – jeweils in den Geräteeinstellungen umschaltbar, sodass nur die relevanten Funktionen angezeigt werden.
+
+Die App schätzt außerdem die elektrische Leistung und den Verbrauch der Wärmepumpe (eine Berechnung, keine Messung). Misst du die Wärmepumpe bereits mit einem eigenen Energiezähler in Homey, zum Beispiel einem Shelly EM? Dann schließe dieses Gerät in seinen Einstellungen von Homey Energy aus, damit der Verbrauch nicht doppelt gezählt wird.
+
 Toshiba und Estia sind Marken der Toshiba Corporation. Dies ist eine von der Community entwickelte App und steht in keiner Verbindung zu Toshiba und wird von Toshiba nicht unterstützt.

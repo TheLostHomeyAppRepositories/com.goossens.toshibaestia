@@ -273,6 +273,11 @@ modbus-serial's `client.isOpen` is unreliable for half-closed sockets — it onl
 
 ## 7. Live-power & energy estimation
 
+> **Homey Energy:** `measure_power` and `meter_power` carry `isApproximated: true` (Homey's flag for "no power meter,
+> the driver calculates it"; manifest + runtime `setCapabilityOptions`). If the heat pump also has a real meter in
+> Homey (e.g. a Shelly EM on its circuit), the user should exclude this device from Energy, or Homey counts it twice
+> (seen 2026-10-14 on Jo's Homey). README (13 languages) says so.
+
 The BMS-IFMB0UEW-E exposes no power, kWh, current or flow register. A full read-only scan (holding 40001–42000 and input registers, idle and at 41 Hz) found only the registers below; the remote controller's WF (flow), CT (outdoor current), PMV and HPS are **not** on the interface. Since 1.2.0 the estimate lives in [`drivers/heatpump/power-model.ts`](drivers/heatpump/power-model.ts) (pure, replay-tested in `test/power-model.test.ts`).
 
 ### Undocumented registers (R32, verified against the remote's "Sensor information")

@@ -260,8 +260,9 @@ const ALWAYS_ON_CAPABILITIES: Array<[string, Record<string, unknown>?]> = [
   ['night_setback',    { title: { en: 'Night setback',    nl: 'Nachtverlaging' } }],
   ['auto_temp',        { title: { en: 'Auto temperature', nl: 'Auto-temperatuur' } }],
   // Energy estimation
-  ['measure_power',         { title: { en: 'Estimated power',         nl: 'Geschat vermogen' } }],
-  ['meter_power',           { title: { en: 'Estimated total energy',  nl: 'Geschatte totale energie' } }],
+  // isApproximated: Homey's flag for "the device has no power meter, the driver calculates it".
+  ['measure_power',         { title: { en: 'Estimated power',         nl: 'Geschat vermogen' }, isApproximated: true }],
+  ['meter_power',           { title: { en: 'Estimated total energy',  nl: 'Geschatte totale energie' }, isApproximated: true }],
   // Season detection (1.1.0)
   ['measure_temperature.outdoor_avg', { title: {
     en: 'Average outdoor temperature', nl: 'Gemiddelde buitentemperatuur', da: 'Gennemsnitlig udetemperatur',

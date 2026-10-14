@@ -359,7 +359,8 @@
         "ru": "Оценочная мощность",
         "ko": "예상 전력",
         "ar": "الطاقة المقدرة"
-      }
+      },
+      "isApproximated": true
     },
     "meter_power": {
       "title": {
@@ -376,7 +377,8 @@
         "ru": "Оценочная общая энергия",
         "ko": "예상 총 에너지",
         "ar": "إجمالي الطاقة المقدرة"
-      }
+      },
+      "isApproximated": true
     },
     "onoff.hotwater": {
       "title": {

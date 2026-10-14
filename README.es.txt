@@ -3,4 +3,7 @@ Lleva tu bomba de calor aire-agua Toshiba Estia a Homey. Habla directamente con 
 Requiere una interfaz Toshiba BMS-IFMB0UEW-E (o similar) Modbus RTU conectada al bus AB de la bomba de calor, además de cualquier puerta de enlace Modbus TCP conectada a la interfaz (Waveshare RS485-a-WiFi/ETH, Elfin EW-11, USR-W630 o similar). Tu Homey Pro debe llegar a la puerta de enlace en la LAN local.
 
 Compatibilidad con las unidades hidro Estia Serie 4 WM R410A, Serie 5 WM R410A y Serie 1/2 R32 (WM y AIO). Instalaciones de una o dos zonas, con o sin un tanque de agua caliente doméstica; activa cada uno en la configuración del dispositivo y solo se muestran las capacidades relevantes.
+
+La app también estima la potencia y el consumo eléctricos de la bomba de calor (un cálculo, no una medición). ¿Ya mides la bomba de calor con su propio medidor de energía en Homey, por ejemplo un Shelly EM? Excluye entonces este dispositivo de Homey Energy en sus ajustes, para que el consumo no se cuente dos veces.
+
 Toshiba y Estia son marcas registradas de Toshiba Corporation. Esta es una aplicación desarrollada por la comunidad y no está afiliada ni respaldada por Toshiba.
