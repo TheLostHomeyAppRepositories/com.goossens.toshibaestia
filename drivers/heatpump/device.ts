@@ -31,6 +31,7 @@ import {
   type PowerSample,
   type RefrigerantCheckState,
 } from './power-model';
+import { ExternalMeterLink } from './external-meter';
 
 type TempScaling = 'x1' | 'x10';
 type ThermostatMode = 'off' | 'heat' | 'cool';
@@ -227,6 +228,16 @@ const MANIFEST_CAPABILITY_OPTIONS: Record<string, Record<string, unknown>> = {
   'alarm_generic':                 { title: { en: 'Heat pump alarm',     nl: 'Warmtepomp alarm' } },
 };
 
+/** Power capability titles: measured by a linked meter, or estimated by the power model. */
+const MEASURED_TITLES = {
+  power: { en: "Measured power", nl: "Gemeten vermogen", da: "Målt effekt", de: "Gemessene Leistung", es: "Potencia medida", fr: "Puissance mesurée", it: "Potenza misurata", no: "Målt effekt", sv: "Uppmätt effekt", pl: "Zmierzona moc", ru: "Измеренная мощность", ko: "측정된 전력", ar: "القدرة المقيسة" },
+  energy: { en: "Measured total energy", nl: "Gemeten totale energie", da: "Målt samlet energi", de: "Gemessene Gesamtenergie", es: "Energía total medida", fr: "Énergie totale mesurée", it: "Energia totale misurata", no: "Målt total energi", sv: "Uppmätt total energi", pl: "Zmierzona całkowita energia", ru: "Измеренная общая энергия", ko: "측정된 총 에너지", ar: "إجمالي الطاقة المقيسة" },
+};
+const ESTIMATED_TITLES = {
+  power: { en: "Estimated power", nl: "Geschat vermogen", da: "Anslået strømforbrug", de: "Geschätzte Leistung", es: "Potencia estimada", fr: "Puissance estimée", it: "Potenza stimata", no: "Estimert strømforbruk", sv: "Uppskattad effekt", pl: "Szacowana moc", ru: "Оценочная мощность", ko: "예상 전력", ar: "الطاقة المقدرة" },
+  energy: { en: "Estimated total energy", nl: "Geschatte totale energie", da: "Anslået samlet energi", de: "Geschätzter Gesamtenergieverbrauch", es: "Energía total estimada", fr: "Énergie totale estimée", it: "Energia totale stimata", no: "Estimert total energi", sv: "Uppskattad total energi", pl: "Szacowana całkowita energia", ru: "Оценочная общая энергия", ko: "예상 총 에너지", ar: "إجمالي الطاقة المقدرة" },
+};
+
 /** Titles and metadata applied on every onInit for each dynamic capability.
  *  Always supply nl + en; Homey falls back to its built-in localized title for
  *  standard capabilities (target_temperature etc.) if nl isn't provided. */
@@ -323,6 +334,8 @@ export default class HeatpumpDevice extends Homey.Device {
   private power!: PowerEstimator;
   private refrigerantCheck!: RefrigerantSensorCheck;
   private lastPower: { watts: number; timeMs: number } | null = null;
+  /** Meter linked on the app settings page; while usable it replaces the estimate. */
+  private meterLink: ExternalMeterLink | null = null;
   private lastPowerSample: PowerSample | null = null;
   // Heater-hours reconciliation: the heater time counted since the counter last ticked, and
   // how much of that period the app was actually polling (gaps over 5 min don't count).
@@ -358,6 +371,7 @@ export default class HeatpumpDevice extends Homey.Device {
     await this.syncOptionalCapabilities(settings);
     this.registerCapabilityListeners();
     this.initPower(settings);
+    this.applyExternalMeter().catch((err) => this.error('applyExternalMeter', err));
     await this.updateSeason(settings).catch((err) => this.error('updateSeason', err));
 
     // Restore the last-fault display from persistent store so users see the
@@ -390,6 +404,7 @@ export default class HeatpumpDevice extends Homey.Device {
 
   async onUninit(): Promise<void> {
     this.clearPolling();
+    this.closeExternalMeter();
     if (this.dhwBoostOffTimer) {
       this.homey.clearTimeout(this.dhwBoostOffTimer);
       this.dhwBoostOffTimer = null;
@@ -398,6 +413,63 @@ export default class HeatpumpDevice extends Homey.Device {
 
   async onDeleted(): Promise<void> {
     this.clearPolling();
+    this.closeExternalMeter();
+  }
+
+  /** The meter linked on the app settings page, or null for the estimate. */
+  public getExternalMeterId(): string | null {
+    return (this.getStoreValue('externalMeterId') as string | null) ?? null;
+  }
+
+  /** Links a meter (any Homey device with measure_power) or unlinks it with null. */
+  public async setExternalMeter(meterId: string | null): Promise<void> {
+    await this.setStoreValue('externalMeterId', meterId);
+    await this.applyExternalMeter();
+  }
+
+  private closeExternalMeter(): void {
+    this.meterLink = null;
+  }
+
+  /** Re-reads the linked meter through the Web API (once per poll). */
+  private async refreshExternalMeter(): Promise<void> {
+    const link = this.meterLink;
+    if (!link) return;
+    try {
+      const api = await this.app.getHomeyApi();
+      link.update(await api.devices.getDevice({ id: link.meterId }));
+    } catch (err) {
+      if (link.available) this.error(`External meter ${link.name} could not be read`, err);
+      link.markUnavailable();
+    }
+  }
+
+  /** Opens the linked meter through Homey's Web API and marks power as measured or estimated. */
+  private async applyExternalMeter(): Promise<void> {
+    this.closeExternalMeter();
+    const meterId = this.getExternalMeterId();
+    if (meterId) {
+      try {
+        const api = await this.app.getHomeyApi();
+        this.meterLink = new ExternalMeterLink(meterId, await api.devices.getDevice({ id: meterId }));
+        this.log(`External meter linked: ${this.meterLink.name} (${this.meterLink.energyCapability ?? 'power only'})`);
+      } catch (err) {
+        this.error('External meter could not be opened', err);
+      }
+    }
+    await this.applyPowerCapabilityOptions(this.meterLink !== null);
+  }
+
+  /** Titles and Homey's isApproximated flag follow whether power is measured or estimated. */
+  private async applyPowerCapabilityOptions(measured: boolean): Promise<void> {
+    const options: Array<[string, Record<string, string>]> = measured
+      ? [['measure_power', MEASURED_TITLES.power], ['meter_power', MEASURED_TITLES.energy]]
+      : [['measure_power', ESTIMATED_TITLES.power], ['meter_power', ESTIMATED_TITLES.energy]];
+    for (const [capability, title] of options) {
+      if (!this.hasCapability(capability)) continue;
+      await this.setCapabilityOptions(capability, { title, isApproximated: !measured })
+        .catch((err) => this.error(`setCapabilityOptions ${capability}`, err));
+    }
   }
 
   async onSettings({
@@ -883,12 +955,28 @@ export default class HeatpumpDevice extends Homey.Device {
     this.refrigerantCheck.update(sample, reading.waterSaysOn);
     this.lastPowerSample = sample;
 
-    if (this.lastPower) this.meterKwh += energyKwh(this.lastPower.watts, reading.watts, sample.timeMs - this.lastPower.timeMs);
-    this.meterKwh += reading.backfillKwh;
-    this.meterKwh += this.reconcileHeaterHours(snapshot[REGISTERS.backupHeaterHours.number], reading.heaterW, sample.timeMs, s);
-    this.lastPower = { watts: reading.watts, timeMs: sample.timeMs };
+    // The heater-hours bookkeeping always runs, so it stays consistent across meter on/off.
+    const heaterBackfillKwh = this.reconcileHeaterHours(snapshot[REGISTERS.backupHeaterHours.number], reading.heaterW, sample.timeMs, s);
+    await this.refreshExternalMeter();
+    const meter = this.meterLink?.usable ? this.meterLink : null;
+    const intervalMs = this.lastPower ? sample.timeMs - this.lastPower.timeMs : 0;
+    let watts: number;
+    if (meter) {
+      // Measured: power and energy come from the linked meter; the estimate only runs alongside.
+      watts = meter.watts as number;
+      const counted = meter.energySinceLast();
+      if (counted !== null) this.meterKwh += counted;
+      else if (this.lastPower) this.meterKwh += energyKwh(this.lastPower.watts, watts, intervalMs);
+    } else {
+      this.meterLink?.resetEnergy();
+      watts = reading.watts;
+      if (this.lastPower) this.meterKwh += energyKwh(this.lastPower.watts, reading.watts, intervalMs);
+      this.meterKwh += reading.backfillKwh;
+      this.meterKwh += heaterBackfillKwh;
+    }
+    this.lastPower = { watts, timeMs: sample.timeMs };
     if (this.hasCapability('measure_power')) {
-      await this.setCapabilityValue('measure_power', reading.watts).catch(() => undefined);
+      await this.setCapabilityValue('measure_power', watts).catch(() => undefined);
     }
     if (this.hasCapability('meter_power')) {
       await this.setCapabilityValue('meter_power', Math.round(this.meterKwh * 1000) / 1000).catch(() => undefined);
@@ -915,6 +1003,11 @@ export default class HeatpumpDevice extends Homey.Device {
       else if (this.power.flowIsLearnt) flowSource = `${this.homey.__('power.flow_learnt')} (${learnt.flowSamplesLpm.length})`;
       const detection = this.homey.__(reading.detection === 'refrigerant' ? 'power.detect_refrigerant' : 'power.detect_water');
       powerStatus = `${this.power.flowLpm.toFixed(1)} l/min, ${flowSource} · ${detection}`;
+    }
+    if (this.getExternalMeterId()) {
+      powerStatus = meter
+        ? `${this.homey.__('power.measured_by', { name: meter.name })} · ${this.homey.__('power.estimate_now', { watts: Math.round(reading.watts) })} (${powerStatus})`
+        : `${this.homey.__('power.meter_unavailable', { name: this.meterLink?.name ?? '?' })} · ${powerStatus}`;
     }
     if (s.powerStatus !== powerStatus) await this.setSettings({ powerStatus }).catch((err) => this.error('setSettings powerStatus', err));
   }

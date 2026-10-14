@@ -20,6 +20,23 @@
     "detect_water": "compressore tramite temperature dell'acqua",
     "detect_frequency": "frequenza del compressore misurata",
     "calibrated": "calibrato con CT",
-    "from_databook": "dal Data Book"
+    "from_databook": "dal Data Book",
+    "measured_by": "misurato da __name__",
+    "estimate_now": "stima attuale __watts__ W",
+    "meter_unavailable": "contatore __name__ non disponibile, si usa la stima"
+  },
+  "settings": {
+    "subtitle": "Impostazioni generali dell'app. La connessione (IP, porta, ID unità, intervallo, funzioni) si imposta nelle impostazioni di ogni pompa di calore.",
+    "meter_legend": "Contatore di energia esterno",
+    "meter_help": "Misuri già una pompa di calore con un contatore di energia separato in Homey (ad esempio uno Shelly EM sul suo circuito)? Sceglilo qui. La pompa di calore mostrerà la potenza e il consumo misurati al posto della stima; la stima continua per confronto e subentra se il contatore non è disponibile. Poi, in Homey Energy, includi la pompa di calore ed escludi il contatore, così nulla viene contato due volte.",
+    "meter_none": "Nessuno (usa la stima)",
+    "meter_no_pumps": "Nessuna pompa di calore aggiunta.",
+    "meter_saved": "Contatore salvato.",
+    "meter_error": "Impossibile salvare il contatore: ",
+    "diag_legend": "Diagnostica",
+    "debug_label": "Log Modbus dettagliato",
+    "debug_help": "Scrive ogni richiesta e risposta Modbus nel log dell'app. Utile in una nuova installazione; disattivalo quando tutto funziona.",
+    "save": "Salva",
+    "saved": "Salvato."
   }
 }

@@ -20,6 +20,23 @@
     "detect_water": "compressor via water temperatures",
     "detect_frequency": "compressor frequency measured",
     "calibrated": "calibrated with CT",
-    "from_databook": "from the Data Book"
+    "from_databook": "from the Data Book",
+    "measured_by": "measured by __name__",
+    "estimate_now": "estimate now __watts__ W",
+    "meter_unavailable": "meter __name__ unavailable, using the estimate"
+  },
+  "settings": {
+    "subtitle": "Global app settings. Connection details (IP, port, unit ID, poll interval, features) are in each heat pump's device settings.",
+    "meter_legend": "External energy meter",
+    "meter_help": "Already measuring a heat pump with a separate energy meter in Homey (for example a Shelly EM on its circuit)? Pick it here. The heat pump then shows the measured power and energy instead of the estimate; the estimate keeps running for comparison and takes over when the meter is unavailable. Afterwards, in Homey Energy, include the heat pump and exclude the meter device, so nothing is counted twice.",
+    "meter_none": "None (use the estimate)",
+    "meter_no_pumps": "No heat pump added yet.",
+    "meter_saved": "Meter saved.",
+    "meter_error": "Could not save the meter: ",
+    "diag_legend": "Diagnostics",
+    "debug_label": "Enable verbose Modbus logging",
+    "debug_help": "Logs every Modbus request/response to the app log. Useful when debugging a new install; turn it off once things work.",
+    "save": "Save",
+    "saved": "Saved."
   }
 }

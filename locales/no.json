@@ -20,6 +20,23 @@
     "detect_water": "kompressor via vanntemperaturer",
     "detect_frequency": "kompressorfrekvens målt",
     "calibrated": "kalibrert med CT",
-    "from_databook": "fra Data Book"
+    "from_databook": "fra Data Book",
+    "measured_by": "målt av __name__",
+    "estimate_now": "anslag nå __watts__ W",
+    "meter_unavailable": "måler __name__ utilgjengelig, anslaget brukes"
+  },
+  "settings": {
+    "subtitle": "Generelle appinnstillinger. Tilkoblingen (IP, port, enhets-ID, intervall, funksjoner) stilles inn i hver varmepumpes enhetsinnstillinger.",
+    "meter_legend": "Ekstern energimåler",
+    "meter_help": "Måler du allerede en varmepumpe med en egen energimåler i Homey (for eksempel en Shelly EM på kursen)? Velg den her. Varmepumpen viser da målt effekt og forbruk i stedet for anslaget; anslaget går videre for sammenligning og tar over hvis måleren ikke er tilgjengelig. Ta deretter med varmepumpen i Homey Energy og utelat måleren, så ingenting telles to ganger.",
+    "meter_none": "Ingen (bruk anslaget)",
+    "meter_no_pumps": "Ingen varmepumpe lagt til ennå.",
+    "meter_saved": "Måler lagret.",
+    "meter_error": "Måleren kunne ikke lagres: ",
+    "diag_legend": "Diagnostikk",
+    "debug_label": "Detaljert Modbus-logging",
+    "debug_help": "Skriver hver Modbus-forespørsel og -svar til app-loggen. Nyttig ved en ny installasjon; slå det av når alt fungerer.",
+    "save": "Lagre",
+    "saved": "Lagret."
   }
 }

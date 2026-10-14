@@ -4,6 +4,6 @@ Wymaga interfejsu Toshiba BMS-IFMB0UEW-E (lub podobnego) Modbus RTU podłączone
 
 Obsługuje jednostki hydro serii R410A 4 WM, R410A 5 WM i R32 1/2 (WM i AIO) Estia. Instalacje jedno- lub dwustrefowe, z lub bez zbiornika na ciepłą wodę użytkową — wybierz opcję w ustawieniach urządzenia, a tylko odpowiednie funkcje będą widoczne.
 
-Aplikacja szacuje też moc i zużycie energii elektrycznej pompy ciepła (to obliczenie, nie pomiar). Mierzysz już pompę ciepła własnym licznikiem energii w Homey, na przykład Shelly EM? Wyklucz wtedy to urządzenie z Homey Energy w jego ustawieniach, aby zużycie nie było liczone podwójnie.
+Aplikacja szacuje też moc i zużycie energii elektrycznej pompy ciepła (to obliczenie, nie pomiar). Mierzysz już pompę ciepła własnym licznikiem energii w Homey, na przykład Shelly EM? Wybierz ten licznik na stronie ustawień aplikacji: pompa ciepła pokaże wtedy zmierzoną moc i zużycie. W Homey Energy zostaw pompę ciepła i wyklucz licznik, aby nic nie było liczone podwójnie.
 
 Toshiba i Estia są znakami towarowymi Toshiba Corporation. To jest aplikacja społecznościowa, niepowiązana z Toshiba ani niepopierana przez Toshiba.

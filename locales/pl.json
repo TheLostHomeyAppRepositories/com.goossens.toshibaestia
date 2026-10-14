@@ -20,6 +20,23 @@
     "detect_water": "sprężarka wg temperatur wody",
     "detect_frequency": "zmierzona częstotliwość sprężarki",
     "calibrated": "skalibrowane z CT",
-    "from_databook": "z Data Book"
+    "from_databook": "z Data Book",
+    "measured_by": "mierzone przez __name__",
+    "estimate_now": "szacunek teraz __watts__ W",
+    "meter_unavailable": "licznik __name__ niedostępny, używany jest szacunek"
+  },
+  "settings": {
+    "subtitle": "Ogólne ustawienia aplikacji. Połączenie (IP, port, ID jednostki, interwał, funkcje) ustawiasz w ustawieniach każdej pompy ciepła.",
+    "meter_legend": "Zewnętrzny licznik energii",
+    "meter_help": "Mierzysz już pompę ciepła osobnym licznikiem energii w Homey (na przykład Shelly EM na jej obwodzie)? Wybierz go tutaj. Pompa ciepła pokaże wtedy zmierzoną moc i zużycie zamiast szacunku; szacunek działa dalej dla porównania i przejmuje, gdy licznik jest niedostępny. Następnie w Homey Energy uwzględnij pompę ciepła i wyklucz licznik, aby nic nie było liczone podwójnie.",
+    "meter_none": "Brak (użyj szacunku)",
+    "meter_no_pumps": "Nie dodano jeszcze pompy ciepła.",
+    "meter_saved": "Licznik zapisany.",
+    "meter_error": "Nie udało się zapisać licznika: ",
+    "diag_legend": "Diagnostyka",
+    "debug_label": "Szczegółowe logowanie Modbus",
+    "debug_help": "Zapisuje każde zapytanie i odpowiedź Modbus w logu aplikacji. Przydatne przy nowej instalacji; wyłącz, gdy wszystko działa.",
+    "save": "Zapisz",
+    "saved": "Zapisano."
   }
 }

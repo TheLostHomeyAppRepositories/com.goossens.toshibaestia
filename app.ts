@@ -2,6 +2,23 @@ import Homey from 'homey';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 require('source-map-support').install();
 import { ModbusController } from './modbus/controller';
+import { ApiDevice, MeterChoice, meterChoices } from './drivers/heatpump/external-meter';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { HomeyAPI } = require('homey-api');
+
+/** One heat pump on the settings page with the meter linked to it (null: the estimate). */
+export interface MeterLink {
+  deviceId: string;
+  name: string;
+  meterId: string | null;
+}
+
+/** What a heat pump device offers the app for external meters (drivers/heatpump/device.ts). */
+interface MeterLinkedDevice extends Homey.Device {
+  getExternalMeterId(): string | null;
+  setExternalMeter(meterId: string | null): Promise<void>;
+}
 
 /**
  * App-level host. Owns a single ModbusController shared across all devices,
@@ -11,6 +28,8 @@ import { ModbusController } from './modbus/controller';
  */
 export default class ToshibaEstiaApp extends Homey.App {
   public modbus!: ModbusController;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private homeyApi: any | null = null;
 
   async onInit(): Promise<void> {
     const debug = (this.homey.settings.get('debug') as boolean | null) ?? false;
@@ -29,6 +48,44 @@ export default class ToshibaEstiaApp extends Homey.App {
         this.log(`Debug logging ${now ? 'enabled' : 'disabled'}`);
       }
     });
+  }
+
+  /**
+   * Homey's Web API, used only to read an external meter the user links to a heat pump
+   * (permission homey:manager:api). Created on first use.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async getHomeyApi(): Promise<any> {
+    if (!this.homeyApi) this.homeyApi = await HomeyAPI.createAppAPI({ homey: this.homey });
+    return this.homeyApi;
+  }
+
+  /** Devices that can be linked as meter (settings page). */
+  async listMeters(): Promise<MeterChoice[]> {
+    const api = await this.getHomeyApi();
+    const devices = Object.values(await api.devices.getDevices()) as ApiDevice[];
+    return meterChoices(devices, `homey:app:${this.id}:`);
+  }
+
+  private heatPumps(): MeterLinkedDevice[] {
+    return this.homey.drivers.getDriver('heatpump').getDevices() as MeterLinkedDevice[];
+  }
+
+  /** Every heat pump with its linked meter (settings page). */
+  getMeterLinks(): MeterLink[] {
+    return this.heatPumps().map((device) => ({
+      deviceId: String(device.getData().id),
+      name: device.getName(),
+      meterId: device.getExternalMeterId(),
+    }));
+  }
+
+  /** Links a meter to a heat pump, or unlinks it with null (settings page). */
+  async setMeterLink(deviceId: string, meterId: string | null): Promise<MeterLink[]> {
+    const device = this.heatPumps().find((d) => String(d.getData().id) === deviceId);
+    if (!device) throw new Error(`Unknown heat pump ${deviceId}`);
+    await device.setExternalMeter(meterId);
+    return this.getMeterLinks();
   }
 
   async onUninit(): Promise<void> {

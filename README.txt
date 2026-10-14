@@ -4,6 +4,6 @@ Requires a Toshiba BMS-IFMB0UEW-E (or similar) Modbus RTU interface wired to the
 
 Supports R410A 4 Series WM, R410A 5 Series WM, and R32 1/2 Series (WM and AIO) Estia hydro units. Single-zone or dual-zone installations, with or without a domestic hot water tank — toggle each in the device settings and only the relevant capabilities show up.
 
-The app also estimates the heat pump's electrical power and energy use (a calculation, not a measurement). Already measuring the heat pump with its own energy meter in Homey, for example a Shelly EM? Then exclude this device from Homey Energy in its settings, so the consumption isn't counted twice.
+The app also estimates the heat pump's electrical power and energy use (a calculation, not a measurement). Already measuring the heat pump with its own energy meter in Homey, for example a Shelly EM? Pick that meter on the app's settings page: the heat pump then shows the measured power and energy. In Homey Energy, keep the heat pump and exclude the meter device, so nothing is counted twice.
 
 Toshiba and Estia are trademarks of Toshiba Corporation. This is a community-developed app and is not affiliated with or endorsed by Toshiba.

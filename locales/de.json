@@ -20,6 +20,23 @@
     "detect_water": "Verdichter über Wassertemperaturen",
     "detect_frequency": "Verdichterfrequenz gemessen",
     "calibrated": "mit CT kalibriert",
-    "from_databook": "aus dem Data Book"
+    "from_databook": "aus dem Data Book",
+    "measured_by": "gemessen von __name__",
+    "estimate_now": "Schätzung jetzt __watts__ W",
+    "meter_unavailable": "Zähler __name__ nicht verfügbar, die Schätzung wird verwendet"
+  },
+  "settings": {
+    "subtitle": "Allgemeine App-Einstellungen. Die Verbindung (IP, Port, Unit-ID, Abfrageintervall, Funktionen) stellst du in den Geräteeinstellungen jeder Wärmepumpe ein.",
+    "meter_legend": "Externer Energiezähler",
+    "meter_help": "Misst du eine Wärmepumpe bereits mit einem separaten Energiezähler in Homey (zum Beispiel einem Shelly EM an ihrem Stromkreis)? Wähle ihn hier. Die Wärmepumpe zeigt dann die gemessene Leistung und den Verbrauch statt der Schätzung; die Schätzung läuft zum Vergleich weiter und übernimmt, wenn der Zähler nicht verfügbar ist. Nimm danach in Homey Energy die Wärmepumpe auf und schließe das Zählergerät aus, damit nichts doppelt gezählt wird.",
+    "meter_none": "Keiner (Schätzung verwenden)",
+    "meter_no_pumps": "Noch keine Wärmepumpe hinzugefügt.",
+    "meter_saved": "Zähler gespeichert.",
+    "meter_error": "Der Zähler konnte nicht gespeichert werden: ",
+    "diag_legend": "Diagnose",
+    "debug_label": "Ausführliches Modbus-Logging",
+    "debug_help": "Schreibt jede Modbus-Anfrage und -Antwort ins App-Log. Hilfreich bei einer neuen Installation; schalte es aus, sobald alles funktioniert.",
+    "save": "Speichern",
+    "saved": "Gespeichert."
   }
 }

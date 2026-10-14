@@ -277,6 +277,17 @@ modbus-serial's `client.isOpen` is unreliable for half-closed sockets — it onl
 > the driver calculates it"; manifest + runtime `setCapabilityOptions`). If the heat pump also has a real meter in
 > Homey (e.g. a Shelly EM on its circuit), the user should exclude this device from Energy, or Homey counts it twice
 > (seen 2026-10-14 on Jo's Homey). README (13 languages) says so.
+>
+> **External meter (1.2.0):** the app settings page lets the user link any appliance meter (a device with
+> `measure_power`, not cumulative / home battery / solar / this app) to a heat pump. The app reads it with
+> `homey-api` (`HomeyAPI.createAppAPI`, permission `homey:manager:api`) once per poll via `getDevice` — the
+> realtime `makeCapabilityInstance` route did not deliver updates inside the app. While usable, `measure_power`
+> = the meter's power and `meter_power` grows by the meter's counter delta (`meterPowerImportedCapability`, else
+> `meter_power`, else integrated power); the estimate keeps running and is shown in `powerStatus`. Heater-hours
+> reconciliation still runs (bookkeeping) but adds nothing while measured. Titles + `isApproximated` switch.
+> Store review: the permission needs a justification ("read the user-chosen sub-meter of the heat pump");
+> Athom's guidelines say device apps "should not" use it — if rejected, remove `api.ts`, the settings section,
+> the permission and `external-meter.ts`, or replace the picker with a Flow card.
 
 The BMS-IFMB0UEW-E exposes no power, kWh, current or flow register. A full read-only scan (holding 40001–42000 and input registers, idle and at 41 Hz) found only the registers below; the remote controller's WF (flow), CT (outdoor current), PMV and HPS are **not** on the interface. Since 1.2.0 the estimate lives in [`drivers/heatpump/power-model.ts`](drivers/heatpump/power-model.ts) (pure, replay-tested in `test/power-model.test.ts`).
 

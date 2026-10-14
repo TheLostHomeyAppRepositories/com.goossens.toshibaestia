@@ -8,23 +8,30 @@
 <body>
   <header class="homey-header">
     <h1 class="homey-title">Toshiba Estia</h1>
-    <p class="homey-subtitle">Global app settings. All connection details (IP, port, unit ID, poll interval, feature toggles) live on each <i>device</i>'s settings page (Homey app &rarr; the heat pump &rarr; Settings).</p>
+    <p class="homey-subtitle" data-i18n="settings.subtitle"></p>
   </header>
 
   <fieldset class="homey-form-fieldset">
-    <legend class="homey-form-legend">Diagnostics</legend>
+    <legend class="homey-form-legend" data-i18n="settings.meter_legend"></legend>
+    <p class="homey-form-help" data-i18n="settings.meter_help"></p>
+    <div id="meters"></div>
+    <div id="meter-status" class="homey-text" style="margin-top:0.5em;"></div>
+  </fieldset>
+
+  <fieldset class="homey-form-fieldset">
+    <legend class="homey-form-legend" data-i18n="settings.diag_legend"></legend>
 
     <div class="homey-form-group">
       <div class="homey-form-checkbox">
         <input id="debug" type="checkbox" />
-        <label for="debug">Enable verbose Modbus logging</label>
+        <label for="debug" data-i18n="settings.debug_label"></label>
       </div>
-      <p class="homey-form-help">Logs every Modbus request/response to the app log. Useful when debugging a new install; turn it off once things work.</p>
+      <p class="homey-form-help" data-i18n="settings.debug_help"></p>
     </div>
   </fieldset>
 
   <div class="homey-button-group">
-    <button id="save" class="homey-button-primary-full">Save</button>
+    <button id="save" class="homey-button-primary-full" data-i18n="settings.save"></button>
   </div>
 
   <div id="status" class="homey-text" style="margin-top:1em;"></div>
@@ -35,6 +42,63 @@
       const debugEl  = document.getElementById('debug');
       const saveEl   = document.getElementById('save');
       const statusEl = document.getElementById('status');
+      const metersEl = document.getElementById('meters');
+      const meterStatusEl = document.getElementById('meter-status');
+
+      document.querySelectorAll('[data-i18n]').forEach(function(el) {
+        el.textContent = Homey.__(el.getAttribute('data-i18n'));
+      });
+
+      const flash = (el, text) => {
+        el.textContent = text;
+        setTimeout(function() { el.textContent = ''; }, 2500);
+      };
+
+      // One dropdown per heat pump: "none" (the estimate) or any device that measures power.
+      function renderMeters(links, meters) {
+        metersEl.innerHTML = '';
+        if (links.length === 0) {
+          metersEl.textContent = Homey.__('settings.meter_no_pumps');
+          return;
+        }
+        links.forEach(function(link) {
+          const group = document.createElement('div');
+          group.className = 'homey-form-group';
+          const label = document.createElement('label');
+          label.className = 'homey-form-label';
+          label.textContent = link.name;
+          const select = document.createElement('select');
+          select.className = 'homey-form-select';
+          const none = document.createElement('option');
+          none.value = '';
+          none.textContent = Homey.__('settings.meter_none');
+          select.appendChild(none);
+          meters.forEach(function(meter) {
+            const option = document.createElement('option');
+            option.value = meter.id;
+            option.textContent = meter.name;
+            select.appendChild(option);
+          });
+          select.value = link.meterId || '';
+          select.addEventListener('change', function() {
+            Homey.api('PUT', '/links', { deviceId: link.deviceId, meterId: select.value || null }, function(err) {
+              if (err) return Homey.alert(Homey.__('settings.meter_error') + (err.message || err));
+              flash(meterStatusEl, Homey.__('settings.meter_saved'));
+            });
+          });
+          group.appendChild(label);
+          group.appendChild(select);
+          metersEl.appendChild(group);
+        });
+      }
+
+      Homey.api('GET', '/links', null, function(err, links) {
+        if (err) return Homey.alert(err.message || err);
+        Homey.api('GET', '/meters', null, function(err2, meters) {
+          if (err2) return Homey.alert(err2.message || err2);
+          renderMeters(links, meters);
+        });
+      });
 
       Homey.get('debug', function(err, val) {
         if (err) return Homey.alert(err);
@@ -44,8 +108,7 @@
       saveEl.addEventListener('click', function() {
         Homey.set('debug', debugEl.checked, function(err) {
           if (err) return Homey.alert(err);
-          statusEl.textContent = 'Saved.';
-          setTimeout(function() { statusEl.textContent = ''; }, 2500);
+          flash(statusEl, Homey.__('settings.saved'));
         });
       });
 

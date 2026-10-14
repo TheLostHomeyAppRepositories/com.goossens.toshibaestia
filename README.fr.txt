@@ -4,6 +4,6 @@ Nécessite une interface Modbus RTU Toshiba BMS-IFMB0UEW-E (ou similaire) câbl�
 
 Prend en charge les unités hydro Estia des séries R410A 4 WM, R410A 5 WM, et R32 1/2 (WM et AIO). Installations à une ou deux zones, avec ou sans réservoir d'eau chaude sanitaire — activez chaque option dans les paramètres de l'appareil et seules les capacités pertinentes apparaîtront.
 
-L'app estime aussi la puissance et la consommation électriques de la pompe à chaleur (un calcul, pas une mesure). Vous mesurez déjà la pompe à chaleur avec son propre compteur d'énergie dans Homey, par exemple un Shelly EM ? Excluez alors cet appareil de Homey Energy dans ses réglages, pour que la consommation ne soit pas comptée deux fois.
+L'app estime aussi la puissance et la consommation électriques de la pompe à chaleur (un calcul, pas une mesure). Vous mesurez déjà la pompe à chaleur avec son propre compteur d'énergie dans Homey, par exemple un Shelly EM ? Choisissez ce compteur sur la page de réglages de l'app : la pompe à chaleur affiche alors la puissance et la consommation mesurées. Dans Homey Energy, gardez la pompe à chaleur et excluez le compteur, pour que rien ne soit compté deux fois.
 
 Toshiba et Estia sont des marques de Toshiba Corporation. Cette application est développée par la communauté et n'est ni affiliée à ni approuvée par Toshiba.

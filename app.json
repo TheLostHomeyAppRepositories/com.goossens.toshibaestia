@@ -40,7 +40,9 @@
     "climate"
   ],
   "brandColor": "#E60012",
-  "permissions": [],
+  "permissions": [
+    "homey:manager:api"
+  ],
   "images": {
     "small": "/assets/images/small.png",
     "large": "/assets/images/large.png",
@@ -54,6 +56,20 @@
   "support": "https://github.com/jogoossens/com.goossens.toshibaestia/issues",
   "bugs": {
     "url": "https://github.com/jogoossens/com.goossens.toshibaestia/issues"
+  },
+  "api": {
+    "getMeters": {
+      "method": "GET",
+      "path": "/meters"
+    },
+    "getLinks": {
+      "method": "GET",
+      "path": "/links"
+    },
+    "setLink": {
+      "method": "PUT",
+      "path": "/links"
+    }
   },
   "flow": {
     "triggers": [

@@ -20,6 +20,23 @@
     "detect_water": "compresor por temperaturas del agua",
     "detect_frequency": "frecuencia del compresor medida",
     "calibrated": "calibrado con CT",
-    "from_databook": "del Data Book"
+    "from_databook": "del Data Book",
+    "measured_by": "medido por __name__",
+    "estimate_now": "estimación ahora __watts__ W",
+    "meter_unavailable": "medidor __name__ no disponible, se usa la estimación"
+  },
+  "settings": {
+    "subtitle": "Ajustes generales de la app. La conexión (IP, puerto, ID de unidad, intervalo, funciones) se configura en los ajustes de cada bomba de calor.",
+    "meter_legend": "Medidor de energía externo",
+    "meter_help": "¿Ya mides una bomba de calor con un medidor de energía aparte en Homey (por ejemplo un Shelly EM en su circuito)? Elígelo aquí. La bomba de calor mostrará entonces la potencia y el consumo medidos en lugar de la estimación; la estimación sigue funcionando para comparar y toma el relevo si el medidor no está disponible. Después, en Homey Energy, incluye la bomba de calor y excluye el medidor, para que nada se cuente dos veces.",
+    "meter_none": "Ninguno (usar la estimación)",
+    "meter_no_pumps": "Aún no se ha añadido ninguna bomba de calor.",
+    "meter_saved": "Medidor guardado.",
+    "meter_error": "No se pudo guardar el medidor: ",
+    "diag_legend": "Diagnóstico",
+    "debug_label": "Registro Modbus detallado",
+    "debug_help": "Escribe cada petición y respuesta Modbus en el registro de la app. Útil en una instalación nueva; desactívalo cuando todo funcione.",
+    "save": "Guardar",
+    "saved": "Guardado."
   }
 }

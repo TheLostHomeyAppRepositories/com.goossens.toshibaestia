@@ -20,6 +20,23 @@
     "detect_water": "compresseur via températures de l'eau",
     "detect_frequency": "fréquence du compresseur mesurée",
     "calibrated": "étalonné avec CT",
-    "from_databook": "d'après le Data Book"
+    "from_databook": "d'après le Data Book",
+    "measured_by": "mesuré par __name__",
+    "estimate_now": "estimation actuelle __watts__ W",
+    "meter_unavailable": "compteur __name__ indisponible, l'estimation est utilisée"
+  },
+  "settings": {
+    "subtitle": "Réglages généraux de l'app. La connexion (IP, port, ID d'unité, intervalle, fonctions) se règle dans les réglages de chaque pompe à chaleur.",
+    "meter_legend": "Compteur d'énergie externe",
+    "meter_help": "Vous mesurez déjà une pompe à chaleur avec un compteur d'énergie séparé dans Homey (par exemple un Shelly EM sur son circuit) ? Choisissez-le ici. La pompe à chaleur affiche alors la puissance et la consommation mesurées au lieu de l'estimation ; l'estimation continue en parallèle pour comparaison et prend le relais si le compteur est indisponible. Ensuite, dans Homey Energy, incluez la pompe à chaleur et excluez le compteur, pour que rien ne soit compté deux fois.",
+    "meter_none": "Aucun (utiliser l'estimation)",
+    "meter_no_pumps": "Aucune pompe à chaleur ajoutée.",
+    "meter_saved": "Compteur enregistré.",
+    "meter_error": "Le compteur n'a pas pu être enregistré : ",
+    "diag_legend": "Diagnostic",
+    "debug_label": "Journal Modbus détaillé",
+    "debug_help": "Écrit chaque requête et réponse Modbus dans le journal de l'app. Utile pour une nouvelle installation ; désactivez-le quand tout fonctionne.",
+    "save": "Enregistrer",
+    "saved": "Enregistré."
   }
 }

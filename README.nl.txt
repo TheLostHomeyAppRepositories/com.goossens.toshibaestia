@@ -4,6 +4,6 @@ Vereist een Toshiba BMS-IFMB0UEW-E (of vergelijkbaar) Modbus RTU-interface die i
 
 Ondersteunt R410A 4 Series WM, R410A 5 Series WM en R32 1/2 Series (WM en AIO) Estia hydro-eenheden. Enkelvoudige of dubbele zone-installaties, met of zonder een boiler voor huishoudelijk warm water — schakel elke optie in de apparaatinstellingen en alleen de relevante mogelijkheden worden weergegeven.
 
-De app schat ook het elektrische vermogen en verbruik van de warmtepomp (een berekening, geen meting). Meet je de warmtepomp al met een eigen energiemeter in Homey, bijvoorbeeld een Shelly EM? Sluit dit toestel dan in zijn instellingen uit van Homey Energy, zodat het verbruik niet dubbel telt.
+De app schat ook het elektrische vermogen en verbruik van de warmtepomp (een berekening, geen meting). Meet je de warmtepomp al met een eigen energiemeter in Homey, bijvoorbeeld een Shelly EM? Kies die meter op de instellingenpagina van de app: de warmtepomp toont dan het gemeten vermogen en verbruik. Laat in Homey Energy de warmtepomp meetellen en sluit de meter uit, zodat niets dubbel telt.
 
 Toshiba en Estia zijn handelsmerken van Toshiba Corporation. Dit is een door de community ontwikkelde app en is niet gelieerd aan of goedgekeurd door Toshiba.
