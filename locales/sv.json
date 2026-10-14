@@ -27,7 +27,8 @@
     "test_no_meter": "Ingen extern mätare kopplad. Välj en via Reparera eller på appens inställningssida.",
     "meter_missing": "Den kopplade energimätaren finns inte längre (borttagen eller parkopplad på nytt). Välj den igen via Reparera eller på appens inställningssida; tills dess används uppskattningen.",
     "test_unavailable": "Mätare __name__ är inte tillgänglig just nu; uppskattningen används.",
-    "tested": "testad __time__"
+    "tested": "testad __time__",
+    "meter_in_use": "Den här mätaren är redan kopplad till __name__. En mätare kan bara mäta en värmepump, annars räknar Homey Energy den dubbelt."
   },
   "settings": {
     "subtitle": "Allmänna appinställningar. Anslutningen (IP, port, enhets-ID, intervall, funktioner) ställs in i varje värmepumps enhetsinställningar.",

@@ -27,7 +27,8 @@
     "test_no_meter": "No hay ningún medidor externo vinculado. Elige uno con Reparar o en la página de ajustes de la app.",
     "meter_missing": "El medidor de energía vinculado ya no existe (eliminado o emparejado de nuevo). Vuelve a elegirlo con Reparar o en la página de ajustes de la app; hasta entonces se usa la estimación.",
     "test_unavailable": "El medidor __name__ no está disponible ahora; se usa la estimación.",
-    "tested": "probado __time__"
+    "tested": "probado __time__",
+    "meter_in_use": "Este medidor ya está vinculado a __name__. Un medidor solo puede medir una bomba de calor; si no, Homey Energy lo cuenta dos veces."
   },
   "settings": {
     "subtitle": "Ajustes generales de la app. La conexión (IP, puerto, ID de unidad, intervalo, funciones) se configura en los ajustes de cada bomba de calor.",

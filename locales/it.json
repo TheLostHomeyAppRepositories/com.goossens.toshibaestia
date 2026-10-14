@@ -27,7 +27,8 @@
     "test_no_meter": "Nessun contatore esterno collegato. Sceglilo con Ripara o nella pagina delle impostazioni dell'app.",
     "meter_missing": "Il contatore di energia collegato non esiste più (rimosso o abbinato di nuovo). Sceglilo di nuovo con Ripara o nella pagina delle impostazioni dell'app; fino ad allora si usa la stima.",
     "test_unavailable": "Il contatore __name__ non è disponibile ora; si usa la stima.",
-    "tested": "testato __time__"
+    "tested": "testato __time__",
+    "meter_in_use": "Questo contatore è già collegato a __name__. Un contatore può misurare una sola pompa di calore, altrimenti Homey Energy lo conta due volte."
   },
   "settings": {
     "subtitle": "Impostazioni generali dell'app. La connessione (IP, porta, ID unità, intervallo, funzioni) si imposta nelle impostazioni di ogni pompa di calore.",

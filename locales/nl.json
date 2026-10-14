@@ -27,7 +27,8 @@
     "test_no_meter": "Geen externe meter gekoppeld. Kies er een via Repareren of op de instellingenpagina van de app.",
     "meter_missing": "De gekoppelde energiemeter bestaat niet meer (verwijderd of opnieuw gekoppeld). Kies hem opnieuw via Repareren of op de instellingenpagina van de app; tot dan wordt de schatting gebruikt.",
     "test_unavailable": "Meter __name__ is nu niet beschikbaar; de schatting wordt gebruikt.",
-    "tested": "getest __time__"
+    "tested": "getest __time__",
+    "meter_in_use": "Deze meter is al gekoppeld aan __name__. Eén meter kan maar één warmtepomp meten, anders telt Homey Energy hem dubbel."
   },
   "settings": {
     "subtitle": "Algemene app-instellingen. De verbinding (IP, poort, unit-ID, pollinterval, functies) stel je in bij elke warmtepomp, in de instellingen van het toestel.",

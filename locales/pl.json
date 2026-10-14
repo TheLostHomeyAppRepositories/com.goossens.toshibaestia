@@ -27,7 +27,8 @@
     "test_no_meter": "Nie połączono zewnętrznego licznika. Wybierz go przez Napraw lub na stronie ustawień aplikacji.",
     "meter_missing": "Połączony licznik energii już nie istnieje (usunięty lub sparowany ponownie). Wybierz go ponownie przez Napraw lub na stronie ustawień aplikacji; do tego czasu używany jest szacunek.",
     "test_unavailable": "Licznik __name__ jest teraz niedostępny; używany jest szacunek.",
-    "tested": "przetestowano __time__"
+    "tested": "przetestowano __time__",
+    "meter_in_use": "Ten licznik jest już połączony z __name__. Jeden licznik może mierzyć tylko jedną pompę ciepła, inaczej Homey Energy policzy go podwójnie."
   },
   "settings": {
     "subtitle": "Ogólne ustawienia aplikacji. Połączenie (IP, port, ID jednostki, interwał, funkcje) ustawiasz w ustawieniach każdej pompy ciepła.",

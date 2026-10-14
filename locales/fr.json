@@ -27,7 +27,8 @@
     "test_no_meter": "Aucun compteur externe lié. Choisissez-en un via Réparer ou sur la page de réglages de l'app.",
     "meter_missing": "Le compteur d'énergie lié n'existe plus (supprimé ou appairé à nouveau). Choisissez-le à nouveau via Réparer ou sur la page de réglages de l'app ; en attendant, l'estimation est utilisée.",
     "test_unavailable": "Le compteur __name__ est indisponible pour l'instant ; l'estimation est utilisée.",
-    "tested": "testé __time__"
+    "tested": "testé __time__",
+    "meter_in_use": "Ce compteur est déjà lié à __name__. Un compteur ne peut mesurer qu'une seule pompe à chaleur, sinon Homey Energy le compte deux fois."
   },
   "settings": {
     "subtitle": "Réglages généraux de l'app. La connexion (IP, port, ID d'unité, intervalle, fonctions) se règle dans les réglages de chaque pompe à chaleur.",

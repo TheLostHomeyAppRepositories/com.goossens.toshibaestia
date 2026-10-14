@@ -27,7 +27,8 @@
     "test_no_meter": "Kein externer Zähler verknüpft. Wähle einen über Reparieren oder auf der Einstellungsseite der App.",
     "meter_missing": "Der verknüpfte Energiezähler existiert nicht mehr (entfernt oder neu angelernt). Wähle ihn erneut über Reparieren oder auf der Einstellungsseite der App; bis dahin wird die Schätzung verwendet.",
     "test_unavailable": "Zähler __name__ ist gerade nicht verfügbar; die Schätzung wird verwendet.",
-    "tested": "getestet __time__"
+    "tested": "getestet __time__",
+    "meter_in_use": "Dieser Zähler ist bereits mit __name__ verknüpft. Ein Zähler kann nur eine Wärmepumpe messen, sonst zählt Homey Energy ihn doppelt."
   },
   "settings": {
     "subtitle": "Allgemeine App-Einstellungen. Die Verbindung (IP, Port, Unit-ID, Abfrageintervall, Funktionen) stellst du in den Geräteeinstellungen jeder Wärmepumpe ein.",

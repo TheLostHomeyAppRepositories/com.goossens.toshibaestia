@@ -27,7 +27,8 @@
     "test_no_meter": "Ingen ekstern måler er koblet til. Velg en via Reparer eller på appens innstillingsside.",
     "meter_missing": "Den tilkoblede energimåleren finnes ikke lenger (fjernet eller paret på nytt). Velg den igjen via Reparer eller på appens innstillingsside; inntil da brukes anslaget.",
     "test_unavailable": "Måler __name__ er ikke tilgjengelig nå; anslaget brukes.",
-    "tested": "testet __time__"
+    "tested": "testet __time__",
+    "meter_in_use": "Denne måleren er allerede koblet til __name__. Én måler kan bare måle én varmepumpe, ellers teller Homey Energy den to ganger."
   },
   "settings": {
     "subtitle": "Generelle appinnstillinger. Tilkoblingen (IP, port, enhets-ID, intervall, funksjoner) stilles inn i hver varmepumpes enhetsinnstillinger.",

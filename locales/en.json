@@ -27,7 +27,8 @@
     "test_no_meter": "No external meter linked. Pick one via Repair or on the app settings page.",
     "meter_missing": "The linked energy meter no longer exists (removed or paired again). Pick it again via Repair or on the app settings page; until then the estimate is used.",
     "test_unavailable": "Meter __name__ is unavailable right now; the estimate is used.",
-    "tested": "tested __time__"
+    "tested": "tested __time__",
+    "meter_in_use": "This meter is already linked to __name__. One meter can measure only one heat pump, otherwise Homey Energy counts it twice."
   },
   "settings": {
     "subtitle": "Global app settings. Connection details (IP, port, unit ID, poll interval, features) are in each heat pump's device settings.",

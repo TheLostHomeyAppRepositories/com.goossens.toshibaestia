@@ -342,6 +342,8 @@ export default class HeatpumpDevice extends Homey.Device {
   /** True while the linked meter device no longer exists; shown as device warning. Null until first checked. */
   private meterMissing: boolean | null = null;
   private meterOpenedMs = 0;
+  /** Whether the power titles currently say measured (true) or estimated (false); null until first set. */
+  private powerMeasured: boolean | null = null;
   private lastPowerSample: PowerSample | null = null;
   // Heater-hours reconciliation: the heater time counted since the counter last ticked, and
   // how much of that period the app was actually polling (gaps over 5 min don't count).
@@ -435,6 +437,11 @@ export default class HeatpumpDevice extends Homey.Device {
 
   /** Links a meter (any Homey device with measure_power) or unlinks it with null. */
   public async setExternalMeter(meterId: string | null): Promise<void> {
+    // One meter per heat pump: linked to two, Homey Energy would count it twice.
+    const other = meterId
+      ? (this.driver.getDevices() as HeatpumpDevice[]).find((d) => d !== this && d.getExternalMeterId() === meterId)
+      : undefined;
+    if (other) throw new Error(this.homey.__('power.meter_in_use', { name: other.getName() }));
     await this.setStoreValue('externalMeterId', meterId);
     await this.applyExternalMeter();
   }
@@ -507,7 +514,7 @@ export default class HeatpumpDevice extends Homey.Device {
         if (!(missing && this.meterMissing)) this.error('External meter could not be opened', err);
       }
     }
-    await this.applyPowerCapabilityOptions(this.meterLink !== null);
+    await this.applyPowerCapabilityOptions(this.meterLink?.usable ?? false);
     let externalMeter = this.homey.__('settings.meter_none');
     if (missing) externalMeter = this.homey.__('settings.meter_missing_option');
     else if (meterId) externalMeter = this.meterLink?.name ?? this.homey.__('power.meter_unavailable', { name: '?' });
@@ -517,6 +524,7 @@ export default class HeatpumpDevice extends Homey.Device {
 
   /** Titles and Homey's isApproximated flag follow whether power is measured or estimated. */
   private async applyPowerCapabilityOptions(measured: boolean): Promise<void> {
+    this.powerMeasured = measured;
     const options: Array<[string, Record<string, string>]> = measured
       ? [['measure_power', MEASURED_TITLES.power], ['meter_power', MEASURED_TITLES.energy]]
       : [['measure_power', ESTIMATED_TITLES.power], ['meter_power', ESTIMATED_TITLES.energy]];
@@ -1025,6 +1033,8 @@ export default class HeatpumpDevice extends Homey.Device {
     const heaterBackfillKwh = this.reconcileHeaterHours(snapshot[REGISTERS.backupHeaterHours.number], reading.heaterW, sample.timeMs, s);
     await this.refreshExternalMeter();
     const meter = this.meterLink?.usable ? this.meterLink : null;
+    // Titles and Homey's isApproximated flag follow what is shown now: the meter, or the estimate while it is out.
+    if ((meter !== null) !== this.powerMeasured) await this.applyPowerCapabilityOptions(meter !== null);
     const intervalMs = this.lastPower ? sample.timeMs - this.lastPower.timeMs : 0;
     let watts: number;
     if (meter) {
