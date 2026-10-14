@@ -278,7 +278,9 @@ modbus-serial's `client.isOpen` is unreliable for half-closed sockets — it onl
 > Homey (e.g. a Shelly EM on its circuit), the user should exclude this device from Energy, or Homey counts it twice
 > (seen 2026-10-14 on Jo's Homey). README (13 languages) says so.
 >
-> **External meter (1.2.0):** the app settings page lets the user link any appliance meter (a device with
+> **External meter (1.2.0):** like Cortex AI's brains, two ways to edit: **Repair** on the heat pump (custom view
+> `repair/external_meter.html`, `onRepair` handlers `init`/`save`) and the app settings page; a read-only device
+> setting `externalMeter` shows the linked meter and its hint explains both. The app settings page lets the user link any appliance meter (a device with
 > `measure_power`, not cumulative / home battery / solar / this app) to a heat pump. The app reads it with
 > `homey-api` (`HomeyAPI.createAppAPI`, permission `homey:manager:api`) once per poll via `getDevice` — the
 > realtime `makeCapabilityInstance` route did not deliver updates inside the app. While usable, `measure_power`

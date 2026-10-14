@@ -185,6 +185,22 @@ export default class HeatpumpDriver extends Homey.Driver {
     session.setHandler('list_devices', async () => this.buildListDevices(this.pairState));
   }
 
+  /**
+   * Repair: pick the external energy meter of this heat pump (custom view repair/external_meter.html).
+   * The same choice is on the app settings page.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async onRepair(session: any, device: any): Promise<void> {
+    session.setHandler('init', async () => ({
+      name: device.getName(),
+      meterId: device.getExternalMeterId(),
+      meters: await this.app.listMeters(),
+    }));
+    session.setHandler('save', async (data: { meterId?: string | null }) => {
+      await device.setExternalMeter(data?.meterId || null);
+    });
+  }
+
   /** Test the connection and decode identity registers. */
   private async probe(state: PairState): Promise<ProbeResult> {
     try {

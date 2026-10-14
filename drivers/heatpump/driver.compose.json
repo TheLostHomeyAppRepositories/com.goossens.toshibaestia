@@ -410,5 +410,10 @@
     {
       "id": "features"
     }
+  ],
+  "repair": [
+    {
+      "id": "external_meter"
+    }
   ]
 }

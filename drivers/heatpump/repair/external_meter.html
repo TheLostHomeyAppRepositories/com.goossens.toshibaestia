@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Toshiba Estia</title>
+  <style>
+    .homey-form-group { margin-bottom: .75em; }
+    #status { margin-top: .75em; font-size: .9em; }
+  </style>
+</head>
+<body>
+  <header class="homey-header">
+    <h1 class="homey-title" data-i18n="settings.meter_legend"></h1>
+    <p class="homey-subtitle" data-i18n="settings.meter_help"></p>
+  </header>
+
+  <fieldset class="homey-form-fieldset">
+    <div class="homey-form-group">
+      <label id="device-name" class="homey-form-label" for="meter"></label>
+      <select id="meter" class="homey-form-select"></select>
+    </div>
+  </fieldset>
+
+  <button id="save" class="homey-button-primary-full" data-i18n="settings.save"></button>
+  <div id="status" class="homey-text"></div>
+
+  <script type="text/javascript">
+    // Repair view: pick the external energy meter of this heat pump (same choice as on the app settings page).
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      el.textContent = Homey.__(el.getAttribute('data-i18n'));
+    });
+    const select = document.getElementById('meter');
+    const saveEl = document.getElementById('save');
+
+    Homey.emit('init').then(function(data) {
+      document.getElementById('device-name').textContent = data.name;
+      const none = document.createElement('option');
+      none.value = '';
+      none.textContent = Homey.__('settings.meter_none');
+      select.appendChild(none);
+      data.meters.forEach(function(meter) {
+        const option = document.createElement('option');
+        option.value = meter.id;
+        option.textContent = meter.name;
+        select.appendChild(option);
+      });
+      select.value = data.meterId || '';
+    }).catch(function(err) {
+      Homey.alert(err.message || String(err));
+    });
+
+    saveEl.addEventListener('click', function() {
+      saveEl.disabled = true;
+      Homey.emit('save', { meterId: select.value || null }).then(function() {
+        Homey.done();
+      }).catch(function(err) {
+        saveEl.disabled = false;
+        Homey.alert(Homey.__('settings.meter_error') + (err.message || String(err)));
+      });
+    });
+  </script>
+</body>
+</html>

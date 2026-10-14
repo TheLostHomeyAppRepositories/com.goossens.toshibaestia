@@ -66,7 +66,8 @@ interface DeviceSettings {
   ctCurrentA?: number;         // calibration: CT current read on the remote during a run
   sgHeaterAllowed?: boolean;   // DN 6CE = 0: backup heater allowed in SG Ready "System Forced ON"
   lastCalibration?: string;    // read-only: the latest calibration and its operating point
-  powerStatus?: string;        // read-only: flow in use + how the compressor is detected
+  powerStatus?: string;
+  externalMeter?: string;       // read-only: the linked meter (repair / app settings page)        // read-only: flow in use + how the compressor is detected
   detectedSeries?: string;
   detectedSlaveAddress?: string;
   detectedBaudRate?: string;
@@ -458,6 +459,8 @@ export default class HeatpumpDevice extends Homey.Device {
       }
     }
     await this.applyPowerCapabilityOptions(this.meterLink !== null);
+    const externalMeter = meterId ? (this.meterLink?.name ?? this.homey.__('power.meter_unavailable', { name: '?' })) : this.homey.__('settings.meter_none');
+    await this.setSettings({ externalMeter }).catch((err) => this.error('setSettings externalMeter', err));
   }
 
   /** Titles and Homey's isApproximated flag follow whether power is measured or estimated. */
