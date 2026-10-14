@@ -24,6 +24,7 @@ import {
   PowerEstimator,
   RefrigerantSensorCheck,
   compressorCm3FromCurrent,
+  compressionTempsC,
   energyKwh,
   type LearntState,
   type PowerConfig,
@@ -100,24 +101,43 @@ const seasonConfig = (s: DeviceSettings): SeasonConfig => ({
  * compressorCm3: the frequency model's constant = compressor displacement ÷ overall
  * efficiency. Displacements from the service manual's parts list (Toshiba's model number
  * is the displacement in 0.1 cm³): DX150 (401/601) 15.0, NX220 (801/1101 1-phase) 22.0,
- * DX380 / RX380 (1401, and the 3-phase H8W units) 38.0 cm³. Efficiency 0.75, measured
- * on an 1101 (CT current and house-meter steps, AGENTS.md § 7). R410A units only get
- * it by calibration (ctCurrentA).
+ * DX380 / RX380 (1401, and the 3-phase H8W units) 38.0 cm³. Efficiency 0.77, measured
+ * on an 1101 HW with a power meter (Shelly Pro EM-50, 2026-10-13: hot water at 28–80 Hz
+ * and floor heating, ±4 % per steady poll) with the condensing temperature of
+ * compressionTempsC() and the aux draw below counted apart (AGENTS.md § 7). Before
+ * 2026-10-14: 0.75 against TC alone, which read 20–30 % low in floor heating. R410A units
+ * only get it by calibration (ctCurrentA).
+ *
+ * aux: the unit's own draw, from the ErP tables (installation manual 2F30151001_05
+ * p. 37–39): standbyW = P_SB + INTERFACE_W (the Modbus interface and remote controller
+ * aren't in P_SB), runAuxW = P_TO − P_SB (water pump and outdoor fan), preheatW =
+ * compressor-winding preheat in frost (service manual AE0-2101W p. 104: 40 W single-phase,
+ * 50 W three-phase). Measured on an 1101 HW (Shelly Pro EM-50, 2026-10-13): 12–27 W
+ * standby (P_SB 7 W), ~47 W with only the pump running. R410A units: no ErP data at
+ * hand, so the R32 11 kW values (DEFAULT_AUX).
  *
  * NOTE: backup heater wattage is NOT here — it's an installation choice
  * (3/6/9 kW typically) and lives in its own settings dropdown.
  */
-const MODEL_PRESETS: Record<string, { capacityKw: number; heatInputKw: number; tables?: string; compressorCm3?: number }> = {
+interface Aux { standbyW: number; runAuxW: number; preheatW: number }
+const INTERFACE_W = 15;
+const aux = (pSbW: number, pToW: number, preheatW: number): Aux => ({ standbyW: pSbW + INTERFACE_W, runAuxW: pToW - pSbW, preheatW });
+const AUX_401_601 = aux(8, 40, 40);
+const AUX_801_1101 = aux(7, 49, 40);
+const AUX_1401 = aux(11, 52, 40);
+const AUX_3PH = aux(11, 52, 50);
+const DEFAULT_AUX = AUX_801_1101;
+const MODEL_PRESETS: Record<string, { capacityKw: number; heatInputKw: number; tables?: string; compressorCm3?: number; aux?: Aux }> = {
   // R32 1 Series (F21 indoor) and 2 Series (S21 indoor) share the same outdoor
   // units (HWT-_HW-E codes) and the same compressor → identical input ratings.
   // One entry per kW class; covers both generations.
-  'r32-s1-401':   { capacityKw: 4,   heatInputKw: 0.77, tables: '401', compressorCm3: 20.0 },  // outdoor HWT-401HW-E, DX150
-  'r32-s1-601':   { capacityKw: 6,   heatInputKw: 1.25, tables: '601', compressorCm3: 20.0 },  // outdoor HWT-601HW-E, DX150
-  'r32-s1-801':   { capacityKw: 8,   heatInputKw: 1.54, tables: '801', compressorCm3: 29.3 },  // outdoor HWT-801HW-E, NX220
-  'r32-s1-1101':  { capacityKw: 11,  heatInputKw: 2.39, tables: '1101', compressorCm3: 29.3 }, // outdoor HWT-1101HW-E (e.g. F21SM3 / S21SM3), NX220
-  'r32-s1-801-3ph':  { capacityKw: 8,  heatInputKw: 1.54, tables: '801', compressorCm3: 50.7 },  // outdoor HWT-801H8W-E, RX380
-  'r32-s1-1101-3ph': { capacityKw: 11, heatInputKw: 2.39, tables: '1101', compressorCm3: 50.7 }, // outdoor HWT-1101H8W-E, RX380
-  'r32-s1-1401':  { capacityKw: 14,  heatInputKw: 3.04, compressorCm3: 50.7 }, // outdoor HWT-1401H(8)W-E, DX380 / RX380 (not in the Data Book tables)
+  'r32-s1-401':   { capacityKw: 4,   heatInputKw: 0.77, tables: '401', compressorCm3: 19.5, aux: AUX_401_601 },  // outdoor HWT-401HW-E, DX150
+  'r32-s1-601':   { capacityKw: 6,   heatInputKw: 1.25, tables: '601', compressorCm3: 19.5, aux: AUX_401_601 },  // outdoor HWT-601HW-E, DX150
+  'r32-s1-801':   { capacityKw: 8,   heatInputKw: 1.54, tables: '801', compressorCm3: 28.6, aux: AUX_801_1101 },  // outdoor HWT-801HW-E, NX220
+  'r32-s1-1101':  { capacityKw: 11,  heatInputKw: 2.39, tables: '1101', compressorCm3: 28.6, aux: AUX_801_1101 }, // outdoor HWT-1101HW-E (e.g. F21SM3 / S21SM3), NX220
+  'r32-s1-801-3ph':  { capacityKw: 8,  heatInputKw: 1.54, tables: '801', compressorCm3: 49.4, aux: AUX_3PH },  // outdoor HWT-801H8W-E, RX380
+  'r32-s1-1101-3ph': { capacityKw: 11, heatInputKw: 2.39, tables: '1101', compressorCm3: 49.4, aux: AUX_3PH }, // outdoor HWT-1101H8W-E, RX380
+  'r32-s1-1401':  { capacityKw: 14,  heatInputKw: 3.04, compressorCm3: 49.4, aux: AUX_1401 }, // outdoor HWT-1401H(8)W-E, DX380 / RX380 (not in the Data Book tables); preheat 40 W (H8W: 50 W)
   // R410A Series 5 (2017-2021)
   'r410a-s5-455': { capacityKw: 4.5, heatInputKw: 0.92 },
   'r410a-s5-805': { capacityKw: 8,   heatInputKw: 1.79 },
@@ -710,6 +730,7 @@ export default class HeatpumpDevice extends Homey.Device {
       compressorCm3: (s.modelKey ?? DEFAULT_MODEL).startsWith('r32')
         ? (this.getStoreValue('compressorCm3') as number | null) ?? preset.compressorCm3 ?? null
         : null,
+      ...(preset.aux ?? DEFAULT_AUX),
     };
   }
 
@@ -723,9 +744,8 @@ export default class HeatpumpDevice extends Homey.Device {
     if (!x || Date.now() - x.timeMs > 3 * 60_000 || !x.compressorHz || x.evaporatorC == null || x.condensingC == null) {
       throw new Error(this.homey.__('error.ct_not_running'));
     }
-    const cm3 = compressorCm3FromCurrent(
-      currentA, x.compressorHz, Math.min(x.evaporatorC, x.condensingC), Math.max(x.evaporatorC, x.condensingC),
-    );
+    const [evaporating, condensing] = compressionTempsC(x.evaporatorC, x.condensingC, x.twoC);
+    const cm3 = compressorCm3FromCurrent(currentA, x.compressorHz, evaporating, condensing);
     if (cm3 == null || cm3 < 5 || cm3 > 100) throw new Error(this.homey.__('error.ct_implausible'));
     this.log(`Calibrated from CT ${currentA} A at ${x.compressorHz} Hz, TE ${x.evaporatorC}, TC ${x.condensingC}: ${cm3.toFixed(1)} cm³`);
     // Keep every calibration with its operating point: comparing them (summer hot water,

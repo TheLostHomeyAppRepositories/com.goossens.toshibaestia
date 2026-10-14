@@ -24,6 +24,10 @@
  *    from domestic-hot-water runs (tank volume × ΔTTW). Both the learnt flow and the
  *    tables' COP proved optimistic on a measured unit — see AGENTS.md § 7.
  *
+ * On top of either: the unit's own draw — standby (controls, interface, remote), water pump
+ * and outdoor fan while the compressor runs, and the compressor-winding preheat in frost —
+ * from the ErP data per outdoor unit.
+ *
  * Pure module — no Homey imports — so it can be replayed against recorded data.
  * See AGENTS.md § 7 for the design notes and the validation data.
  */
@@ -88,6 +92,18 @@ export interface PowerConfig {
    * when unknown (the water model is used then).
    */
   compressorCm3?: number | null;
+  /**
+   * Draw (W) while the compressor stands still: controls, Modbus interface and remote
+   * controller. Omitted = 0, as in replays against a house meter that can't see it.
+   */
+  standbyW?: number;
+  /** Extra draw (W) while the compressor runs: water pump and outdoor fan. */
+  runAuxW?: number;
+  /**
+   * Compressor-winding preheat (W) while stopped in frost — the Estia has no crankcase
+   * heater; the inverter warms the winding instead (service manual AE0-2101W p. 104).
+   */
+  preheatW?: number;
 }
 
 export type Activity = 'idle' | 'dhw' | 'heating' | 'cooling';
@@ -97,6 +113,8 @@ export interface PowerReading {
   compressorW: number;
   heaterW: number;
   immersionW: number;
+  /** Standby, pump and fan, and winding preheat (PowerConfig standbyW / runAuxW / preheatW). */
+  auxW: number;
   thermalW: number;
   activity: Activity;
   compressorOn: boolean;
@@ -132,6 +150,18 @@ const MODELS = (tables as unknown as { models: Record<string, ModelTables> }).mo
 const R32_SAT_C = [-30, -20, -10, 0, 10, 20, 30, 40, 50, 60, 70];
 const R32_SAT_MPA = [0.273, 0.406, 0.581, 0.813, 1.107, 1.474, 1.927, 2.478, 3.140, 3.927, 4.855];
 const POLYTROPIC_N = 1.2;
+// In heating and hot water, TC sits on the liquid line after the plate heat exchanger
+// (service manual AE0-2101W p. 29): it reads subcooled liquid, which leaves at the
+// return-water end and can be colder than the leaving water (seen: TC 28 °C at TWO 32 °C
+// in floor heating). The refrigerant condenses above the leaving water; literature and
+// field data put that approach at 1–5.6 K. 3 K matched the measured input within ±5 %
+// at both 28 and 60 °C condensing (AGENTS.md § 7).
+export const CONDENSING_APPROACH_K = 3;
+// Winding preheat: when TO ≤ −1 °C (and TD < 30 °C), 10 min on / 5 min off down to −3 °C,
+// continuously below (service manual AE0-2101W p. 104).
+const PREHEAT_ON_C = -1;
+const PREHEAT_CONTINUOUS_C = -3;
+const PREHEAT_DUTY = 10 / 15;
 
 /** R32 saturation pressure (Pa) at a temperature, interpolated in ln(p) over 1/T. */
 export function r32SaturationPa(tempC: number): number {
@@ -153,6 +183,19 @@ export function compressionWorkJPerM3(evaporatingC: number, condensingC: number)
   const p2 = r32SaturationPa(Math.max(condensingC, evaporatingC));
   const k = (POLYTROPIC_N - 1) / POLYTROPIC_N;
   return (1 / k) * p1 * ((p2 / p1) ** k - 1);
+}
+
+/**
+ * Evaporating and condensing temperature for the compression work. Heating and hot water
+ * (TC above TE): TE evaporates, and the refrigerant condenses at TC or CONDENSING_APPROACH_K
+ * above the leaving water, whichever is higher. Cooling and defrost reverse the cycle: the
+ * outdoor coil (TE) condenses, the plate heat exchanger (TC) evaporates.
+ */
+export function compressionTempsC(evaporatorC: number, condensingC: number, waterOutC: number | null): [number, number] {
+  if (condensingC >= evaporatorC) {
+    return [evaporatorC, waterOutC == null ? condensingC : Math.max(condensingC, waterOutC + CONDENSING_APPROACH_K)];
+  }
+  return [condensingC, evaporatorC];
 }
 
 /** Electrical input (W) of the compressor from its frequency (frequency model). */
@@ -390,8 +433,10 @@ export class PowerEstimator {
       while (this.tankHistory.length > 0 && s.timeMs - this.tankHistory[0].t > 10 * 60_000) this.tankHistory.shift();
     }
 
+    const idleAuxKw = this.auxKw(s, false);
     const idle: PowerReading = {
-      watts: 0, compressorW: 0, heaterW: 0, immersionW: 0, thermalW: 0, activity: 'idle', compressorOn: false, detection: 'water', waterSaysOn: false, backfillKwh: 0,
+      watts: Math.round(idleAuxKw * 1000), compressorW: 0, heaterW: 0, immersionW: 0, auxW: Math.round(idleAuxKw * 1000),
+      thermalW: 0, activity: 'idle', compressorOn: false, detection: 'water', waterSaysOn: false, backfillKwh: 0,
     };
     if (s.twiC == null || s.twoC == null) return idle;
     const rawDt = s.twoC - s.twiC;
@@ -437,9 +482,7 @@ export class PowerEstimator {
     const mode = activity === 'cooling' ? 'cooling' : 'heating';
     let compressorKw: number;
     if (detection === 'frequency') {
-      // Heating: TE evaporates, TC condenses; cooling and defrost reverse the cycle.
-      const low = Math.min(s.evaporatorC!, s.condensingC!);
-      const high = Math.max(s.evaporatorC!, s.condensingC!);
+      const [low, high] = compressionTempsC(s.evaporatorC!, s.condensingC!, s.twoC);
       compressorKw = frequencyModelWatts(this.config.compressorCm3!, s.compressorHz!, low, high) / 1000;
     } else {
       compressorKw = compressorOn ? compressorInputKw(this.config, mode, thermalKw, outdoor, s.twoC) : 0;
@@ -520,12 +563,14 @@ export class PowerEstimator {
 
     this.learnFlow(s, activity, compressorOn, heaterKw > 0);
 
-    const watts = Math.round((compressorKw + heaterKw + immersionKw) * 1000);
+    const auxKw = this.auxKw(s, compressorOn);
+    const watts = Math.round((compressorKw + heaterKw + immersionKw + auxKw) * 1000);
     return {
       watts,
       compressorW: Math.round(compressorKw * 1000),
       heaterW: Math.round(heaterKw * 1000),
       immersionW: Math.round(immersionKw * 1000),
+      auxW: Math.round(auxKw * 1000),
       thermalW: Math.round(thermalKw * 1000),
       activity,
       compressorOn,
@@ -533,6 +578,17 @@ export class PowerEstimator {
       waterSaysOn,
       backfillKwh,
     };
+  }
+
+  /** The unit's own draw (kW): standby, plus pump and fan while running, plus winding preheat in frost. */
+  private auxKw(s: PowerSample, compressorOn: boolean): number {
+    const { standbyW = 0, runAuxW = 0, preheatW = 0 } = this.config;
+    let w = standbyW;
+    if (compressorOn) w += runAuxW;
+    else if (preheatW > 0 && s.outdoorC != null && s.outdoorC <= PREHEAT_ON_C) {
+      w += s.outdoorC <= PREHEAT_CONTINUOUS_C ? preheatW : preheatW * PREHEAT_DUTY;
+    }
+    return w / 1000;
   }
 
   /**
@@ -660,7 +716,7 @@ const CHECK_COUNT_CAP = 1000;
  * R32 unit this was built on, but they're not in Toshiba's register list, so another
  * unit may put something else there. Trust them only once they behaved that way on this
  * unit: TE next to the outdoor temperature and 0 Hz while the water is quiet; TE well
- * away from outdoor, Hz above 0 and TC at or above the leaving water while the water
+ * away from outdoor, Hz above 0 and TC at or above the return water while the water
  * side shows a run. A constant or an outdoor-like value never passes both.
  */
 export class RefrigerantSensorCheck {
@@ -695,8 +751,10 @@ export class RefrigerantSensorCheck {
       this.state[key] = Math.min(CHECK_COUNT_CAP, this.state[key] + 1);
     };
     if (this.runStreak >= 3) {
-      // While heating, the refrigerant condenses at or above the leaving water (TC ≥ TWO − 3 K).
-      const tcOk = s.condensingC == null || s.twoC <= s.twiC || s.condensingC >= s.twoC - 3;
+      // While heating, TC reads the liquid leaving the plate heat exchanger at the return-water
+      // end: at or above the return (TWI), whole degrees allowing 2 K. Not TWO: in floor
+      // heating TC sits up to 5 K below the leaving water (2026-10-13).
+      const tcOk = s.condensingC == null || s.twoC <= s.twiC || s.condensingC >= s.twiC - 2;
       bump(away >= REFRIGERANT_ON_K && (hz == null || hz > 0) && tcOk ? 'runConfirm' : 'runMiss');
     } else if (away <= 2 && (hz == null ? waterDt <= 1 : hz === 0)) {
       // Standing water keeps TWI and TWO apart for hours; with a frequency, 0 Hz says idle.

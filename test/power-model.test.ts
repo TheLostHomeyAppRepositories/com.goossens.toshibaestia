@@ -18,10 +18,10 @@ import fs from 'fs';
 import path from 'path';
 import {
   PowerEstimator, PowerConfig, PowerSample, RefrigerantSensorCheck, compressorInputKw, energyKwh,
-  compressorCm3FromCurrent, frequencyModelWatts,
+  compressorCm3FromCurrent, frequencyModelWatts, compressionTempsC,
 } from '../drivers/heatpump/power-model';
 
-interface Row extends PowerSample { houseW: number }
+interface Row extends PowerSample { houseW: number; realW?: number }
 
 function load(file: string, evaporator: 'te' | 'none' | 'outdoor' | 'constant' = 'te'): Row[] {
   const lines = fs.readFileSync(path.join(__dirname, 'fixtures', file), 'utf8').trim().split(/\r?\n/);
@@ -46,6 +46,9 @@ function load(file: string, evaporator: 'te' | 'none' | 'outdoor' | 'constant' =
       condensingC: evaporator === 'te' ? num(c.tc) : null,
       compressorHz: evaporator === 'te' ? num(c.hz) : null,
       houseW: Number(c.houseW),
+      // Power-meter fixtures (2026-10-13): the boost flag (40009) and the heat pump's own meter.
+      ...(c.boost === undefined ? {} : { boostActive: c.boost === '1' }),
+      ...(c.realW === undefined ? {} : { realW: Number(c.realW) }),
     };
   });
 }
@@ -61,8 +64,8 @@ const R32_1101_AIO: PowerConfig = {
   tankLitres: 210,
 };
 
-/** Same unit with the frequency model: C from the CT reading and house-meter steps below. */
-const R32_1101_HZ: PowerConfig = { ...R32_1101_AIO, compressorCm3: 29.3 };
+/** Same unit with the frequency model: C = 22.0 cm³ / 0.77, measured with a power meter (see below). */
+const R32_1101_HZ: PowerConfig = { ...R32_1101_AIO, compressorCm3: 28.6 };
 
 const FIXTURE = 'r32s1-1101-dhw-2026-10-03.csv';
 const FIXTURE_HEATER = 'r32s1-1101-dhw-heater-2026-10-03.csv';
@@ -244,22 +247,27 @@ test('register 40028 is trusted only when it behaves like TE', () => {
 //   → 14.6 A × 235 V × 0.98 (Toshiba's power factor) = 3362 W;
 // - compressor stop, 2026-10-03 10:08:01 UTC: −1973 W in one poll at 45 Hz;
 // - 45 → 30 Hz, 2026-10-03 12:16:56 UTC: −678 W in one poll.
-// C = 29.3 cm³ is fitted on these three; the Data Book's maximum-frequency table gives
-// 33.5 cm³ for this model before scaling (see AGENTS.md § 7).
+// Until 2026-10-14 C was 29.3 cm³, fitted on these three with TC as the condensing
+// temperature. The power meter of 2026-10-13 (tests below) showed TC reads the liquid line
+// (up to 5 K under the leaving water in floor heating): with compressionTempsC() and the
+// aux draw apart, C = 22.0 / 0.77 = 28.6 cm³ — and the three still agree within ±6 %.
 
-test('frequency model: the three electrical references agree on one constant (±6 %)', () => {
-  const ct = 14.6 * 235 * 0.98;
-  assert.ok(Math.abs(frequencyModelWatts(29.3, 71, 13, 59) - ct) / ct < 0.06, `${frequencyModelWatts(29.3, 71, 13, 59).toFixed(0)} W vs CT ${ct.toFixed(0)} W`);
+test('frequency model: the earlier electrical references still agree (±6 %)', () => {
+  const temps = (te: number, tc: number, two: number | null) => compressionTempsC(te, tc, two);
+  const ct = 14.6 * 235 * 0.98; // CT = the whole outdoor unit, so the compressor alone sits a little lower
+  const [e1, c1] = temps(13, 59, 58);
+  assert.ok(Math.abs(frequencyModelWatts(28.6, 71, e1, c1) - ct) / ct < 0.06, `${frequencyModelWatts(28.6, 71, e1, c1).toFixed(0)} W vs CT ${ct.toFixed(0)} W`);
   const rows = load(FIXTURE);
   const stop = rows.filter((r) => r.timeMs < at('2026-10-03T10:08:01Z')).pop()!;
-  const atStop = frequencyModelWatts(29.3, stop.compressorHz!, stop.evaporatorC!, stop.condensingC!);
+  const atStop = frequencyModelWatts(28.6, stop.compressorHz!, ...temps(stop.evaporatorC!, stop.condensingC!, stop.twoC));
   assert.ok(Math.abs(atStop - 1973) / 1973 < 0.06, `${atStop.toFixed(0)} W vs step 1973 W at ${stop.compressorHz} Hz`);
   const heater = load(FIXTURE_HEATER);
   const before = heater.filter((r) => r.timeMs < at('2026-10-03T12:16:56Z')).pop()!;
-  const drop = frequencyModelWatts(29.3, 45, before.evaporatorC!, before.condensingC!) - frequencyModelWatts(29.3, 30, before.evaporatorC!, before.condensingC!);
+  const [e3, c3] = temps(before.evaporatorC!, before.condensingC!, before.twoC);
+  const drop = frequencyModelWatts(28.6, 45, e3, c3) - frequencyModelWatts(28.6, 30, e3, c3);
   assert.ok(Math.abs(drop - 678) / 678 < 0.1, `${drop.toFixed(0)} W vs step 678 W`);
-  // The calibration helper recovers the constant from the CT reading.
-  assert.ok(Math.abs(compressorCm3FromCurrent(14.6, 71, 13, 59, 235, 0.98)! - 30.7) < 0.5);
+  // The calibration helper recovers the constant from the CT reading (fan included, so a bit above 28.6).
+  assert.ok(Math.abs(compressorCm3FromCurrent(14.6, 71, e1, c1, 235, 0.98)! - 29.5) < 0.5);
 });
 
 test('frequency model: zero watts whenever the compressor reports 0 Hz, heater still seen', () => {
@@ -300,7 +308,8 @@ test('frequency model: independent check on a 71 Hz run (2026-10-04), not used f
   const readings = rows.map((r) => est.update(r));
   const i = rows.findIndex((r) => r.timeMs >= at('2026-10-04T09:50:18Z'));
   const step = rows[i - 1].houseW - rows[i].houseW;
-  assert.ok(Math.abs(readings[i - 1].compressorW - step) / step < 0.05, `model ${readings[i - 1].compressorW} W vs step ${step} W`);
+  // House-meter step: ±5 % of base-load noise; the power meter of 2026-10-13 is the sharper reference.
+  assert.ok(Math.abs(readings[i - 1].compressorW - step) / step < 0.06, `model ${readings[i - 1].compressorW} W vs step ${step} W`);
   // At the app's 60 s poll the registers are trusted during this 14-minute run.
   const check = new RefrigerantSensorCheck();
   const water = new PowerEstimator(R32_1101_AIO);
@@ -371,5 +380,136 @@ test('SG Ready Forced ON boost (DN 6CE = 0): heater counted at any water flow, e
       prev = { t: r.timeMs, w: x.watts, real: realW };
     });
     assert.ok(Math.abs(model - real) / real < 0.12, `phase ${phase}: model ${model.toFixed(2)} kWh vs house ${real.toFixed(2)} kWh (base ${base} W)`);
+  }
+});
+
+// ── Power meter on the heat pump (2026-10-13) ──────────────────────────────────
+// A Shelly Pro EM-50 clamps both line wires leaving the Estia's breaker (outdoor + indoor
+// unit), so `realW` is the whole heat pump: compressor, backup heater, pump, fan, controls.
+// Same unit as above (HWT-1101HW-E + HWT-1101F21ST6W-E, one 3 kW heater stage), polled
+// every ~15 s. Aux draw as the app's preset for this model (ErP + interface, device.ts).
+const R32_1101_METERED: PowerConfig = {
+  ...R32_1101_HZ, standbyW: 22, runAuxW: 42, preheatW: 40,
+};
+
+function meterReplay(file: string, config = R32_1101_METERED) {
+  const rows = load(file);
+  const est = new PowerEstimator(config, { flowSamplesLpm: [11.5] });
+  const readings = rows.map((r) => est.update(r));
+  let modelKwh = 0;
+  let realKwh = 0;
+  rows.forEach((r, i) => {
+    modelKwh += readings[i].backfillKwh;
+    if (i === 0) return;
+    const ms = r.timeMs - rows[i - 1].timeMs;
+    realKwh += energyKwh(rows[i - 1].realW!, r.realW!, ms);
+    modelKwh += energyKwh(readings[i - 1].watts, readings[i].watts, ms);
+  });
+  return {
+    rows, readings, modelKwh, realKwh, err: (modelKwh - realKwh) / realKwh,
+  };
+}
+
+test('power meter: every recorded run within 10 % of the measured energy (2026-10-13)', () => {
+  for (const file of [
+    'r32s1-1101-em-dhw-2026-10-13.csv', // hot water 29 → 45 °C, up to 80 Hz
+    'r32s1-1101-em-dhw-heater-2026-10-13.csv', // hot water 45 → 53 °C, then 5 min backup heater
+    'r32s1-1101-em-floor-2026-10-13.csv', // floor heating at 32 °C, TC up to 5 K under the leaving water
+    'r32s1-1101-em-short-runs-2026-10-13.csv', // three 10–15 min runs at low water temperature
+  ]) {
+    const r = meterReplay(file);
+    assert.ok(Math.abs(r.err) < 0.1, `${file}: model ${r.modelKwh.toFixed(3)} vs meter ${r.realKwh.toFixed(3)} kWh (${(r.err * 100).toFixed(1)} %)`);
+  }
+});
+
+test('power meter: steady polls within 10 % in hot water and in floor heating', () => {
+  for (const file of ['r32s1-1101-em-dhw-2026-10-13.csv', 'r32s1-1101-em-floor-2026-10-13.csv']) {
+    const { rows, readings } = meterReplay(file);
+    const ratios: number[] = [];
+    rows.forEach((r, i) => {
+      if (i === 0 || i === rows.length - 1 || !r.compressorHz) return;
+      const steady = rows[i - 1].compressorHz === r.compressorHz && rows[i + 1].compressorHz === r.compressorHz
+        && Math.abs(rows[i + 1].realW! - rows[i - 1].realW!) < 0.05 * r.realW!;
+      if (steady && r.realW! > 300) ratios.push(readings[i].watts / r.realW!);
+    });
+    ratios.sort((a, b) => a - b);
+    const median = ratios[Math.floor(ratios.length / 2)];
+    assert.ok(ratios.length >= 20, `${file}: only ${ratios.length} steady polls`);
+    assert.ok(median > 0.95 && median < 1.05, `${file}: median model/meter ${median.toFixed(3)}`);
+    assert.ok(ratios[Math.floor(ratios.length * 0.1)] > 0.9 && ratios[Math.floor(ratios.length * 0.9)] < 1.1,
+      `${file}: p10–p90 ${ratios[Math.floor(ratios.length * 0.1)].toFixed(2)}–${ratios[Math.floor(ratios.length * 0.9)].toFixed(2)}`);
+  }
+});
+
+test('power meter: standby counted while stopped (meter 12–27 W, ErP P_SB 7 W + interface)', () => {
+  const r = meterReplay('r32s1-1101-em-idle-2026-10-13.csv');
+  r.readings.forEach((x) => assert.equal(x.watts, 22));
+  // The interface/remote allowance is an estimate: within 20 % of this unit's meter.
+  assert.ok(Math.abs(r.err) < 0.2, `idle ${r.modelKwh.toFixed(3)} vs ${r.realKwh.toFixed(3)} kWh`);
+  // Without aux settings (house-meter replays) a stopped unit still reads 0 W.
+  const bare = meterReplay('r32s1-1101-em-idle-2026-10-13.csv', R32_1101_HZ);
+  bare.readings.forEach((x) => assert.equal(x.watts, 0));
+});
+
+test('winding preheat in frost while stopped: 10/15 duty from −1 °C, continuous below −3 °C', () => {
+  const est = new PowerEstimator(R32_1101_METERED);
+  const base = {
+    zoneOn: false, dhwOn: false, coolMode: false, twiC: 20, twoC: 20, thoC: 20, tankC: 45, condensingC: 10, compressorHz: 0,
+  };
+  const at = (outdoorC: number, k: number) => est.update({
+    ...base, timeMs: k * 60_000, outdoorC, evaporatorC: outdoorC,
+  }).auxW;
+  assert.equal(at(5, 1), 22);
+  assert.equal(at(0, 2), 22);
+  assert.equal(at(-1, 3), Math.round(22 + (40 * 10) / 15));
+  assert.equal(at(-2, 4), Math.round(22 + (40 * 10) / 15));
+  assert.equal(at(-3, 5), 62);
+  assert.equal(at(-8, 6), 62);
+});
+
+test('register check stays trusted through floor heating with TC under the leaving water', () => {
+  const rows = load('r32s1-1101-em-floor-2026-10-13.csv');
+  assert.ok(rows.some((r) => r.compressorHz! > 0 && r.condensingC! <= r.twoC! - 4), 'fixture should hold TC ≥ 4 K under TWO');
+  const check = new RefrigerantSensorCheck({
+    idleAgree: 20, runConfirm: 5, runMiss: 0,
+  });
+  const water = new PowerEstimator(R32_1101_AIO);
+  rows.forEach((r) => check.update(r, water.update({ ...r, evaporatorC: null, compressorHz: null }).waterSaysOn));
+  const { runConfirm, runMiss } = check.snapshot;
+  assert.equal(check.trusted, true, JSON.stringify(check.snapshot));
+  assert.ok(runMiss * 10 <= runConfirm, `misses ${runMiss} vs confirms ${runConfirm}`);
+});
+
+test('condensing temperature: TC, or 3 K above the leaving water when TC reads lower; cooling reversed', () => {
+  assert.deepEqual(compressionTempsC(9, 28, 32), [9, 35]); // floor heating: TC on the subcooled liquid line
+  assert.deepEqual(compressionTempsC(8, 62, 58), [8, 62]); // hot water: TC above TWO + 3
+  assert.deepEqual(compressionTempsC(35, 6, 12), [6, 35]); // cooling: outdoor coil condenses
+  assert.deepEqual(compressionTempsC(9, 28, null), [9, 28]);
+});
+
+// Toshiba Engineering Data Book E23-103 (§ 2-5): input at maximum frequency, pump excluded,
+// fan and controls included. A guard for every R32 outdoor unit, with this app's constants
+// (device.ts MODEL_PRESETS) and no fitting: evaporating ≈ TO − 7 K, condensing = LWT + 3 K.
+// W55 rows are left out: there the unit is current-limited below its maximum frequency.
+test('frequency model against the Data Book peak input of every R32 outdoor unit (0.75–1.25)', () => {
+  const units: Array<[string, number, number, number, Array<[number, number]>]> = [
+    // name, C (cm³), max Hz, fan W, [outdoor °C, kW] at W35
+    ['HWT-401HW-E', 19.5, 80, 43, [[7, 1.49], [2, 1.52], [-7, 1.49]]],
+    // The 601's A7 and A2 peaks equal the 401's (7.25 kW out, 1.49 kW in): it is capped at
+    // the 401's 80 Hz in mild weather and only reaches 100 Hz in the cold.
+    ['HWT-601HW-E', 19.5, 80, 43, [[7, 1.49], [2, 1.52]]],
+    ['HWT-601HW-E', 19.5, 100, 43, [[-7, 1.95]]],
+    ['HWT-801HW-E', 28.6, 90, 60, [[7, 2.62], [2, 2.77], [-7, 2.88]]],
+    ['HWT-1101HW-E', 28.6, 100, 60, [[7, 3.15], [2, 3.24], [-7, 3.41]]],
+    ['HWT-1401HW-E', 49.4, 82, 100, [[7, 4.73], [2, 4.62], [-7, 4.53]]],
+    ['HWT-801H8W-E', 49.4, 53, 100, [[7, 2.68], [2, 2.80], [-7, 2.58]]],
+    ['HWT-1101H8W-E', 49.4, 64, 100, [[7, 3.66], [2, 3.57], [-7, 3.23]]],
+    ['HWT-1401H8W-E', 49.4, 82, 100, [[7, 4.73], [2, 4.62], [-7, 4.53]]],
+  ];
+  for (const [name, cm3, hz, fanW, points] of units) {
+    for (const [outdoor, kw] of points) {
+      const model = (frequencyModelWatts(cm3, hz, outdoor - 7, 35 + 3) + fanW) / 1000;
+      assert.ok(model / kw > 0.75 && model / kw < 1.25, `${name} A${outdoor}/W35: model ${model.toFixed(2)} vs Data Book ${kw} kW`);
+    }
   }
 });
