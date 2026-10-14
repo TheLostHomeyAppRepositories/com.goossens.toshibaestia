@@ -19,7 +19,9 @@ Works with the Toshiba **BMS-IFMB0UEW-E** Modbus RTU interface (or any compatibl
 - DHW tank (TTW), heater outlet (THO), and DHW setpoint
 - Live status: heat pump on/off, mode, all energy-saving toggles
 - Alarm flag + decoded fault code (e.g. `F10 [Hydro unit 0]`)
-- Estimated electrical power (W) and energy (kWh): from the heat the water carries and Toshiba's performance tables, with the water flow learnt from hot-water heat-ups (see [AGENTS.md § 7](AGENTS.md#7-live-power--energy-estimation))
+- Estimated electrical power (W) and energy (kWh), flagged as approximated for Homey Energy: on R32 units from the compressor's frequency and refrigerant temperatures (calibrate once with the CT current from the remote controller), on other units from the heat the water carries, with the water flow learnt from hot-water heat-ups. Standby, pump, fan and the backup heater are included (see [AGENTS.md § 7](AGENTS.md#7-live-power--energy-estimation))
+- **External energy meter** *(optional)*: link any Homey device that measures the heat pump's circuit (e.g. a Shelly EM) via **Repair** on the heat pump or **Edit** on the app settings page; the heat pump then shows the measured power and energy, and falls back to the estimate when the meter is out. Maintenance action **Test external meter**; a device warning when the linked meter is removed. Uses the `homey:manager:api` permission only to read that meter.
+- **Season detection**: summer, mid-season or winter from the average outdoor temperature over a few days, with separate start and end thresholds
 
 ### Write
 
@@ -33,9 +35,9 @@ Works with the Toshiba **BMS-IFMB0UEW-E** Modbus RTU interface (or any compatibl
 
 ### Flow cards
 
-- **Trigger**: "Heat pump faulted" — fires on alarm rising edge, tokens carry fault code, origin, human description.
-- **Condition**: "Heat pump alarm is (not) active".
-- **Action**: "Boost DHW for [N] minutes" — turns boost on now, off after N minutes, with a safety timer that survives flow completion.
+- **Triggers**: "Heat pump faulted" (fires on alarm rising edge, tokens carry fault code, origin, human description); "The season changed".
+- **Conditions**: "Heat pump alarm is (not) active"; "Hot water is (not) on"; "Season is (not) …".
+- **Actions**: "Boost DHW for [N] minutes" (turns boost on now, off after N minutes, with a safety timer that survives flow completion); "Turn hot water on or off"; "Set water temperature" (Zone 1); "Turn auto temperature on or off"; "Set the season"; "Report SG Ready Forced ON" (so the backup heater is counted while the SG Ready contact forces it on).
 
 ## Localization
 
