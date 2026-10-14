@@ -48,6 +48,7 @@
     "meter_label": "Energimätare för den här värmepumpen",
     "status_measured": "Mätt av __name__ · __watts__ W",
     "status_estimate": "Ingen mätare: uppskattningen används",
-    "status_unavailable": "Mätare __name__ är inte tillgänglig; uppskattningen används"
+    "status_unavailable": "Mätare __name__ är inte tillgänglig; uppskattningen används",
+    "repair_help": "Mäter du redan en värmepump med en separat energimätare i Homey (till exempel en Shelly EM på dess grupp)? Välj den här. Värmepumpen visar då uppmätt effekt och förbrukning i stället för uppskattningen; uppskattningen fortsätter för jämförelse och tar över om mätaren inte är tillgänglig. Ta sedan med värmepumpen i Homey Energy och uteslut mätaren, så att inget räknas dubbelt."
   }
 }

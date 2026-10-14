@@ -4,6 +4,6 @@ Kræver et Toshiba BMS-IFMB0UEW-E (eller lignende) Modbus RTU interface, der er 
 
 Understøtter R410A 4 Series WM, R410A 5 Series WM, og R32 1/2 Series (WM og AIO) Estia hydroenheder. Enkeltzone- eller dobbeltzoneinstallationer, med eller uden en husholdningsvarmtvandstank — skift hver enkelt i enhedsindstillingerne, og kun de relevante funktioner vises.
 
-Appen anslår også varmepumpens elektriske effekt og forbrug (en beregning, ikke en måling). Måler du allerede varmepumpen med sin egen energimåler i Homey, for eksempel en Shelly EM? Vælg måleren på appens indstillingsside: varmepumpen viser så den målte effekt og det målte forbrug. Behold varmepumpen i Homey Energy og udelad måleren, så intet tælles to gange.
+Appen anslår også varmepumpens elektriske effekt og forbrug (en beregning, ikke en måling). Måler du allerede varmepumpen med sin egen energimåler i Homey, for eksempel en Shelly EM? Vælg måleren via Reparer på varmepumpen eller med Rediger ud for varmepumpen på appens indstillingsside: varmepumpen viser så den målte effekt og det målte forbrug. Behold varmepumpen i Homey Energy og udelad måleren, så intet tælles to gange.
 
 Toshiba og Estia er varemærker tilhørende Toshiba Corporation. Dette er en fællesskabsudviklet app og er ikke tilknyttet eller godkendt af Toshiba.

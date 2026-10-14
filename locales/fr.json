@@ -48,6 +48,7 @@
     "meter_label": "Compteur d'énergie de cette pompe à chaleur",
     "status_measured": "Mesuré par __name__ · __watts__ W",
     "status_estimate": "Aucun compteur : l'estimation est utilisée",
-    "status_unavailable": "Le compteur __name__ est indisponible ; l'estimation est utilisée"
+    "status_unavailable": "Le compteur __name__ est indisponible ; l'estimation est utilisée",
+    "repair_help": "Vous mesurez déjà une pompe à chaleur avec un compteur d'énergie séparé dans Homey (par exemple un Shelly EM sur son circuit) ? Choisissez-le ici. La pompe à chaleur affiche alors la puissance et la consommation mesurées au lieu de l'estimation ; l'estimation continue en parallèle pour comparaison et prend le relais si le compteur est indisponible. Ensuite, dans Homey Energy, incluez la pompe à chaleur et excluez le compteur, pour que rien ne soit compté deux fois."
   }
 }

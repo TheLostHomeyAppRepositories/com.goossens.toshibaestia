@@ -48,6 +48,7 @@
     "meter_label": "Contatore di energia di questa pompa di calore",
     "status_measured": "Misurato da __name__ · __watts__ W",
     "status_estimate": "Nessun contatore: si usa la stima",
-    "status_unavailable": "Il contatore __name__ non è disponibile; si usa la stima"
+    "status_unavailable": "Il contatore __name__ non è disponibile; si usa la stima",
+    "repair_help": "Misuri già una pompa di calore con un contatore di energia separato in Homey (ad esempio uno Shelly EM sul suo circuito)? Sceglilo qui. La pompa di calore mostrerà la potenza e il consumo misurati al posto della stima; la stima continua per confronto e subentra se il contatore non è disponibile. Poi, in Homey Energy, includi la pompa di calore ed escludi il contatore, così nulla viene contato due volte."
   }
 }

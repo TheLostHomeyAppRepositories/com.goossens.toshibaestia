@@ -48,6 +48,7 @@
     "meter_label": "Licznik energii tej pompy ciepła",
     "status_measured": "Mierzone przez __name__ · __watts__ W",
     "status_estimate": "Brak licznika: używany jest szacunek",
-    "status_unavailable": "Licznik __name__ jest niedostępny; używany jest szacunek"
+    "status_unavailable": "Licznik __name__ jest niedostępny; używany jest szacunek",
+    "repair_help": "Mierzysz już pompę ciepła osobnym licznikiem energii w Homey (na przykład Shelly EM na jej obwodzie)? Wybierz go tutaj. Pompa ciepła pokaże wtedy zmierzoną moc i zużycie zamiast szacunku; szacunek działa dalej dla porównania i przejmuje, gdy licznik jest niedostępny. Następnie w Homey Energy uwzględnij pompę ciepła i wyklucz licznik, aby nic nie było liczone podwójnie."
   }
 }

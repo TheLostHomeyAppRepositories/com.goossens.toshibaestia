@@ -48,6 +48,7 @@
     "meter_label": "Energiezähler dieser Wärmepumpe",
     "status_measured": "Gemessen von __name__ · __watts__ W",
     "status_estimate": "Kein Zähler: die Schätzung wird verwendet",
-    "status_unavailable": "Zähler __name__ ist nicht verfügbar; die Schätzung wird verwendet"
+    "status_unavailable": "Zähler __name__ ist nicht verfügbar; die Schätzung wird verwendet",
+    "repair_help": "Misst du eine Wärmepumpe bereits mit einem separaten Energiezähler in Homey (zum Beispiel einem Shelly EM an ihrem Stromkreis)? Wähle ihn hier. Die Wärmepumpe zeigt dann die gemessene Leistung und den Verbrauch statt der Schätzung; die Schätzung läuft zum Vergleich weiter und übernimmt, wenn der Zähler nicht verfügbar ist. Nimm danach in Homey Energy die Wärmepumpe auf und schließe das Zählergerät aus, damit nichts doppelt gezählt wird."
   }
 }

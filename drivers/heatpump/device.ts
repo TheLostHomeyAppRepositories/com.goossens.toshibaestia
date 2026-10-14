@@ -339,8 +339,8 @@ export default class HeatpumpDevice extends Homey.Device {
   private lastPower: { watts: number; timeMs: number } | null = null;
   /** Meter linked on the app settings page; while usable it replaces the estimate. */
   private meterLink: ExternalMeterLink | null = null;
-  /** True while the linked meter device no longer exists; shown as device warning. */
-  private meterMissing = false;
+  /** True while the linked meter device no longer exists; shown as device warning. Null until first checked. */
+  private meterMissing: boolean | null = null;
   private meterOpenedMs = 0;
   private lastPowerSample: PowerSample | null = null;
   // Heater-hours reconciliation: the heater time counted since the counter last ticked, and
@@ -430,7 +430,7 @@ export default class HeatpumpDevice extends Homey.Device {
   /** State of the linked meter for the app settings page. */
   public getExternalMeterState(): { name: string | null; missing: boolean; watts: number | null } {
     const link = this.meterLink;
-    return { name: link?.name ?? null, missing: this.meterMissing, watts: link?.usable ? link.watts : null };
+    return { name: link?.name ?? null, missing: this.meterMissing === true, watts: link?.usable ? link.watts : null };
   }
 
   /** Links a meter (any Homey device with measure_power) or unlinks it with null. */
@@ -470,7 +470,8 @@ export default class HeatpumpDevice extends Homey.Device {
     this.meterMissing = missing;
     await (missing ? this.setWarning(this.homey.__('power.meter_missing')) : this.unsetWarning())
       .catch((err) => this.error('meter warning', err));
-    if (missing) await this.setSettings({ externalMeter: this.homey.__('settings.meter_missing_option') }).catch(() => undefined);
+    const label = missing ? this.homey.__('settings.meter_missing_option') : this.meterLink?.name;
+    if (label) await this.setSettings({ externalMeter: label }).catch(() => undefined);
   }
 
   /** Maintenance action: reads the meter now and shows the result, or throws why it fails. */
@@ -501,8 +502,9 @@ export default class HeatpumpDevice extends Homey.Device {
         this.meterLink = new ExternalMeterLink(meterId, await api.devices.getDevice({ id: meterId }));
         this.log(`External meter linked: ${this.meterLink.name} (${this.meterLink.energyCapability ?? 'power only'})`);
       } catch (err) {
-        this.error('External meter could not be opened', err);
         missing = isMeterGone(err);
+        // A removed meter is retried every 5 minutes; log it once.
+        if (!(missing && this.meterMissing)) this.error('External meter could not be opened', err);
       }
     }
     await this.applyPowerCapabilityOptions(this.meterLink !== null);
@@ -510,8 +512,6 @@ export default class HeatpumpDevice extends Homey.Device {
     if (missing) externalMeter = this.homey.__('settings.meter_missing_option');
     else if (meterId) externalMeter = this.meterLink?.name ?? this.homey.__('power.meter_unavailable', { name: '?' });
     await this.setSettings({ externalMeter }).catch((err) => this.error('setSettings externalMeter', err));
-    // Re-evaluated on every open, so unlinking or relinking clears the warning.
-    this.meterMissing = !missing;
     await this.setMeterMissing(missing);
   }
 
@@ -661,6 +661,8 @@ export default class HeatpumpDevice extends Homey.Device {
     // option was added pick up the new labels. Idempotent: setCapabilityOptions
     // is a no-op when the options already match.
     for (const [cap, opts] of ALWAYS_ON_CAPABILITIES) {
+      // Power titles follow the external meter (applyPowerCapabilityOptions), not this list.
+      if (cap === 'measure_power' || cap === 'meter_power') continue;
       if (opts && this.hasCapability(cap)) {
         try { await this.setCapabilityOptions(cap, opts); } catch (err) { this.error(`setCapabilityOptions ${cap}`, err); }
       }
@@ -952,6 +954,12 @@ export default class HeatpumpDevice extends Homey.Device {
     const missingS = (hours - prev.value) * 3600 - prev.countedS;
     this.heaterHours = { value: hours, sinceMs: nowMs, countedS: 0, coveredS: 0 };
     if (prev.coveredS < 0.9 * periodS || missingS < 300) return 0;
+    // The counter rose more than the period allows (+1 h for its resolution): a bad read, e.g. 0 after a
+    // power cut, then the real value. Book nothing, or the whole counter lands in meter_power.
+    if ((hours - prev.value) * 3600 > periodS + 3600) {
+      this.log(`Backup heater hours ${prev.value} → ${hours} in ${Math.round(periodS / 60)} min: implausible, not booked`);
+      return 0;
+    }
     const stepKw = Math.min(BACKUP_STEP_KW, parseFloat(s.backupHeaterKW ?? '3') || 0);
     this.log(`Backup heater hours ${prev.value} → ${hours}: counted ${Math.round(prev.countedS / 60)} min, booking ${Math.round(missingS / 60)} min more`);
     return (stepKw * missingS) / 3600;
@@ -1022,7 +1030,7 @@ export default class HeatpumpDevice extends Homey.Device {
     if (meter) {
       // Measured: power and energy come from the linked meter; the estimate only runs alongside.
       watts = meter.watts as number;
-      const counted = meter.energySinceLast();
+      const counted = meter.energySinceLast(sample.timeMs);
       if (counted !== null) this.meterKwh += counted;
       else if (this.lastPower) this.meterKwh += energyKwh(this.lastPower.watts, watts, intervalMs);
     } else {

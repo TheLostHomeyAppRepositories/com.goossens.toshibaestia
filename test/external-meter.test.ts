@@ -36,24 +36,34 @@ test('appliance meters only: no own devices, whole-home meters, batteries or sol
 
 test('meter delta: counts increases, starts over after a drop or a missing counter', () => {
   const d = new MeterDelta();
-  assert.equal(d.next(10), 0);
-  assert.equal(d.next(10.25), 0.25);
-  assert.equal(d.next(3), 0, 'counter reset');
-  assert.equal(d.next(3.5), 0.5);
-  assert.equal(d.next(null), 0);
-  assert.equal(d.next(4), 0, 'baseline again after a gap');
-  assert.ok(Math.abs(d.next(4.1) - 0.1) < 1e-9);
+  const h = 3_600_000;
+  assert.equal(d.next(10, 0), 0);
+  assert.equal(d.next(10.25, h), 0.25);
+  assert.equal(d.next(3, 2 * h), 0, 'counter reset');
+  assert.equal(d.next(3.5, 3 * h), 0.5);
+  assert.equal(d.next(null, 4 * h), 0);
+  assert.equal(d.next(4, 5 * h), 0, 'baseline again after a gap');
+  assert.ok(Math.abs(d.next(4.1, 6 * h) - 0.1) < 1e-9);
+});
+
+test('meter delta: a counter that reads 0 and comes back adds nothing', () => {
+  const d = new MeterDelta();
+  const poll = 30_000;
+  assert.equal(d.next(1500, 0), 0);
+  assert.equal(d.next(0, poll), 0, 'glitch');
+  assert.equal(d.next(1500.01, 2 * poll), 0, 'back to its real total: more than possible in 30 s');
+  assert.ok(Math.abs(d.next(1500.05, 3 * poll) - 0.04) < 1e-9, '4.8 kW for 30 s counts again');
 });
 
 test('link: takes the meter\'s power, counter and availability on every read', () => {
   const link = new ExternalMeterLink('shelly', shellyEm);
   assert.equal(link.watts, 38.3);
   assert.equal(link.usable, true);
-  assert.equal(link.energySinceLast(), 0, 'first reading is the baseline');
+  assert.equal(link.energySinceLast(0), 0, 'first reading is the baseline');
 
   link.update({ ...shellyEm, capabilitiesObj: { measure_power: { value: 1500 }, 'meter_power.imported': { value: 12.9 } } });
   assert.equal(link.watts, 1500);
-  assert.ok(Math.abs((link.energySinceLast() ?? 0) - 0.4) < 1e-9);
+  assert.ok(Math.abs((link.energySinceLast(3_600_000) ?? 0) - 0.4) < 1e-9);
 
   link.update({ ...shellyEm, available: false });
   assert.equal(link.usable, false);
@@ -66,7 +76,7 @@ test('link: takes the meter\'s power, counter and availability on every read', (
 test('link without an energy counter reports null, so the caller integrates the power', () => {
   const link = new ExternalMeterLink('ups', { id: 'ups', name: 'UPS', capabilities: ['measure_power'], capabilitiesObj: { measure_power: { value: 160 } } });
   assert.equal(link.energyCapability, null);
-  assert.equal(link.energySinceLast(), null);
+  assert.equal(link.energySinceLast(0), null);
   assert.equal(link.watts, 160);
 });
 

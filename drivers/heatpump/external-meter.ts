@@ -67,22 +67,28 @@ export function isMeterGone(err: unknown): boolean {
   return e?.statusCode === 404 || /not found/i.test(String(e?.message ?? ''));
 }
 
+/** More than any heat pump with its backup heaters draws; a larger step is a counter glitch. */
+const MAX_PLAUSIBLE_KW = 50;
+
 /**
  * Energy since the previous reading of a lifetime counter. The first reading, a missing
- * counter and a drop (counter reset, other meter) add nothing and start over.
+ * counter, a drop (counter reset, other meter) and a rise larger than possible in the
+ * interval (a counter that read 0 and came back) add nothing and start over.
  */
 export class MeterDelta {
-  private lastKwh: number | null = null;
+  private last: { kwh: number; timeMs: number } | null = null;
 
-  next(kwh: number | null): number {
-    const previous = this.lastKwh;
-    this.lastKwh = kwh;
-    if (kwh === null || previous === null || kwh < previous) return 0;
-    return kwh - previous;
+  next(kwh: number | null, timeMs: number): number {
+    const previous = this.last;
+    this.last = kwh === null ? null : { kwh, timeMs };
+    if (kwh === null || previous === null || kwh < previous.kwh) return 0;
+    const delta = kwh - previous.kwh;
+    const possible = (MAX_PLAUSIBLE_KW * Math.max(0, timeMs - previous.timeMs)) / 3_600_000 + 0.01;
+    return delta > possible ? 0 : delta;
   }
 
   reset(): void {
-    this.lastKwh = null;
+    this.last = null;
   }
 }
 
@@ -124,9 +130,9 @@ export class ExternalMeterLink {
   }
 
   /** Energy (kWh) the meter counted since the previous call; null when it has no counter. */
-  energySinceLast(): number | null {
+  energySinceLast(timeMs: number): number | null {
     if (this.energyCapability === null) return null;
-    return this.delta.next(this.kwh);
+    return this.delta.next(this.kwh, timeMs);
   }
 
   /** Forget the counter baseline, e.g. while the estimate is used instead. */

@@ -11,7 +11,7 @@
 <body>
   <header class="homey-header">
     <h1 class="homey-title" data-i18n="settings.meter_legend"></h1>
-    <p class="homey-subtitle" data-i18n="settings.meter_help"></p>
+    <p class="homey-subtitle" data-i18n="settings.repair_help"></p>
   </header>
 
   <fieldset class="homey-form-fieldset">
@@ -32,7 +32,23 @@
     const select = document.getElementById('meter');
     const saveEl = document.getElementById('save');
 
-    Homey.emit('init').then(function(data) {
+    // Homey.emit is callback-only on some Homey versions and Promise-only on others (AGENTS.md).
+    function emit(event, data) {
+      return new Promise(function(resolve, reject) {
+        let settled = false;
+        function done(err, val) {
+          if (settled) return;
+          settled = true;
+          if (err) reject(err); else resolve(val);
+        }
+        try {
+          const ret = Homey.emit(event, data, function(err, result) { done(err, result); });
+          if (ret && typeof ret.then === 'function') ret.then(function(r) { done(null, r); }, done);
+        } catch (e) { done(e); }
+      });
+    }
+
+    emit('init').then(function(data) {
       document.getElementById('device-name').textContent = data.name;
       const none = document.createElement('option');
       none.value = '';
@@ -56,15 +72,17 @@
       Homey.alert(err.message || String(err));
     });
 
-    saveEl.addEventListener('click', function() {
+    // Capture phase: Homey's own handler on homey-button-* stops the click before a button listener (AGENTS.md).
+    document.addEventListener('click', function(e) {
+      if (!e.target || e.target.id !== 'save' || saveEl.disabled) return;
       saveEl.disabled = true;
-      Homey.emit('save', { meterId: select.value || null }).then(function() {
+      emit('save', { meterId: select.value || null }).then(function() {
         Homey.done();
       }).catch(function(err) {
         saveEl.disabled = false;
         Homey.alert(Homey.__('settings.meter_error') + (err.message || String(err)));
       });
-    });
+    }, true);
   </script>
 </body>
 </html>

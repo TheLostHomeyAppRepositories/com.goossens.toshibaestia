@@ -48,6 +48,7 @@
     "meter_label": "Energy meter for this heat pump",
     "status_measured": "Measured by __name__ · __watts__ W",
     "status_estimate": "No meter: the estimate is used",
-    "status_unavailable": "Meter __name__ is unavailable; the estimate is used"
+    "status_unavailable": "Meter __name__ is unavailable; the estimate is used",
+    "repair_help": "Already measuring a heat pump with a separate energy meter in Homey (for example a Shelly EM on its circuit)? Pick it here. The heat pump then shows the measured power and energy instead of the estimate; the estimate keeps running for comparison and takes over when the meter is unavailable. Afterwards, in Homey Energy, include the heat pump and exclude the meter device, so nothing is counted twice."
   }
 }

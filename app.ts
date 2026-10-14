@@ -36,7 +36,7 @@ interface MeterLinkedDevice extends Homey.Device {
 export default class ToshibaEstiaApp extends Homey.App {
   public modbus!: ModbusController;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private homeyApi: any | null = null;
+  private homeyApi: Promise<any> | null = null;
 
   async onInit(): Promise<void> {
     const debug = (this.homey.settings.get('debug') as boolean | null) ?? false;
@@ -62,9 +62,15 @@ export default class ToshibaEstiaApp extends Homey.App {
    * (permission homey:manager:api). Created on first use.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getHomeyApi(): Promise<any> {
-    if (!this.homeyApi) this.homeyApi = await HomeyAPI.createAppAPI({ homey: this.homey });
-    return this.homeyApi;
+  getHomeyApi(): Promise<any> {
+    // One shared instance, also when several heat pumps ask at once during start-up.
+    if (!this.homeyApi) {
+      this.homeyApi = HomeyAPI.createAppAPI({ homey: this.homey }).catch((err: unknown) => {
+        this.homeyApi = null;
+        throw err;
+      });
+    }
+    return this.homeyApi as Promise<any>;
   }
 
   /** Devices that can be linked as meter (settings page). */

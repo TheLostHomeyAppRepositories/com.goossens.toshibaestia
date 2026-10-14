@@ -4,6 +4,6 @@ Richiede un'interfaccia Toshiba BMS-IFMB0UEW-E (o simile) Modbus RTU collegata a
 
 Supporta le unità idroniche Estia delle Serie WM R410A 4, WM R410A 5 e 1/2 Serie R32 (WM e AIO). Installazioni a singola zona o a doppia zona, con o senza serbatoio di acqua calda domestica — imposta ogni opzione nelle impostazioni del dispositivo e solo le funzionalità rilevanti saranno visibili.
 
-L'app stima anche la potenza e il consumo elettrici della pompa di calore (un calcolo, non una misura). Misuri già la pompa di calore con un suo contatore di energia in Homey, ad esempio uno Shelly EM? Scegli quel contatore nella pagina delle impostazioni dell'app: la pompa di calore mostrerà la potenza e il consumo misurati. In Homey Energy, mantieni la pompa di calore ed escludi il contatore, così nulla viene contato due volte.
+L'app stima anche la potenza e il consumo elettrici della pompa di calore (un calcolo, non una misura). Misuri già la pompa di calore con un suo contatore di energia in Homey, ad esempio uno Shelly EM? Scegli quel contatore con Ripara sulla pompa di calore, o con Modifica accanto alla pompa di calore nella pagina delle impostazioni dell'app: la pompa di calore mostrerà la potenza e il consumo misurati. In Homey Energy, mantieni la pompa di calore ed escludi il contatore, così nulla viene contato due volte.
 
 Toshiba ed Estia sono marchi di Toshiba Corporation. Questa è un'app sviluppata dalla community e non è affiliata né approvata da Toshiba.

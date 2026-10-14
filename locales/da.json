@@ -48,6 +48,7 @@
     "meter_label": "Energimåler for denne varmepumpe",
     "status_measured": "Målt af __name__ · __watts__ W",
     "status_estimate": "Ingen måler: skønnet bruges",
-    "status_unavailable": "Måler __name__ er ikke tilgængelig; skønnet bruges"
+    "status_unavailable": "Måler __name__ er ikke tilgængelig; skønnet bruges",
+    "repair_help": "Måler du allerede en varmepumpe med en separat energimåler i Homey (for eksempel en Shelly EM på dens gruppe)? Vælg den her. Varmepumpen viser så den målte effekt og det målte forbrug i stedet for skønnet; skønnet kører videre til sammenligning og tager over, hvis måleren ikke er tilgængelig. Inkluder bagefter varmepumpen i Homey Energy og udelad måleren, så intet tælles to gange."
   }
 }

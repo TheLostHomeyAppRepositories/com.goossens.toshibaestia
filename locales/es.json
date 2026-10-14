@@ -48,6 +48,7 @@
     "meter_label": "Medidor de energía de esta bomba de calor",
     "status_measured": "Medido por __name__ · __watts__ W",
     "status_estimate": "Sin medidor: se usa la estimación",
-    "status_unavailable": "El medidor __name__ no está disponible; se usa la estimación"
+    "status_unavailable": "El medidor __name__ no está disponible; se usa la estimación",
+    "repair_help": "¿Ya mides una bomba de calor con un medidor de energía aparte en Homey (por ejemplo un Shelly EM en su circuito)? Elígelo aquí. La bomba de calor mostrará entonces la potencia y el consumo medidos en lugar de la estimación; la estimación sigue funcionando para comparar y toma el relevo si el medidor no está disponible. Después, en Homey Energy, incluye la bomba de calor y excluye el medidor, para que nada se cuente dos veces."
   }
 }

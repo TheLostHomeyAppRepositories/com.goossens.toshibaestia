@@ -48,6 +48,7 @@
     "meter_label": "Energiemeter van deze warmtepomp",
     "status_measured": "Gemeten door __name__ · __watts__ W",
     "status_estimate": "Geen meter: de schatting wordt gebruikt",
-    "status_unavailable": "Meter __name__ is niet beschikbaar; de schatting wordt gebruikt"
+    "status_unavailable": "Meter __name__ is niet beschikbaar; de schatting wordt gebruikt",
+    "repair_help": "Meet je een warmtepomp al met een aparte energiemeter in Homey (bijvoorbeeld een Shelly EM op zijn groep)? Kies hem hier. De warmtepomp toont dan het gemeten vermogen en verbruik in plaats van de schatting; de schatting blijft meedraaien ter vergelijking en neemt over als de meter niet beschikbaar is. Neem daarna in Homey Energy de warmtepomp op en sluit de meter uit, zodat niets dubbel telt."
   }
 }
