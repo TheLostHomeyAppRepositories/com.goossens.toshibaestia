@@ -293,12 +293,12 @@ Read in one separate request (40021–40032) so a unit that rejects them can't b
 electric = Hz × C × n/(n−1) · p1 · ((p2/p1)^((n−1)/n) − 1)  + aux     n = 1.2, R32 saturation pressures
 heating/DHW (TC ≥ TE): p1 = psat(TE), p2 = psat(max(TC, TWO + 3 K))       compressionTempsC()
 cooling/defrost (TC < TE): p1 = psat(TC), p2 = psat(TE)
-aux = standbyW + (compressor on ? runAuxW : winding preheat in frost)
+aux = standbyW + (compressor on or zone on ? runAuxW : 0) + (compressor off ? winding preheat in frost : 0)
 ```
 
 **Why TWO + 3 K:** TC sits on the liquid line, so in low-temperature heating it reads the subcooled liquid at the return-water end (TC 28 °C at TWO 32 °C), not the condensing temperature. The refrigerant must condense above the leaving water; field data and literature put the approach at 1–5.6 K. Using TC alone read 20–30 % low in floor heating (power meter, 2026-10-13); 3 K fits both floor heating and hot water within ±5 %. A load-scaled approach (1 + 3·Hz/fmax) and a TD/TS refrigerant energy balance were tested and were worse (TD/TS: 50–150 % error — it needs a real suction pressure, LPS is stuck).
 
-**Aux** (`standbyW`, `runAuxW`, `preheatW`, per preset in `device.ts`): from the ErP tables of the installation manual (2F30151001_05 p. 37–39): standby = P_SB + 15 W (Modbus interface and remote controller, not in P_SB), running = P_TO − P_SB (pump and outdoor fan), preheat = 40 W single-phase / 50 W three-phase while stopped at TO ≤ −1 °C, 10/15 duty down to −3 °C, continuous below (service manual p. 104; the Estia has no crankcase heater). HRW outdoor units add a 150 W base-plate heater whose control isn't documented — not modelled. R410A presets borrow the R32 11 kW values.
+**Aux** (`standbyW`, `runAuxW`, `preheatW`, per preset in `device.ts`): from the ErP tables of the installation manual (2F30151001_05 p. 37–39): standby = P_SB, pump = P_TO − P_SB while the compressor runs (pump and outdoor fan) **and** while the zone is on with the compressor waiting (ErP "thermostat off": the pump keeps running; measured ~47 W total vs ~26.5 W standby), preheat = 40 W single-phase / 50 W three-phase while stopped at TO ≤ −1 °C, 10/15 duty down to −3 °C, continuous below (service manual p. 104; the Estia has no crankcase heater). HRW outdoor units add a 150 W base-plate heater whose control isn't documented — not modelled. R410A presets borrow the R32 11 kW values.
 
 `C` (cm³) = compressor displacement ÷ overall efficiency. Displacements from the service manual's part list (Toshiba's model number is the displacement in 0.1 cm³): DX150A1T (401/601) 15.0, NX220A1FJ (801/1101 1-phase) 22.0, DX380A2TJ (1401 1-phase) and RX380A2TJ (801/1101/1401 3-phase H8W) 38.0 cm³. Overall efficiency 0.77, measured on an 1101 HW with a power meter (2026-10-13, aux counted apart) → C = 19.5 / 28.6 / 49.4. (Until 2026-10-14: 0.75 → 20.0 / 29.3 / 50.7, fitted against TC alone; the calibration now uses compressionTempsC() too.) The 3-phase 801/1101 have their own model entries (bigger compressor). R410A units have no default; the user can calibrate any R32 unit by typing the CT current (setting `ctCurrentA`) during a run: `C = I × 230 V × 0.97 / (Hz × work)`, stored as `compressorCm3`, cleared on a model change. Every calibration is also kept with its operating point in the store (`ctCalibrations`, last 20) — compare summer DHW and winter heating points to see whether one constant fits. Uncalibrated units other than the 1101: expect ±10–15 % (efficiency differs per compressor).
 
@@ -308,10 +308,12 @@ Validation (11 kW AIO HWT-1101HW-E + HWT-1101F21ST6W-E):
 |---|---|
 | **Power meter** (Shelly Pro EM-50 on both line wires of the Estia breaker, 2026-10-13): hot water to 80 Hz / hot water + 5 min heater / floor heating 32 °C / three 10–15 min runs | +2.0 / −2.2 / −1.8 / −7.5 % per run (app before: −5 / −6 / −21 / −28…−34 %) |
 | Same, steady polls (Hz unchanged, meter within 5 %) | median model/meter 0.95–1.05 in hot water and floor heating; ±4 % mean error over 173 polls |
-| Same, 37 h incl. standby | −3.0 % (before: −33 %: standby wasn't counted) |
+| Same, 37 h: running parts / all incl. idle | −3.0 % / −16.8 % (before: −33 % overall). The idle gap (0.58 kWh) is the unexplained state below plus the gateway and SG relay on this breaker |
 | CT 14.6 A at 71 Hz (3362 W, whole outdoor unit), stop step 1973 W at 45 Hz, 45 → 30 Hz step 678 W | −3 / +5 / +3 % |
 | House-meter stop step 3168 W at 67 Hz (2026-10-04) | +5 % (house meter ±5 %) |
 | Data Book E23-103 peak input, all 8 R32 outdoor units, A7/A2/A−7 at W35 (TE ≈ TO − 7 K) | 0.76–1.02: small units 0.9–1.0; 1101/1401 at maximum Hz 0.76–0.88 |
+
+**Open — idle draw above ErP:** the metered 1101 idles at ~12 W (P_SB 7 W + Modbus interface, a Waveshare gateway and a Shelly Pro 2 on the same breaker) **or ~26.5 W, 83 % of the time**: a 14.5 W load (pf 0.45 → 0.54) that switches on and off for hours, cycling ~8–10 min in the morning, with no Modbus register changing and unrelated to runs, modes or time since a run. Cause unknown, so standby stays at the datasheet P_SB. (An earlier build added 15 W as "interface + remote" — that was fitted on this one unit and was removed.)
 
 **Open risk — winter / maximum frequency:** against the Data Book the model reads 12–24 % low at maximum frequency on the bigger compressors (1101 at 100 Hz, 1401 at 82 Hz), most at A−7. On the metered unit up to 80 Hz it is within ±5 %, so efficiency probably drops further at the highest speeds. Not modelled until winter data (power meter) shows it; an efficiency term over pressure ratio or frequency would have to fit both the meter and the Data Book points of every unit.
 

@@ -97,7 +97,10 @@ export interface PowerConfig {
    * controller. Omitted = 0, as in replays against a house meter that can't see it.
    */
   standbyW?: number;
-  /** Extra draw (W) while the compressor runs: water pump and outdoor fan. */
+  /**
+   * Extra draw (W) while the water pump runs: with the compressor (pump and outdoor fan),
+   * and with the zone on while the compressor waits (ErP "thermostat off", P_TO).
+   */
   runAuxW?: number;
   /**
    * Compressor-winding preheat (W) while stopped in frost — the Estia has no crankcase
@@ -580,12 +583,16 @@ export class PowerEstimator {
     };
   }
 
-  /** The unit's own draw (kW): standby, plus pump and fan while running, plus winding preheat in frost. */
+  /**
+   * The unit's own draw (kW): standby; plus pump and fan while the compressor runs, or the
+   * pump alone while the zone is on and the compressor waits (measured ~20 W above standby,
+   * ErP P_TO − P_SB 42 W); plus winding preheat in frost.
+   */
   private auxKw(s: PowerSample, compressorOn: boolean): number {
     const { standbyW = 0, runAuxW = 0, preheatW = 0 } = this.config;
     let w = standbyW;
-    if (compressorOn) w += runAuxW;
-    else if (preheatW > 0 && s.outdoorC != null && s.outdoorC <= PREHEAT_ON_C) {
+    if (compressorOn || s.zoneOn) w += runAuxW;
+    if (!compressorOn && preheatW > 0 && s.outdoorC != null && s.outdoorC <= PREHEAT_ON_C) {
       w += s.outdoorC <= PREHEAT_CONTINUOUS_C ? preheatW : preheatW * PREHEAT_DUTY;
     }
     return w / 1000;

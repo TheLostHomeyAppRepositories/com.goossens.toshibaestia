@@ -109,19 +109,19 @@ const seasonConfig = (s: DeviceSettings): SeasonConfig => ({
  * only get it by calibration (ctCurrentA).
  *
  * aux: the unit's own draw, from the ErP tables (installation manual 2F30151001_05
- * p. 37–39): standbyW = P_SB + INTERFACE_W (the Modbus interface and remote controller
- * aren't in P_SB), runAuxW = P_TO − P_SB (water pump and outdoor fan), preheatW =
+ * p. 37–39): standbyW = P_SB, runAuxW = P_TO − P_SB (water pump and outdoor fan), preheatW =
  * compressor-winding preheat in frost (service manual AE0-2101W p. 104: 40 W single-phase,
- * 50 W three-phase). Measured on an 1101 HW (Shelly Pro EM-50, 2026-10-13): 12–27 W
- * standby (P_SB 7 W), ~47 W with only the pump running. R410A units: no ErP data at
- * hand, so the R32 11 kW values (DEFAULT_AUX).
+ * 50 W three-phase). Measured on an 1101 HW (Shelly Pro EM-50, 2026-10-12…14) with the
+ * Modbus interface, a Modbus gateway and an SG relay on the same breaker: ~12 W idle (P_SB
+ * 7 W + those), but ~83 % of the time ~26.5 W — a 14.5 W load that switches for hours with
+ * no register changing, cause unknown, so not counted (AGENTS.md § 7). ~47 W with only the
+ * pump running. R410A units: no ErP data at hand, so the R32 11 kW values (DEFAULT_AUX).
  *
  * NOTE: backup heater wattage is NOT here — it's an installation choice
  * (3/6/9 kW typically) and lives in its own settings dropdown.
  */
 interface Aux { standbyW: number; runAuxW: number; preheatW: number }
-const INTERFACE_W = 15;
-const aux = (pSbW: number, pToW: number, preheatW: number): Aux => ({ standbyW: pSbW + INTERFACE_W, runAuxW: pToW - pSbW, preheatW });
+const aux = (pSbW: number, pToW: number, preheatW: number): Aux => ({ standbyW: pSbW, runAuxW: pToW - pSbW, preheatW });
 const AUX_401_601 = aux(8, 40, 40);
 const AUX_801_1101 = aux(7, 49, 40);
 const AUX_1401 = aux(11, 52, 40);

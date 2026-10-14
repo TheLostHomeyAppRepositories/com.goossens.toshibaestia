@@ -389,7 +389,7 @@ test('SG Ready Forced ON boost (DN 6CE = 0): heater counted at any water flow, e
 // Same unit as above (HWT-1101HW-E + HWT-1101F21ST6W-E, one 3 kW heater stage), polled
 // every ~15 s. Aux draw as the app's preset for this model (ErP + interface, device.ts).
 const R32_1101_METERED: PowerConfig = {
-  ...R32_1101_HZ, standbyW: 22, runAuxW: 42, preheatW: 40,
+  ...R32_1101_HZ, standbyW: 7, runAuxW: 42, preheatW: 40,
 };
 
 function meterReplay(file: string, config = R32_1101_METERED) {
@@ -441,11 +441,12 @@ test('power meter: steady polls within 10 % in hot water and in floor heating', 
   }
 });
 
-test('power meter: standby counted while stopped (meter 12–27 W, ErP P_SB 7 W + interface)', () => {
+test('power meter: standby = ErP P_SB while stopped (meter: ~12 W incl. interface, gateway and SG relay)', () => {
   const r = meterReplay('r32s1-1101-em-idle-2026-10-13.csv');
-  r.readings.forEach((x) => assert.equal(x.watts, 22));
-  // The interface/remote allowance is an estimate: within 20 % of this unit's meter.
-  assert.ok(Math.abs(r.err) < 0.2, `idle ${r.modelKwh.toFixed(3)} vs ${r.realKwh.toFixed(3)} kWh`);
+  r.readings.forEach((x) => assert.equal(x.watts, 7));
+  // This window is in the ~26.5 W state: a 14.5 W load that switches for hours with no
+  // register changing (cause unknown, not modelled) on top of ~12 W (P_SB + the extras).
+  assert.ok(r.realKwh / r.modelKwh > 3, `idle ${r.modelKwh.toFixed(3)} vs ${r.realKwh.toFixed(3)} kWh`);
   // Without aux settings (house-meter replays) a stopped unit still reads 0 W.
   const bare = meterReplay('r32s1-1101-em-idle-2026-10-13.csv', R32_1101_HZ);
   bare.readings.forEach((x) => assert.equal(x.watts, 0));
@@ -459,12 +460,16 @@ test('winding preheat in frost while stopped: 10/15 duty from −1 °C, continuo
   const at = (outdoorC: number, k: number) => est.update({
     ...base, timeMs: k * 60_000, outdoorC, evaporatorC: outdoorC,
   }).auxW;
-  assert.equal(at(5, 1), 22);
-  assert.equal(at(0, 2), 22);
-  assert.equal(at(-1, 3), Math.round(22 + (40 * 10) / 15));
-  assert.equal(at(-2, 4), Math.round(22 + (40 * 10) / 15));
-  assert.equal(at(-3, 5), 62);
-  assert.equal(at(-8, 6), 62);
+  assert.equal(at(5, 1), 7);
+  assert.equal(at(0, 2), 7);
+  assert.equal(at(-1, 3), Math.round(7 + (40 * 10) / 15));
+  assert.equal(at(-2, 4), Math.round(7 + (40 * 10) / 15));
+  assert.equal(at(-3, 5), 47);
+  assert.equal(at(-8, 6), 47);
+  // Zone on, compressor waiting: the pump runs (ErP P_TO) and the winding is still preheated.
+  assert.equal(est.update({
+    ...base, zoneOn: true, timeMs: 7 * 60_000, outdoorC: -5, evaporatorC: -5,
+  }).auxW, 7 + 42 + 40);
 });
 
 test('register check stays trusted through floor heating with TC under the leaving water', () => {
