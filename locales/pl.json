@@ -32,7 +32,7 @@
   "settings": {
     "subtitle": "Ogólne ustawienia aplikacji. Połączenie (IP, port, ID jednostki, interwał, funkcje) ustawiasz w ustawieniach każdej pompy ciepła.",
     "meter_legend": "Zewnętrzny licznik energii",
-    "meter_help": "Mierzysz już pompę ciepła osobnym licznikiem energii w Homey (na przykład Shelly EM na jej obwodzie)? Wybierz go tutaj. Pompa ciepła pokaże wtedy zmierzoną moc i zużycie zamiast szacunku; szacunek działa dalej dla porównania i przejmuje, gdy licznik jest niedostępny. Następnie w Homey Energy uwzględnij pompę ciepła i wyklucz licznik, aby nic nie było liczone podwójnie.",
+    "meter_help": "Mierzysz już pompę ciepła osobnym licznikiem energii w Homey (na przykład Shelly EM na jej obwodzie)? Każda pompa ciepła ma własny licznik: wybierz go przyciskiem Edytuj obok tej pompy ciepła. Pompa ciepła pokaże wtedy zmierzoną moc i zużycie zamiast szacunku; szacunek działa dalej dla porównania i przejmuje, gdy licznik jest niedostępny. Następnie w Homey Energy uwzględnij pompę ciepła i wyklucz licznik, aby nic nie było liczone podwójnie.",
     "meter_none": "Brak (użyj szacunku)",
     "meter_no_pumps": "Nie dodano jeszcze pompy ciepła.",
     "meter_saved": "Licznik zapisany.",
@@ -42,6 +42,12 @@
     "debug_help": "Zapisuje każde zapytanie i odpowiedź Modbus w logu aplikacji. Przydatne przy nowej instalacji; wyłącz, gdy wszystko działa.",
     "save": "Zapisz",
     "saved": "Zapisano.",
-    "meter_missing_option": "⚠ już nie istnieje"
+    "meter_missing_option": "⚠ już nie istnieje",
+    "edit": "Edytuj",
+    "cancel": "Anuluj",
+    "meter_label": "Licznik energii tej pompy ciepła",
+    "status_measured": "Mierzone przez __name__ · __watts__ W",
+    "status_estimate": "Brak licznika: używany jest szacunek",
+    "status_unavailable": "Licznik __name__ jest niedostępny; używany jest szacunek"
   }
 }

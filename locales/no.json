@@ -32,7 +32,7 @@
   "settings": {
     "subtitle": "Generelle appinnstillinger. Tilkoblingen (IP, port, enhets-ID, intervall, funksjoner) stilles inn i hver varmepumpes enhetsinnstillinger.",
     "meter_legend": "Ekstern energimåler",
-    "meter_help": "Måler du allerede en varmepumpe med en egen energimåler i Homey (for eksempel en Shelly EM på kursen)? Velg den her. Varmepumpen viser da målt effekt og forbruk i stedet for anslaget; anslaget går videre for sammenligning og tar over hvis måleren ikke er tilgjengelig. Ta deretter med varmepumpen i Homey Energy og utelat måleren, så ingenting telles to ganger.",
+    "meter_help": "Måler du allerede en varmepumpe med en egen energimåler i Homey (for eksempel en Shelly EM på kursen)? Hver varmepumpe har sin egen måler: velg den med Rediger ved siden av den varmepumpen. Varmepumpen viser da målt effekt og forbruk i stedet for anslaget; anslaget går videre for sammenligning og tar over hvis måleren ikke er tilgjengelig. Ta deretter med varmepumpen i Homey Energy og utelat måleren, så ingenting telles to ganger.",
     "meter_none": "Ingen (bruk anslaget)",
     "meter_no_pumps": "Ingen varmepumpe lagt til ennå.",
     "meter_saved": "Måler lagret.",
@@ -42,6 +42,12 @@
     "debug_help": "Skriver hver Modbus-forespørsel og -svar til app-loggen. Nyttig ved en ny installasjon; slå det av når alt fungerer.",
     "save": "Lagre",
     "saved": "Lagret.",
-    "meter_missing_option": "⚠ finnes ikke lenger"
+    "meter_missing_option": "⚠ finnes ikke lenger",
+    "edit": "Rediger",
+    "cancel": "Avbryt",
+    "meter_label": "Energimåler for denne varmepumpen",
+    "status_measured": "Målt av __name__ · __watts__ W",
+    "status_estimate": "Ingen måler: anslaget brukes",
+    "status_unavailable": "Måler __name__ er ikke tilgjengelig; anslaget brukes"
   }
 }

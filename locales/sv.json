@@ -32,7 +32,7 @@
   "settings": {
     "subtitle": "Allmänna appinställningar. Anslutningen (IP, port, enhets-ID, intervall, funktioner) ställs in i varje värmepumps enhetsinställningar.",
     "meter_legend": "Extern energimätare",
-    "meter_help": "Mäter du redan en värmepump med en separat energimätare i Homey (till exempel en Shelly EM på dess grupp)? Välj den här. Värmepumpen visar då uppmätt effekt och förbrukning i stället för uppskattningen; uppskattningen fortsätter för jämförelse och tar över om mätaren inte är tillgänglig. Ta sedan med värmepumpen i Homey Energy och uteslut mätaren, så att inget räknas dubbelt.",
+    "meter_help": "Mäter du redan en värmepump med en separat energimätare i Homey (till exempel en Shelly EM på dess grupp)? Varje värmepump har sin egen mätare: välj den med Redigera bredvid den värmepumpen. Värmepumpen visar då uppmätt effekt och förbrukning i stället för uppskattningen; uppskattningen fortsätter för jämförelse och tar över om mätaren inte är tillgänglig. Ta sedan med värmepumpen i Homey Energy och uteslut mätaren, så att inget räknas dubbelt.",
     "meter_none": "Ingen (använd uppskattningen)",
     "meter_no_pumps": "Ingen värmepump tillagd ännu.",
     "meter_saved": "Mätare sparad.",
@@ -42,6 +42,12 @@
     "debug_help": "Skriver varje Modbus-förfrågan och -svar i apploggen. Användbart vid en ny installation; stäng av det när allt fungerar.",
     "save": "Spara",
     "saved": "Sparat.",
-    "meter_missing_option": "⚠ finns inte längre"
+    "meter_missing_option": "⚠ finns inte längre",
+    "edit": "Redigera",
+    "cancel": "Avbryt",
+    "meter_label": "Energimätare för den här värmepumpen",
+    "status_measured": "Mätt av __name__ · __watts__ W",
+    "status_estimate": "Ingen mätare: uppskattningen används",
+    "status_unavailable": "Mätare __name__ är inte tillgänglig; uppskattningen används"
   }
 }

@@ -32,7 +32,7 @@
   "settings": {
     "subtitle": "Global app settings. Connection details (IP, port, unit ID, poll interval, features) are in each heat pump's device settings.",
     "meter_legend": "External energy meter",
-    "meter_help": "Already measuring a heat pump with a separate energy meter in Homey (for example a Shelly EM on its circuit)? Pick it here. The heat pump then shows the measured power and energy instead of the estimate; the estimate keeps running for comparison and takes over when the meter is unavailable. Afterwards, in Homey Energy, include the heat pump and exclude the meter device, so nothing is counted twice.",
+    "meter_help": "Already measuring a heat pump with a separate energy meter in Homey (for example a Shelly EM on its circuit)? Each heat pump has its own meter: pick it with Edit next to that heat pump. The heat pump then shows the measured power and energy instead of the estimate; the estimate keeps running for comparison and takes over when the meter is unavailable. Afterwards, in Homey Energy, include the heat pump and exclude the meter device, so nothing is counted twice.",
     "meter_none": "None (use the estimate)",
     "meter_no_pumps": "No heat pump added yet.",
     "meter_saved": "Meter saved.",
@@ -42,6 +42,12 @@
     "debug_help": "Logs every Modbus request/response to the app log. Useful when debugging a new install; turn it off once things work.",
     "save": "Save",
     "saved": "Saved.",
-    "meter_missing_option": "⚠ no longer exists"
+    "meter_missing_option": "⚠ no longer exists",
+    "edit": "Edit",
+    "cancel": "Cancel",
+    "meter_label": "Energy meter for this heat pump",
+    "status_measured": "Measured by __name__ · __watts__ W",
+    "status_estimate": "No meter: the estimate is used",
+    "status_unavailable": "Meter __name__ is unavailable; the estimate is used"
   }
 }

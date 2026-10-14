@@ -284,7 +284,7 @@ modbus-serial's `client.isOpen` is unreliable for half-closed sockets — it onl
 > reads the meter now and writes "name · W, kWh (getest HH:MM)" into that label, or throws the reason. A meter the
 > Web API answers with 404 / "Not Found" for (removed or re-paired) sets a device warning (`setWarning`) and shows
 > "⚠ bestaat niet meer" in the label and both dropdowns; checked on every poll, a meter that could not be opened is
-> retried every 5 min, and relinking clears it. The app settings page lets the user link any appliance meter (a device with
+> retried every 5 min, and relinking clears it. The app settings page lists every heat pump with its meter status and an **Edit** button (as the brains list in Cortex AI) that opens a one-heat-pump editor; it lets the user link any appliance meter (a device with
 > `measure_power`, not cumulative / home battery / solar / this app) to a heat pump. The app reads it with
 > `homey-api` (`HomeyAPI.createAppAPI`, permission `homey:manager:api`) once per poll via `getDevice` — the
 > realtime `makeCapabilityInstance` route did not deliver updates inside the app. While usable, `measure_power`

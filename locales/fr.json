@@ -32,7 +32,7 @@
   "settings": {
     "subtitle": "Réglages généraux de l'app. La connexion (IP, port, ID d'unité, intervalle, fonctions) se règle dans les réglages de chaque pompe à chaleur.",
     "meter_legend": "Compteur d'énergie externe",
-    "meter_help": "Vous mesurez déjà une pompe à chaleur avec un compteur d'énergie séparé dans Homey (par exemple un Shelly EM sur son circuit) ? Choisissez-le ici. La pompe à chaleur affiche alors la puissance et la consommation mesurées au lieu de l'estimation ; l'estimation continue en parallèle pour comparaison et prend le relais si le compteur est indisponible. Ensuite, dans Homey Energy, incluez la pompe à chaleur et excluez le compteur, pour que rien ne soit compté deux fois.",
+    "meter_help": "Vous mesurez déjà une pompe à chaleur avec un compteur d'énergie séparé dans Homey (par exemple un Shelly EM sur son circuit) ? Chaque pompe à chaleur a son propre compteur : choisissez-le avec Modifier à côté de cette pompe à chaleur. La pompe à chaleur affiche alors la puissance et la consommation mesurées au lieu de l'estimation ; l'estimation continue en parallèle pour comparaison et prend le relais si le compteur est indisponible. Ensuite, dans Homey Energy, incluez la pompe à chaleur et excluez le compteur, pour que rien ne soit compté deux fois.",
     "meter_none": "Aucun (utiliser l'estimation)",
     "meter_no_pumps": "Aucune pompe à chaleur ajoutée.",
     "meter_saved": "Compteur enregistré.",
@@ -42,6 +42,12 @@
     "debug_help": "Écrit chaque requête et réponse Modbus dans le journal de l'app. Utile pour une nouvelle installation ; désactivez-le quand tout fonctionne.",
     "save": "Enregistrer",
     "saved": "Enregistré.",
-    "meter_missing_option": "⚠ n'existe plus"
+    "meter_missing_option": "⚠ n'existe plus",
+    "edit": "Modifier",
+    "cancel": "Annuler",
+    "meter_label": "Compteur d'énergie de cette pompe à chaleur",
+    "status_measured": "Mesuré par __name__ · __watts__ W",
+    "status_estimate": "Aucun compteur : l'estimation est utilisée",
+    "status_unavailable": "Le compteur __name__ est indisponible ; l'estimation est utilisée"
   }
 }

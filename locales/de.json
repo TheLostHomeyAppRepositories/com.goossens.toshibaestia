@@ -32,7 +32,7 @@
   "settings": {
     "subtitle": "Allgemeine App-Einstellungen. Die Verbindung (IP, Port, Unit-ID, Abfrageintervall, Funktionen) stellst du in den Geräteeinstellungen jeder Wärmepumpe ein.",
     "meter_legend": "Externer Energiezähler",
-    "meter_help": "Misst du eine Wärmepumpe bereits mit einem separaten Energiezähler in Homey (zum Beispiel einem Shelly EM an ihrem Stromkreis)? Wähle ihn hier. Die Wärmepumpe zeigt dann die gemessene Leistung und den Verbrauch statt der Schätzung; die Schätzung läuft zum Vergleich weiter und übernimmt, wenn der Zähler nicht verfügbar ist. Nimm danach in Homey Energy die Wärmepumpe auf und schließe das Zählergerät aus, damit nichts doppelt gezählt wird.",
+    "meter_help": "Misst du eine Wärmepumpe bereits mit einem separaten Energiezähler in Homey (zum Beispiel einem Shelly EM an ihrem Stromkreis)? Jede Wärmepumpe hat ihren eigenen Zähler: wähle ihn mit Bearbeiten neben dieser Wärmepumpe. Die Wärmepumpe zeigt dann die gemessene Leistung und den Verbrauch statt der Schätzung; die Schätzung läuft zum Vergleich weiter und übernimmt, wenn der Zähler nicht verfügbar ist. Nimm danach in Homey Energy die Wärmepumpe auf und schließe das Zählergerät aus, damit nichts doppelt gezählt wird.",
     "meter_none": "Keiner (Schätzung verwenden)",
     "meter_no_pumps": "Noch keine Wärmepumpe hinzugefügt.",
     "meter_saved": "Zähler gespeichert.",
@@ -42,6 +42,12 @@
     "debug_help": "Schreibt jede Modbus-Anfrage und -Antwort ins App-Log. Hilfreich bei einer neuen Installation; schalte es aus, sobald alles funktioniert.",
     "save": "Speichern",
     "saved": "Gespeichert.",
-    "meter_missing_option": "⚠ existiert nicht mehr"
+    "meter_missing_option": "⚠ existiert nicht mehr",
+    "edit": "Bearbeiten",
+    "cancel": "Abbrechen",
+    "meter_label": "Energiezähler dieser Wärmepumpe",
+    "status_measured": "Gemessen von __name__ · __watts__ W",
+    "status_estimate": "Kein Zähler: die Schätzung wird verwendet",
+    "status_unavailable": "Zähler __name__ ist nicht verfügbar; die Schätzung wird verwendet"
   }
 }

@@ -427,6 +427,12 @@ export default class HeatpumpDevice extends Homey.Device {
     return (this.getStoreValue('externalMeterId') as string | null) ?? null;
   }
 
+  /** State of the linked meter for the app settings page. */
+  public getExternalMeterState(): { name: string | null; missing: boolean; watts: number | null } {
+    const link = this.meterLink;
+    return { name: link?.name ?? null, missing: this.meterMissing, watts: link?.usable ? link.watts : null };
+  }
+
   /** Links a meter (any Homey device with measure_power) or unlinks it with null. */
   public async setExternalMeter(meterId: string | null): Promise<void> {
     await this.setStoreValue('externalMeterId', meterId);

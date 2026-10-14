@@ -32,7 +32,7 @@
   "settings": {
     "subtitle": "Ajustes generales de la app. La conexión (IP, puerto, ID de unidad, intervalo, funciones) se configura en los ajustes de cada bomba de calor.",
     "meter_legend": "Medidor de energía externo",
-    "meter_help": "¿Ya mides una bomba de calor con un medidor de energía aparte en Homey (por ejemplo un Shelly EM en su circuito)? Elígelo aquí. La bomba de calor mostrará entonces la potencia y el consumo medidos en lugar de la estimación; la estimación sigue funcionando para comparar y toma el relevo si el medidor no está disponible. Después, en Homey Energy, incluye la bomba de calor y excluye el medidor, para que nada se cuente dos veces.",
+    "meter_help": "¿Ya mides una bomba de calor con un medidor de energía aparte en Homey (por ejemplo un Shelly EM en su circuito)? Cada bomba de calor tiene su propio medidor: elígelo con Editar junto a esa bomba de calor. La bomba de calor mostrará entonces la potencia y el consumo medidos en lugar de la estimación; la estimación sigue funcionando para comparar y toma el relevo si el medidor no está disponible. Después, en Homey Energy, incluye la bomba de calor y excluye el medidor, para que nada se cuente dos veces.",
     "meter_none": "Ninguno (usar la estimación)",
     "meter_no_pumps": "Aún no se ha añadido ninguna bomba de calor.",
     "meter_saved": "Medidor guardado.",
@@ -42,6 +42,12 @@
     "debug_help": "Escribe cada petición y respuesta Modbus en el registro de la app. Útil en una instalación nueva; desactívalo cuando todo funcione.",
     "save": "Guardar",
     "saved": "Guardado.",
-    "meter_missing_option": "⚠ ya no existe"
+    "meter_missing_option": "⚠ ya no existe",
+    "edit": "Editar",
+    "cancel": "Cancelar",
+    "meter_label": "Medidor de energía de esta bomba de calor",
+    "status_measured": "Medido por __name__ · __watts__ W",
+    "status_estimate": "Sin medidor: se usa la estimación",
+    "status_unavailable": "El medidor __name__ no está disponible; se usa la estimación"
   }
 }

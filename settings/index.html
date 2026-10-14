@@ -4,6 +4,20 @@
   <meta charset="utf-8" />
   <title>Toshiba Estia</title>
   <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+  <style>
+    :root {
+      --bad: var(--homey-color-danger, #d23b3b);
+      --muted: var(--homey-text-color-light, #8a8a94);
+      --line: rgba(127,127,140,.22);
+    }
+    .hidden { display: none !important; }
+    .muted { color: var(--muted); }
+    .small { font-size: 13px; line-height: 1.4; }
+    .bad { color: var(--bad); }
+    .item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+    .item:first-child { border-top: 0; }
+    .item .grow { flex: 1 1 auto; min-width: 0; }
+  </style>
 </head>
 <body>
   <header class="homey-header">
@@ -15,6 +29,17 @@
     <legend class="homey-form-legend" data-i18n="settings.meter_legend"></legend>
     <p class="homey-form-help" data-i18n="settings.meter_help"></p>
     <div id="meters"></div>
+
+    <!-- Editor: the meter of one heat pump -->
+    <div id="meter-editor" class="hidden">
+      <p><b id="e-name"></b></p>
+      <div class="homey-form-group">
+        <label class="homey-form-label" for="e-meter" data-i18n="settings.meter_label"></label>
+        <select id="e-meter" class="homey-form-select"></select>
+      </div>
+      <button id="e-save" class="homey-button-primary-full" type="button" data-i18n="settings.save"></button>
+      <button id="e-cancel" class="homey-button-transparent" type="button" data-i18n="settings.cancel"></button>
+    </div>
     <div id="meter-status" class="homey-text" style="margin-top:0.5em;"></div>
   </fieldset>
 
@@ -54,58 +79,104 @@
         setTimeout(function() { el.textContent = ''; }, 2500);
       };
 
-      // One dropdown per heat pump: "none" (the estimate) or any device that measures power.
-      function renderMeters(links, meters) {
+      const editorEl = document.getElementById('meter-editor');
+      const meterSelectEl = document.getElementById('e-meter');
+      let editing = null;
+
+      // Homey.api as a promise.
+      const api = (method, path, body) => new Promise(function(resolve, reject) {
+        Homey.api(method, path, body, function(err, result) { if (err) reject(err); else resolve(result); });
+      });
+      const alertError = (err) => Homey.alert(err && err.message ? err.message : String(err));
+
+      function statusOf(link) {
+        if (!link.meterId) return { text: Homey.__('settings.status_estimate'), bad: false };
+        if (link.missing) return { text: Homey.__('power.meter_missing'), bad: true };
+        if (link.watts === null) return { text: Homey.__('settings.status_unavailable', { name: link.meterName || '?' }), bad: true };
+        return { text: Homey.__('settings.status_measured', { name: link.meterName, watts: Math.round(link.watts) }), bad: false };
+      }
+
+      // One row per heat pump: its meter and an Edit button, like the brains list in Cortex AI.
+      function renderMeters(links) {
         metersEl.innerHTML = '';
         if (links.length === 0) {
           metersEl.textContent = Homey.__('settings.meter_no_pumps');
           return;
         }
         links.forEach(function(link) {
-          const group = document.createElement('div');
-          group.className = 'homey-form-group';
-          const label = document.createElement('label');
-          label.className = 'homey-form-label';
-          label.textContent = link.name;
-          const select = document.createElement('select');
-          select.className = 'homey-form-select';
-          const none = document.createElement('option');
-          none.value = '';
-          none.textContent = Homey.__('settings.meter_none');
-          select.appendChild(none);
-          meters.forEach(function(meter) {
-            const option = document.createElement('option');
-            option.value = meter.id;
-            option.textContent = meter.name;
-            select.appendChild(option);
-          });
-          // The linked meter is gone (removed or paired again): keep it visible as such.
-          if (link.meterId && !meters.some(function(m) { return m.id === link.meterId; })) {
-            const gone = document.createElement('option');
-            gone.value = link.meterId;
-            gone.textContent = Homey.__('settings.meter_missing_option');
-            select.appendChild(gone);
-          }
-          select.value = link.meterId || '';
-          select.addEventListener('change', function() {
-            Homey.api('PUT', '/links', { deviceId: link.deviceId, meterId: select.value || null }, function(err) {
-              if (err) return Homey.alert(Homey.__('settings.meter_error') + (err.message || err));
-              flash(meterStatusEl, Homey.__('settings.meter_saved'));
-            });
-          });
-          group.appendChild(label);
-          group.appendChild(select);
-          metersEl.appendChild(group);
+          const row = document.createElement('div');
+          row.className = 'item';
+          const text = document.createElement('span');
+          text.className = 'grow';
+          const name = document.createElement('b');
+          name.textContent = link.name;
+          const status = statusOf(link);
+          const line = document.createElement('span');
+          line.className = 'small ' + (status.bad ? 'bad' : 'muted');
+          line.textContent = status.text;
+          text.appendChild(name);
+          text.appendChild(document.createElement('br'));
+          text.appendChild(line);
+          const edit = document.createElement('button');
+          edit.type = 'button';
+          edit.className = 'homey-button-small';
+          edit.textContent = Homey.__('settings.edit');
+          edit.addEventListener('click', function() { openEditor(link).catch(alertError); });
+          row.appendChild(text);
+          row.appendChild(edit);
+          metersEl.appendChild(row);
         });
       }
 
-      Homey.api('GET', '/links', null, function(err, links) {
-        if (err) return Homey.alert(err.message || err);
-        Homey.api('GET', '/meters', null, function(err2, meters) {
-          if (err2) return Homey.alert(err2.message || err2);
-          renderMeters(links, meters);
+      async function loadMeters() {
+        renderMeters(await api('GET', '/links'));
+      }
+
+      async function openEditor(link) {
+        const meters = await api('GET', '/meters');
+        editing = link;
+        document.getElementById('e-name').textContent = link.name;
+        meterSelectEl.innerHTML = '';
+        const none = document.createElement('option');
+        none.value = '';
+        none.textContent = Homey.__('settings.meter_none');
+        meterSelectEl.appendChild(none);
+        meters.forEach(function(meter) {
+          const option = document.createElement('option');
+          option.value = meter.id;
+          option.textContent = meter.name;
+          meterSelectEl.appendChild(option);
         });
+        // The linked meter is gone (removed or paired again): keep it visible as such.
+        if (link.meterId && !meters.some(function(m) { return m.id === link.meterId; })) {
+          const gone = document.createElement('option');
+          gone.value = link.meterId;
+          gone.textContent = Homey.__('settings.meter_missing_option');
+          meterSelectEl.appendChild(gone);
+        }
+        meterSelectEl.value = link.meterId || '';
+        metersEl.classList.add('hidden');
+        editorEl.classList.remove('hidden');
+      }
+
+      function closeEditor() {
+        editing = null;
+        editorEl.classList.add('hidden');
+        metersEl.classList.remove('hidden');
+      }
+
+      document.getElementById('e-save').addEventListener('click', function() {
+        api('PUT', '/links', { deviceId: editing.deviceId, meterId: meterSelectEl.value || null })
+          .then(function(links) {
+            closeEditor();
+            renderMeters(links);
+            flash(meterStatusEl, Homey.__('settings.meter_saved'));
+          })
+          .catch(function(err) { Homey.alert(Homey.__('settings.meter_error') + (err.message || err)); });
       });
+      document.getElementById('e-cancel').addEventListener('click', closeEditor);
+
+      loadMeters().catch(alertError);
 
       Homey.get('debug', function(err, val) {
         if (err) return Homey.alert(err);

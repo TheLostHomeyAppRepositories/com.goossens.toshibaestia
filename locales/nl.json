@@ -32,7 +32,7 @@
   "settings": {
     "subtitle": "Algemene app-instellingen. De verbinding (IP, poort, unit-ID, pollinterval, functies) stel je in bij elke warmtepomp, in de instellingen van het toestel.",
     "meter_legend": "Externe energiemeter",
-    "meter_help": "Meet je een warmtepomp al met een aparte energiemeter in Homey (bijvoorbeeld een Shelly EM op zijn groep)? Kies hem hier. De warmtepomp toont dan het gemeten vermogen en verbruik in plaats van de schatting; de schatting blijft meedraaien ter vergelijking en neemt over als de meter niet beschikbaar is. Neem daarna in Homey Energy de warmtepomp op en sluit de meter uit, zodat niets dubbel telt.",
+    "meter_help": "Meet je een warmtepomp al met een aparte energiemeter in Homey (bijvoorbeeld een Shelly EM op zijn groep)? Elke warmtepomp heeft zijn eigen meter: kies hem met Wijzigen naast die warmtepomp. De warmtepomp toont dan het gemeten vermogen en verbruik in plaats van de schatting; de schatting blijft meedraaien ter vergelijking en neemt over als de meter niet beschikbaar is. Neem daarna in Homey Energy de warmtepomp op en sluit de meter uit, zodat niets dubbel telt.",
     "meter_none": "Geen (de schatting gebruiken)",
     "meter_no_pumps": "Nog geen warmtepomp toegevoegd.",
     "meter_saved": "Meter opgeslagen.",
@@ -42,6 +42,12 @@
     "debug_help": "Schrijft elke Modbus-vraag en elk antwoord in de app-log. Handig bij een nieuwe installatie; zet het uit zodra alles werkt.",
     "save": "Opslaan",
     "saved": "Opgeslagen.",
-    "meter_missing_option": "⚠ bestaat niet meer"
+    "meter_missing_option": "⚠ bestaat niet meer",
+    "edit": "Wijzigen",
+    "cancel": "Annuleren",
+    "meter_label": "Energiemeter van deze warmtepomp",
+    "status_measured": "Gemeten door __name__ · __watts__ W",
+    "status_estimate": "Geen meter: de schatting wordt gebruikt",
+    "status_unavailable": "Meter __name__ is niet beschikbaar; de schatting wordt gebruikt"
   }
 }

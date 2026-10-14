@@ -12,11 +12,18 @@ export interface MeterLink {
   deviceId: string;
   name: string;
   meterId: string | null;
+  /** Name of the linked meter as last read; null when none is linked or it was never opened. */
+  meterName: string | null;
+  /** The linked meter no longer exists (removed or paired again). */
+  missing: boolean;
+  /** Latest measured power, or null while the meter is not usable. */
+  watts: number | null;
 }
 
 /** What a heat pump device offers the app for external meters (drivers/heatpump/device.ts). */
 interface MeterLinkedDevice extends Homey.Device {
   getExternalMeterId(): string | null;
+  getExternalMeterState(): { name: string | null; missing: boolean; watts: number | null };
   setExternalMeter(meterId: string | null): Promise<void>;
 }
 
@@ -73,11 +80,17 @@ export default class ToshibaEstiaApp extends Homey.App {
 
   /** Every heat pump with its linked meter (settings page). */
   getMeterLinks(): MeterLink[] {
-    return this.heatPumps().map((device) => ({
-      deviceId: String(device.getData().id),
-      name: device.getName(),
-      meterId: device.getExternalMeterId(),
-    }));
+    return this.heatPumps().map((device) => {
+      const meter = device.getExternalMeterState();
+      return {
+        deviceId: String(device.getData().id),
+        name: device.getName(),
+        meterId: device.getExternalMeterId(),
+        meterName: meter.name,
+        missing: meter.missing,
+        watts: meter.watts,
+      };
+    });
   }
 
   /** Links a meter to a heat pump, or unlinks it with null (settings page). */
