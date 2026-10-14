@@ -23,7 +23,11 @@
     "from_databook": "från Data Book",
     "measured_by": "uppmätt av __name__",
     "estimate_now": "uppskattning nu __watts__ W",
-    "meter_unavailable": "mätare __name__ otillgänglig, uppskattningen används"
+    "meter_unavailable": "mätare __name__ otillgänglig, uppskattningen används",
+    "test_no_meter": "Ingen extern mätare kopplad. Välj en via Reparera eller på appens inställningssida.",
+    "meter_missing": "Den kopplade energimätaren finns inte längre (borttagen eller parkopplad på nytt). Välj den igen via Reparera eller på appens inställningssida; tills dess används uppskattningen.",
+    "test_unavailable": "Mätare __name__ är inte tillgänglig just nu; uppskattningen används.",
+    "tested": "testad __time__"
   },
   "settings": {
     "subtitle": "Allmänna appinställningar. Anslutningen (IP, port, enhets-ID, intervall, funktioner) ställs in i varje värmepumps enhetsinställningar.",
@@ -37,6 +41,7 @@
     "debug_label": "Utförlig Modbus-loggning",
     "debug_help": "Skriver varje Modbus-förfrågan och -svar i apploggen. Användbart vid en ny installation; stäng av det när allt fungerar.",
     "save": "Spara",
-    "saved": "Sparat."
+    "saved": "Sparat.",
+    "meter_missing_option": "⚠ finns inte längre"
   }
 }

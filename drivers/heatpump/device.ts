@@ -31,7 +31,7 @@ import {
   type PowerSample,
   type RefrigerantCheckState,
 } from './power-model';
-import { ExternalMeterLink } from './external-meter';
+import { ExternalMeterLink, isMeterGone } from './external-meter';
 
 type TempScaling = 'x1' | 'x10';
 type ThermostatMode = 'off' | 'heat' | 'cool';
@@ -284,6 +284,8 @@ const ALWAYS_ON_CAPABILITIES: Array<[string, Record<string, unknown>?]> = [
     ar: 'متوسط درجة الحرارة الخارجية',
   } }],
   ['season'],
+  // External meter (1.2.0): maintenance action, options from the manifest
+  ['button.test_meter'],
 ];
 
 /** Registers always polled, independent of optional features. */
@@ -337,6 +339,9 @@ export default class HeatpumpDevice extends Homey.Device {
   private lastPower: { watts: number; timeMs: number } | null = null;
   /** Meter linked on the app settings page; while usable it replaces the estimate. */
   private meterLink: ExternalMeterLink | null = null;
+  /** True while the linked meter device no longer exists; shown as device warning. */
+  private meterMissing = false;
+  private meterOpenedMs = 0;
   private lastPowerSample: PowerSample | null = null;
   // Heater-hours reconciliation: the heater time counted since the counter last ticked, and
   // how much of that period the app was actually polling (gaps over 5 min don't count).
@@ -432,23 +437,58 @@ export default class HeatpumpDevice extends Homey.Device {
     this.meterLink = null;
   }
 
-  /** Re-reads the linked meter through the Web API (once per poll). */
+  /**
+   * Re-reads the linked meter through the Web API (once per poll). A meter that could not be
+   * opened is retried every 5 minutes; the estimate is used meanwhile.
+   */
   private async refreshExternalMeter(): Promise<void> {
     const link = this.meterLink;
-    if (!link) return;
+    if (!link) {
+      if (this.getExternalMeterId() && Date.now() - this.meterOpenedMs >= 5 * 60_000) await this.applyExternalMeter();
+      return;
+    }
     try {
       const api = await this.app.getHomeyApi();
       link.update(await api.devices.getDevice({ id: link.meterId }));
+      await this.setMeterMissing(false);
     } catch (err) {
       if (link.available) this.error(`External meter ${link.name} could not be read`, err);
       link.markUnavailable();
+      await this.setMeterMissing(isMeterGone(err));
     }
+  }
+
+  /** Device warning while the linked meter no longer exists (removed or paired again). */
+  private async setMeterMissing(missing: boolean): Promise<void> {
+    if (missing === this.meterMissing) return;
+    this.meterMissing = missing;
+    await (missing ? this.setWarning(this.homey.__('power.meter_missing')) : this.unsetWarning())
+      .catch((err) => this.error('meter warning', err));
+    if (missing) await this.setSettings({ externalMeter: this.homey.__('settings.meter_missing_option') }).catch(() => undefined);
+  }
+
+  /** Maintenance action: reads the meter now and shows the result, or throws why it fails. */
+  private async testExternalMeter(): Promise<void> {
+    if (!this.getExternalMeterId()) throw new Error(this.homey.__('power.test_no_meter'));
+    if (this.meterLink) await this.refreshExternalMeter();
+    else await this.applyExternalMeter();
+    if (this.meterMissing) throw new Error(this.homey.__('power.meter_missing'));
+    const link = this.meterLink;
+    if (!link?.usable) throw new Error(this.homey.__('power.test_unavailable', { name: link?.name ?? '?' }));
+    const time = new Date().toLocaleTimeString(this.homey.i18n.getLanguage(), {
+      timeZone: this.homey.clock.getTimezone(), hour: '2-digit', minute: '2-digit',
+    });
+    const values = [`${Math.round(link.watts as number)} W`];
+    if (link.kwh !== null) values.push(`${link.kwh.toFixed(2)} kWh`);
+    await this.setSettings({ externalMeter: `${link.name} · ${values.join(', ')} (${this.homey.__('power.tested', { time })})` });
   }
 
   /** Opens the linked meter through Homey's Web API and marks power as measured or estimated. */
   private async applyExternalMeter(): Promise<void> {
     this.closeExternalMeter();
+    this.meterOpenedMs = Date.now();
     const meterId = this.getExternalMeterId();
+    let missing = false;
     if (meterId) {
       try {
         const api = await this.app.getHomeyApi();
@@ -456,11 +496,17 @@ export default class HeatpumpDevice extends Homey.Device {
         this.log(`External meter linked: ${this.meterLink.name} (${this.meterLink.energyCapability ?? 'power only'})`);
       } catch (err) {
         this.error('External meter could not be opened', err);
+        missing = isMeterGone(err);
       }
     }
     await this.applyPowerCapabilityOptions(this.meterLink !== null);
-    const externalMeter = meterId ? (this.meterLink?.name ?? this.homey.__('power.meter_unavailable', { name: '?' })) : this.homey.__('settings.meter_none');
+    let externalMeter = this.homey.__('settings.meter_none');
+    if (missing) externalMeter = this.homey.__('settings.meter_missing_option');
+    else if (meterId) externalMeter = this.meterLink?.name ?? this.homey.__('power.meter_unavailable', { name: '?' });
     await this.setSettings({ externalMeter }).catch((err) => this.error('setSettings externalMeter', err));
+    // Re-evaluated on every open, so unlinking or relinking clears the warning.
+    this.meterMissing = !missing;
+    await this.setMeterMissing(missing);
   }
 
   /** Titles and Homey's isApproximated flag follow whether power is measured or estimated. */
@@ -699,6 +745,9 @@ export default class HeatpumpDevice extends Homey.Device {
         await this.app.modbus.writeRegister(endpoint(), REGISTERS.antibacteriaOnOff.number, value ? 1 : 0);
       });
     }
+
+    // Maintenance action: test the external meter
+    this.safeRegisterListener('button.test_meter', async () => this.testExternalMeter());
   }
 
   /** Helper: idempotent capability listener registration. */

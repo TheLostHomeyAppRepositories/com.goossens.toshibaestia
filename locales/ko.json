@@ -23,7 +23,11 @@
     "from_databook": "Data Book 기준",
     "measured_by": "__name__에서 측정",
     "estimate_now": "현재 추정 __watts__ W",
-    "meter_unavailable": "미터 __name__을(를) 사용할 수 없어 추정값을 사용합니다"
+    "meter_unavailable": "미터 __name__을(를) 사용할 수 없어 추정값을 사용합니다",
+    "test_no_meter": "연결된 외부 미터가 없습니다. 복구 또는 앱 설정 페이지에서 선택하세요.",
+    "meter_missing": "연결된 에너지 미터가 더 이상 없습니다(삭제되었거나 다시 페어링됨). 복구 또는 앱 설정 페이지에서 다시 선택하세요. 그때까지는 추정값을 사용합니다.",
+    "test_unavailable": "미터 __name__을(를) 지금 사용할 수 없어 추정값을 사용합니다.",
+    "tested": "__time__ 테스트됨"
   },
   "settings": {
     "subtitle": "앱 전체 설정입니다. 연결(IP, 포트, 유닛 ID, 폴링 간격, 기능)은 각 히트펌프의 기기 설정에서 지정합니다.",
@@ -37,6 +41,7 @@
     "debug_label": "상세 Modbus 로그",
     "debug_help": "모든 Modbus 요청과 응답을 앱 로그에 기록합니다. 새 설치 시 유용하며, 모두 작동하면 끄세요.",
     "save": "저장",
-    "saved": "저장되었습니다."
+    "saved": "저장되었습니다.",
+    "meter_missing_option": "⚠ 더 이상 없음"
   }
 }

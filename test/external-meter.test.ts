@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  ApiDevice, ExternalMeterLink, MeterDelta, energyCapabilityOf, isApplianceMeter, meterChoices,
+  ApiDevice, ExternalMeterLink, MeterDelta, energyCapabilityOf, isApplianceMeter, isMeterGone, meterChoices,
 } from '../drivers/heatpump/external-meter';
 
 const OWN = 'homey:app:com.goossens.toshibaestia:';
@@ -68,4 +68,12 @@ test('link without an energy counter reports null, so the caller integrates the 
   assert.equal(link.energyCapability, null);
   assert.equal(link.energySinceLast(), null);
   assert.equal(link.watts, 160);
+});
+
+test('a removed meter is told apart from a meter that is only unreachable', () => {
+  assert.equal(isMeterGone({ statusCode: 404, message: 'Not Found: Device with ID x' }), true);
+  assert.equal(isMeterGone(new Error('Not Found: Device with ID x')), true);
+  assert.equal(isMeterGone(new Error('Timeout')), false);
+  assert.equal(isMeterGone({ statusCode: 503 }), false);
+  assert.equal(isMeterGone(null), false);
 });

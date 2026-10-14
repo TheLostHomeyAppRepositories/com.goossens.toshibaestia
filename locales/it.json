@@ -23,7 +23,11 @@
     "from_databook": "dal Data Book",
     "measured_by": "misurato da __name__",
     "estimate_now": "stima attuale __watts__ W",
-    "meter_unavailable": "contatore __name__ non disponibile, si usa la stima"
+    "meter_unavailable": "contatore __name__ non disponibile, si usa la stima",
+    "test_no_meter": "Nessun contatore esterno collegato. Sceglilo con Ripara o nella pagina delle impostazioni dell'app.",
+    "meter_missing": "Il contatore di energia collegato non esiste più (rimosso o abbinato di nuovo). Sceglilo di nuovo con Ripara o nella pagina delle impostazioni dell'app; fino ad allora si usa la stima.",
+    "test_unavailable": "Il contatore __name__ non è disponibile ora; si usa la stima.",
+    "tested": "testato __time__"
   },
   "settings": {
     "subtitle": "Impostazioni generali dell'app. La connessione (IP, porta, ID unità, intervallo, funzioni) si imposta nelle impostazioni di ogni pompa di calore.",
@@ -37,6 +41,7 @@
     "debug_label": "Log Modbus dettagliato",
     "debug_help": "Scrive ogni richiesta e risposta Modbus nel log dell'app. Utile in una nuova installazione; disattivalo quando tutto funziona.",
     "save": "Salva",
-    "saved": "Salvato."
+    "saved": "Salvato.",
+    "meter_missing_option": "⚠ non esiste più"
   }
 }

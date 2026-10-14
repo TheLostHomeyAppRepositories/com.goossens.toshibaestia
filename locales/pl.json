@@ -23,7 +23,11 @@
     "from_databook": "z Data Book",
     "measured_by": "mierzone przez __name__",
     "estimate_now": "szacunek teraz __watts__ W",
-    "meter_unavailable": "licznik __name__ niedostępny, używany jest szacunek"
+    "meter_unavailable": "licznik __name__ niedostępny, używany jest szacunek",
+    "test_no_meter": "Nie połączono zewnętrznego licznika. Wybierz go przez Napraw lub na stronie ustawień aplikacji.",
+    "meter_missing": "Połączony licznik energii już nie istnieje (usunięty lub sparowany ponownie). Wybierz go ponownie przez Napraw lub na stronie ustawień aplikacji; do tego czasu używany jest szacunek.",
+    "test_unavailable": "Licznik __name__ jest teraz niedostępny; używany jest szacunek.",
+    "tested": "przetestowano __time__"
   },
   "settings": {
     "subtitle": "Ogólne ustawienia aplikacji. Połączenie (IP, port, ID jednostki, interwał, funkcje) ustawiasz w ustawieniach każdej pompy ciepła.",
@@ -37,6 +41,7 @@
     "debug_label": "Szczegółowe logowanie Modbus",
     "debug_help": "Zapisuje każde zapytanie i odpowiedź Modbus w logu aplikacji. Przydatne przy nowej instalacji; wyłącz, gdy wszystko działa.",
     "save": "Zapisz",
-    "saved": "Zapisano."
+    "saved": "Zapisano.",
+    "meter_missing_option": "⚠ już nie istnieje"
   }
 }

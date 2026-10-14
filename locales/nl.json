@@ -23,7 +23,11 @@
     "from_databook": "uit het Data Book",
     "measured_by": "gemeten door __name__",
     "estimate_now": "schatting nu __watts__ W",
-    "meter_unavailable": "meter __name__ niet beschikbaar, de schatting wordt gebruikt"
+    "meter_unavailable": "meter __name__ niet beschikbaar, de schatting wordt gebruikt",
+    "test_no_meter": "Geen externe meter gekoppeld. Kies er een via Repareren of op de instellingenpagina van de app.",
+    "meter_missing": "De gekoppelde energiemeter bestaat niet meer (verwijderd of opnieuw gekoppeld). Kies hem opnieuw via Repareren of op de instellingenpagina van de app; tot dan wordt de schatting gebruikt.",
+    "test_unavailable": "Meter __name__ is nu niet beschikbaar; de schatting wordt gebruikt.",
+    "tested": "getest __time__"
   },
   "settings": {
     "subtitle": "Algemene app-instellingen. De verbinding (IP, poort, unit-ID, pollinterval, functies) stel je in bij elke warmtepomp, in de instellingen van het toestel.",
@@ -37,6 +41,7 @@
     "debug_label": "Uitgebreide Modbus-logging",
     "debug_help": "Schrijft elke Modbus-vraag en elk antwoord in de app-log. Handig bij een nieuwe installatie; zet het uit zodra alles werkt.",
     "save": "Opslaan",
-    "saved": "Opgeslagen."
+    "saved": "Opgeslagen.",
+    "meter_missing_option": "⚠ bestaat niet meer"
   }
 }

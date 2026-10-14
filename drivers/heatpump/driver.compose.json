@@ -38,7 +38,8 @@
     "antibacteria",
     "measure_power",
     "meter_power",
-    "season"
+    "season",
+    "button.test_meter"
   ],
   "capabilitiesOptions": {
     "onoff": {
@@ -395,6 +396,39 @@
         "ru": "Горячая вода",
         "ko": "온수",
         "ar": "الماء الساخن"
+      }
+    },
+    "button.test_meter": {
+      "maintenanceAction": true,
+      "title": {
+        "en": "Test external meter",
+        "nl": "Externe meter testen",
+        "de": "Externen Zähler testen",
+        "fr": "Tester le compteur externe",
+        "es": "Probar el medidor externo",
+        "it": "Testa il contatore esterno",
+        "da": "Test ekstern måler",
+        "no": "Test ekstern måler",
+        "sv": "Testa extern mätare",
+        "pl": "Testuj zewnętrzny licznik",
+        "ru": "Проверить внешний счётчик",
+        "ko": "외부 미터 테스트",
+        "ar": "اختبار العدّاد الخارجي"
+      },
+      "desc": {
+        "en": "Reads the linked energy meter now. If it works, its power and counter appear under External energy meter in the settings; if not, you see why.",
+        "nl": "Leest de gekoppelde energiemeter nu uit. Werkt het, dan staan vermogen en teller bij Externe energiemeter in de instellingen; zo niet, dan zie je waarom.",
+        "de": "Liest den verknüpften Energiezähler jetzt aus. Klappt es, stehen Leistung und Zählerstand bei Externer Energiezähler in den Einstellungen; sonst siehst du, warum.",
+        "fr": "Lit maintenant le compteur d'énergie lié. Si cela fonctionne, sa puissance et son index apparaissent sous Compteur d'énergie externe dans les réglages ; sinon, vous voyez pourquoi.",
+        "es": "Lee ahora el medidor de energía vinculado. Si funciona, su potencia y su contador aparecen en Medidor de energía externo en los ajustes; si no, verás por qué.",
+        "it": "Legge ora il contatore di energia collegato. Se funziona, potenza e contatore compaiono sotto Contatore di energia esterno nelle impostazioni; altrimenti vedi il perché.",
+        "da": "Aflæser den tilknyttede energimåler nu. Virker det, står effekt og tællerstand under Ekstern energimåler i indstillingerne; ellers kan du se hvorfor.",
+        "no": "Leser av den tilkoblede energimåleren nå. Fungerer det, står effekt og målerstand under Ekstern energimåler i innstillingene; ellers ser du hvorfor.",
+        "sv": "Läser av den kopplade energimätaren nu. Fungerar det står effekt och mätarställning under Extern energimätare i inställningarna; annars ser du varför.",
+        "pl": "Odczytuje teraz połączony licznik energii. Jeśli działa, moc i stan licznika pojawią się w ustawieniach przy Zewnętrzny licznik energii; jeśli nie, zobaczysz dlaczego.",
+        "ru": "Сейчас считывает подключённый счётчик энергии. Если всё работает, мощность и показания появятся в настройках в разделе «Внешний счётчик энергии»; если нет, вы увидите причину.",
+        "ko": "연결된 에너지 미터를 지금 읽습니다. 정상이면 설정의 외부 에너지 미터에 전력과 누적값이 표시되고, 아니면 그 이유를 보여 줍니다.",
+        "ar": "يقرأ عدّاد الطاقة المرتبط الآن. إذا نجح ذلك فستظهر قدرته وقراءة عدّاده تحت عدّاد طاقة خارجي في الإعدادات؛ وإلا فسترى السبب."
       }
     }
   },

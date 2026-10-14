@@ -23,7 +23,11 @@
     "from_databook": "fra Data Book",
     "measured_by": "målt af __name__",
     "estimate_now": "skøn nu __watts__ W",
-    "meter_unavailable": "måler __name__ utilgængelig, skønnet bruges"
+    "meter_unavailable": "måler __name__ utilgængelig, skønnet bruges",
+    "test_no_meter": "Ingen ekstern måler tilknyttet. Vælg en via Reparer eller på appens indstillingsside.",
+    "meter_missing": "Den tilknyttede energimåler findes ikke længere (fjernet eller parret igen). Vælg den igen via Reparer eller på appens indstillingsside; indtil da bruges skønnet.",
+    "test_unavailable": "Måler __name__ er ikke tilgængelig lige nu; skønnet bruges.",
+    "tested": "testet __time__"
   },
   "settings": {
     "subtitle": "Generelle app-indstillinger. Forbindelsen (IP, port, enheds-ID, interval, funktioner) indstilles i hver varmepumpes enhedsindstillinger.",
@@ -37,6 +41,7 @@
     "debug_label": "Udførlig Modbus-logning",
     "debug_help": "Skriver hver Modbus-forespørgsel og -svar i app-loggen. Nyttigt ved en ny installation; slå det fra, når alt virker.",
     "save": "Gem",
-    "saved": "Gemt."
+    "saved": "Gemt.",
+    "meter_missing_option": "⚠ findes ikke længere"
   }
 }

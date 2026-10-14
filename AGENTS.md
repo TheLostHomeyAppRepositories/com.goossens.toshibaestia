@@ -280,7 +280,11 @@ modbus-serial's `client.isOpen` is unreliable for half-closed sockets — it onl
 >
 > **External meter (1.2.0):** like Cortex AI's brains, two ways to edit: **Repair** on the heat pump (custom view
 > `repair/external_meter.html`, `onRepair` handlers `init`/`save`) and the app settings page; a read-only device
-> setting `externalMeter` shows the linked meter and its hint explains both. The app settings page lets the user link any appliance meter (a device with
+> setting `externalMeter` shows the linked meter and its hint explains both. Maintenance action `button.test_meter`
+> reads the meter now and writes "name · W, kWh (getest HH:MM)" into that label, or throws the reason. A meter the
+> Web API answers with 404 / "Not Found" for (removed or re-paired) sets a device warning (`setWarning`) and shows
+> "⚠ bestaat niet meer" in the label and both dropdowns; checked on every poll, a meter that could not be opened is
+> retried every 5 min, and relinking clears it. The app settings page lets the user link any appliance meter (a device with
 > `measure_power`, not cumulative / home battery / solar / this app) to a heat pump. The app reads it with
 > `homey-api` (`HomeyAPI.createAppAPI`, permission `homey:manager:api`) once per poll via `getDevice` — the
 > realtime `makeCapabilityInstance` route did not deliver updates inside the app. While usable, `measure_power`

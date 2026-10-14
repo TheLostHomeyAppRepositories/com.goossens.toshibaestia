@@ -79,6 +79,13 @@
             option.textContent = meter.name;
             select.appendChild(option);
           });
+          // The linked meter is gone (removed or paired again): keep it visible as such.
+          if (link.meterId && !meters.some(function(m) { return m.id === link.meterId; })) {
+            const gone = document.createElement('option');
+            gone.value = link.meterId;
+            gone.textContent = Homey.__('settings.meter_missing_option');
+            select.appendChild(gone);
+          }
           select.value = link.meterId || '';
           select.addEventListener('change', function() {
             Homey.api('PUT', '/links', { deviceId: link.deviceId, meterId: select.value || null }, function(err) {

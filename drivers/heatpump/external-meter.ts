@@ -61,6 +61,12 @@ export function meterChoices(devices: ApiDevice[], ownDriverPrefix: string): Met
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
+/** Whether a Web API error means the meter device no longer exists (removed or paired again). */
+export function isMeterGone(err: unknown): boolean {
+  const e = err as { statusCode?: unknown; message?: unknown } | null;
+  return e?.statusCode === 404 || /not found/i.test(String(e?.message ?? ''));
+}
+
 /**
  * Energy since the previous reading of a lifetime counter. The first reading, a missing
  * counter and a drop (counter reset, other meter) add nothing and start over.

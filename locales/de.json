@@ -23,7 +23,11 @@
     "from_databook": "aus dem Data Book",
     "measured_by": "gemessen von __name__",
     "estimate_now": "Schätzung jetzt __watts__ W",
-    "meter_unavailable": "Zähler __name__ nicht verfügbar, die Schätzung wird verwendet"
+    "meter_unavailable": "Zähler __name__ nicht verfügbar, die Schätzung wird verwendet",
+    "test_no_meter": "Kein externer Zähler verknüpft. Wähle einen über Reparieren oder auf der Einstellungsseite der App.",
+    "meter_missing": "Der verknüpfte Energiezähler existiert nicht mehr (entfernt oder neu angelernt). Wähle ihn erneut über Reparieren oder auf der Einstellungsseite der App; bis dahin wird die Schätzung verwendet.",
+    "test_unavailable": "Zähler __name__ ist gerade nicht verfügbar; die Schätzung wird verwendet.",
+    "tested": "getestet __time__"
   },
   "settings": {
     "subtitle": "Allgemeine App-Einstellungen. Die Verbindung (IP, Port, Unit-ID, Abfrageintervall, Funktionen) stellst du in den Geräteeinstellungen jeder Wärmepumpe ein.",
@@ -37,6 +41,7 @@
     "debug_label": "Ausführliches Modbus-Logging",
     "debug_help": "Schreibt jede Modbus-Anfrage und -Antwort ins App-Log. Hilfreich bei einer neuen Installation; schalte es aus, sobald alles funktioniert.",
     "save": "Speichern",
-    "saved": "Gespeichert."
+    "saved": "Gespeichert.",
+    "meter_missing_option": "⚠ existiert nicht mehr"
   }
 }

@@ -23,7 +23,11 @@
     "from_databook": "from the Data Book",
     "measured_by": "measured by __name__",
     "estimate_now": "estimate now __watts__ W",
-    "meter_unavailable": "meter __name__ unavailable, using the estimate"
+    "meter_unavailable": "meter __name__ unavailable, using the estimate",
+    "test_no_meter": "No external meter linked. Pick one via Repair or on the app settings page.",
+    "meter_missing": "The linked energy meter no longer exists (removed or paired again). Pick it again via Repair or on the app settings page; until then the estimate is used.",
+    "test_unavailable": "Meter __name__ is unavailable right now; the estimate is used.",
+    "tested": "tested __time__"
   },
   "settings": {
     "subtitle": "Global app settings. Connection details (IP, port, unit ID, poll interval, features) are in each heat pump's device settings.",
@@ -37,6 +41,7 @@
     "debug_label": "Enable verbose Modbus logging",
     "debug_help": "Logs every Modbus request/response to the app log. Useful when debugging a new install; turn it off once things work.",
     "save": "Save",
-    "saved": "Saved."
+    "saved": "Saved.",
+    "meter_missing_option": "⚠ no longer exists"
   }
 }
