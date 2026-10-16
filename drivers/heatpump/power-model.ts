@@ -240,6 +240,9 @@ const HANDOVER_BACKFILL_MS = 5 * 60_000; // heater recognised this soon after a 
 const DT_SMOOTHING_S = 60; // ΔT time constant against whole-degree jitter
 const HEATER_MAX_TWO_DROP_K = 1; // TWO/TWI may fall at most this much per 2 min while the heater runs
 const MAX_GAP_MS = 5 * 60_000; // longer gaps reset the trackers
+// After a compressor run the tank sensor still creeps up ~1 K while the tank settles: a
+// rise counts as heating only from this long after the compressor stopped.
+const TANK_SETTLE_MS = 5 * 60_000;
 const FLOW_MIN_LPM = 3;
 const FLOW_MAX_LPM = 60;
 const FLOW_SAMPLES_KEPT = 7;
@@ -386,6 +389,7 @@ export class PowerEstimator {
   private boostHeaterSinceMs: number | null = null;
   private compressorWasOn = false;
   private compressorStopMs: number | null = null;
+  private compressorLastOnMs: number | null = null;
   private heaterWasOn = false;
   private flowSamples: number[];
   private segment: { startMs: number; lastMs: number; tank0: number; tankLast: number; kSeconds: number; clean: boolean } | null = null;
@@ -520,8 +524,11 @@ export class PowerEstimator {
     // (~12 l/min) adds ~3.6 K. In space heating at ~30 l/min a step adds only ~1.4 K, too
     // little to see next to a running compressor with whole-degree sensors.
     const heaterOnK = compressorOn ? HEATER_ON_K + 1 : HEATER_ON_K;
+    // Without a demand only a tank rising on its own counts, not one still settling after a
+    // compressor run (seen: THO 2 K above TWO and the tank +1 K right after a DHW run).
+    const settledFrom = this.compressorLastOnMs == null ? -Infinity : this.compressorLastOnMs + TANK_SETTLE_MS;
     const heaterPossible = this.config.backupHeaterKw > 0 && heaterDt >= heaterOnK && waterSteady
-      && (demand || this.tankRising());
+      && (demand || this.tankRising(settledFrom));
     if (!heaterPossible) this.heaterSinceMs = null;
     else if (this.heaterSinceMs == null) this.heaterSinceMs = s.timeMs;
     // Boost: Toshiba switches the backup heater on at once and keeps it on until the tank
@@ -560,7 +567,10 @@ export class PowerEstimator {
       const missedMs = s.timeMs - this.compressorStopMs - (s.timeMs - prev.timeMs) / 2;
       backfillKwh = (heaterKw * Math.max(0, missedMs)) / 3_600_000;
     }
-    if (compressorOn) this.compressorStopMs = null;
+    if (compressorOn) {
+      this.compressorStopMs = null;
+      this.compressorLastOnMs = s.timeMs;
+    }
     this.compressorWasOn = compressorOn;
     this.heaterWasOn = heaterKw > 0;
 
@@ -643,6 +653,7 @@ export class PowerEstimator {
     this.boostHeaterSinceMs = null;
     this.compressorWasOn = false;
     this.compressorStopMs = null;
+    this.compressorLastOnMs = null;
     this.heaterWasOn = false;
     this.segment = null;
     this.tankHistory = [];
@@ -659,8 +670,9 @@ export class PowerEstimator {
   }
 
   /** Tank temperature rose by ≥ 1 K over the last 10 minutes. */
-  private tankRising(): boolean {
-    const h = this.tankHistory;
+  /** The tank rose at least 1 K within the last 10 minutes (counting from `sinceMs`). */
+  private tankRising(sinceMs = -Infinity): boolean {
+    const h = this.tankHistory.filter((x) => x.t >= sinceMs);
     return h.length >= 2 && h[h.length - 1].c - Math.min(...h.map((x) => x.c)) >= 1;
   }
 

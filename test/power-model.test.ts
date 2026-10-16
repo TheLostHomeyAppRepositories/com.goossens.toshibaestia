@@ -410,6 +410,18 @@ function meterReplay(file: string, config = R32_1101_METERED) {
   };
 }
 
+test('power meter: no backup heater after a hot-water run with nothing asked for (2026-10-16)', () => {
+  // The DHW timer ends at 12:01 (local); the tank still creeps up 1 K while it settles and
+  // THO stays 1–2 K above TWO as the heater vessel cools slower. The meter shows 11–12 W:
+  // no heater, so neither a heater reading nor a hand-over backfill after the stop.
+  const { rows, readings, err } = meterReplay('r32s1-1101-em-dhw-cooldown-2026-10-16.csv');
+  const stop = rows.findIndex((r) => r.timeMs >= Date.parse('2026-10-16T10:01:00Z'));
+  const after = readings.slice(stop + 1);
+  assert.ok(after.every((x) => x.heaterW === 0), `heater seen at ${after.findIndex((x) => x.heaterW > 0)}`);
+  assert.equal(after.reduce((s, x) => s + x.backfillKwh, 0), 0);
+  assert.ok(Math.abs(err) < 0.1, `energy off by ${(err * 100).toFixed(1)} %`);
+});
+
 test('power meter: every recorded run within 10 % of the measured energy (2026-10-13)', () => {
   for (const file of [
     'r32s1-1101-em-dhw-2026-10-13.csv', // hot water 29 → 45 °C, up to 80 Hz
