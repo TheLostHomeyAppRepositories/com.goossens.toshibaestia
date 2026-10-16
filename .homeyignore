@@ -4,3 +4,5 @@ tsconfig.json
 AGENTS.md
 test/
 .vscode/
+scripts/
+variants/

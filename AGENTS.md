@@ -278,6 +278,15 @@ modbus-serial's `client.isOpen` is unreliable for half-closed sockets — it onl
 > Homey (e.g. a Shelly EM on its circuit), the user should exclude this device from Energy, or Homey counts it twice
 > (seen 2026-10-14 on Jo's Homey). README (13 languages) says so.
 >
+> **Two build variants (since 1.2.1):** Athom rejected build 24 (1.2.0) for `homey:manager:api` (guideline 1.15:
+> only for apps whose core function needs it, e.g. tools apps; their suggestion: Flow cards "Report measured power" /
+> "Report energy meter"). The committed manifests are the **App Store variant** (no permission, no `api`, no
+> `button.test_meter`, no repair view, no `externalMeter` setting). `npm run install:local` (`scripts/install-local.js`)
+> adds those parts from `variants/external-meter.json`, runs `homey app install` (`-- --run` for `homey app run`) and
+> restores the files. At runtime `app.externalMeterAvailable()` checks the manifest permission; without it the device
+> drops `button.test_meter`, skips the meter and always shows the estimate, and the settings page hides the meter
+> section. Publish with plain `homey app publish` (store variant); store texts don't mention the meter.
+>
 > **External meter (1.2.0):** like Cortex AI's brains, two ways to edit: **Repair** on the heat pump (custom view
 > `repair/external_meter.html`, `onRepair` handlers `init`/`save`) and the app settings page; a read-only device
 > setting `externalMeter` shows the linked meter and its hint explains both. Maintenance action `button.test_meter`

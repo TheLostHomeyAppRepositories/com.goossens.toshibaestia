@@ -4,9 +4,6 @@ require('source-map-support').install();
 import { ModbusController } from './modbus/controller';
 import { ApiDevice, MeterChoice, meterChoices } from './drivers/heatpump/external-meter';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { HomeyAPI } = require('homey-api');
-
 /** One heat pump on the settings page with the meter linked to it (null: the estimate). */
 export interface MeterLink {
   deviceId: string;
@@ -58,13 +55,26 @@ export default class ToshibaEstiaApp extends Homey.App {
   }
 
   /**
+   * The external meter needs the homey:manager:api permission, which the App Store build may not
+   * have. Only a local install adds it (scripts/install-local.js); without it the meter is off.
+   */
+  externalMeterAvailable(): boolean {
+    const permissions: unknown = this.homey.manifest?.permissions;
+    return Array.isArray(permissions) && permissions.includes('homey:manager:api');
+  }
+
+  /**
    * Homey's Web API, used only to read an external meter the user links to a heat pump
    * (permission homey:manager:api). Created on first use.
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   getHomeyApi(): Promise<any> {
+    if (!this.externalMeterAvailable()) return Promise.reject(new Error('External meter not available in this build'));
     // One shared instance, also when several heat pumps ask at once during start-up.
     if (!this.homeyApi) {
+      // Loaded on first use only: the App Store build never needs it.
+      // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
+      const { HomeyAPI } = require('homey-api');
       this.homeyApi = HomeyAPI.createAppAPI({ homey: this.homey }).catch((err: unknown) => {
         this.homeyApi = null;
         throw err;

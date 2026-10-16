@@ -25,7 +25,7 @@
     <p class="homey-subtitle" data-i18n="settings.subtitle"></p>
   </header>
 
-  <fieldset class="homey-form-fieldset">
+  <fieldset id="meter-section" class="homey-form-fieldset">
     <legend class="homey-form-legend" data-i18n="settings.meter_legend"></legend>
     <p class="homey-form-help" data-i18n="settings.meter_help"></p>
     <div id="meters"></div>
@@ -129,7 +129,15 @@
       }
 
       async function loadMeters() {
-        renderMeters(await api('GET', '/links'));
+        let links;
+        try {
+          links = await api('GET', '/links');
+        } catch (err) {
+          // App Store build: no external meter (the endpoints only exist in a local install).
+          document.getElementById('meter-section').classList.add('hidden');
+          return;
+        }
+        renderMeters(links);
       }
 
       async function openEditor(link) {

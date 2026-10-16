@@ -8,7 +8,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "node --test -r ts-node/register test/*.test.ts",
-    "modbus-test": "ts-node modbus-test/test-read.ts"
+    "modbus-test": "ts-node modbus-test/test-read.ts",
+    "install:local": "node scripts/install-local.js"
   },
   "dependencies": {
     "homey-api": "^3.20.1",

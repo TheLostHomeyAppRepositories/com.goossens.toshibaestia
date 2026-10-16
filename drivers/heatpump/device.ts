@@ -284,9 +284,10 @@ const ALWAYS_ON_CAPABILITIES: Array<[string, Record<string, unknown>?]> = [
     ar: 'متوسط درجة الحرارة الخارجية',
   } }],
   ['season'],
-  // External meter (1.2.0): maintenance action, options from the manifest
-  ['button.test_meter'],
 ];
+
+/** External meter (1.2.0): maintenance action, only in a build with homey:manager:api (local install). */
+const METER_CAPABILITIES = ['button.test_meter'];
 
 /** Registers always polled, independent of optional features. */
 const ALWAYS_ON_REGISTERS = [
@@ -428,6 +429,8 @@ export default class HeatpumpDevice extends Homey.Device {
 
   /** The meter linked on the app settings page, or null for the estimate. */
   public getExternalMeterId(): string | null {
+    // App Store build: no meter. The stored link stays for a later local install.
+    if (!this.app.externalMeterAvailable()) return null;
     return (this.getStoreValue('externalMeterId') as string | null) ?? null;
   }
 
@@ -439,6 +442,7 @@ export default class HeatpumpDevice extends Homey.Device {
 
   /** Links a meter (any Homey device with measure_power) or unlinks it with null. */
   public async setExternalMeter(meterId: string | null): Promise<void> {
+    if (!this.app.externalMeterAvailable()) throw new Error('External meter not available in this build');
     // One meter per heat pump: linked to two, Homey Energy would count it twice.
     const other = meterId
       ? (this.driver.getDevices() as HeatpumpDevice[]).find((d) => d !== this && d.getExternalMeterId() === meterId)
@@ -457,6 +461,7 @@ export default class HeatpumpDevice extends Homey.Device {
    * opened is retried every 5 minutes; the estimate is used meanwhile.
    */
   private async refreshExternalMeter(): Promise<void> {
+    if (!this.app.externalMeterAvailable()) return;
     const link = this.meterLink;
     if (!link) {
       if (this.getExternalMeterId() && Date.now() - this.meterOpenedMs >= 5 * 60_000) await this.applyExternalMeter();
@@ -502,6 +507,11 @@ export default class HeatpumpDevice extends Homey.Device {
   /** Opens the linked meter through Homey's Web API and marks power as measured or estimated. */
   private async applyExternalMeter(): Promise<void> {
     this.closeExternalMeter();
+    // App Store build: no meter, always the estimate.
+    if (!this.app.externalMeterAvailable()) {
+      await this.applyPowerCapabilityOptions(false);
+      return;
+    }
     this.meterOpenedMs = Date.now();
     const meterId = this.getExternalMeterId();
     let missing = false;
@@ -659,6 +669,7 @@ export default class HeatpumpDevice extends Homey.Device {
     };
     await ensure(s.enableZone2, OPTIONAL_CAPABILITIES.zone2);
     await ensure(s.enableDhw, OPTIONAL_CAPABILITIES.dhw);
+    await ensure(this.app.externalMeterAvailable(), METER_CAPABILITIES);
 
     // Always-on caps may be missing for devices paired before a given cap was added.
     for (const [cap] of ALWAYS_ON_CAPABILITIES) {
